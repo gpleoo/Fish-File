@@ -1,0 +1,2556 @@
+<!--
+================================================================================
+Fish File - Diario di Pesca
+================================================================================
+
+Copyright © 2025 Giampietro Leonoro
+Data di creazione: 5 Novembre 2025
+Tutti i diritti riservati.
+
+ATTENZIONE:
+Questo software è protetto da copyright. È VIETATO copiare, modificare,
+distribuire o utilizzare questo codice senza il consenso scritto esplicito
+dell'autore Giampietro Leonoro.
+
+Per richieste di autorizzazione, consultare il file LICENSE.
+
+================================================================================
+-->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>diario di pesca</title>
+    <link rel="icon" type="image/png" href="https://github.com/gpleoo/FishAI/blob/main/logoFishAI.png?raw=true">
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overscroll-behavior: none; }
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); transform: scale(1.5); }
+
+        /* Animazione splash screen: fade in + crescita progressiva da 60% a 100% in 5s */
+        @keyframes splashFade {
+            0% { opacity: 0; transform: scale(0.6); }
+            10% { opacity: 1; transform: scale(0.64); }
+            90% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const Fish = (props) => <svg {...props} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-1 3.46-3.44 6-7 6s-7.56-2.54-8.5-6Z"/><path d="M18 12v.5M16 17.5v1M13 20v2M10 20v2M7 17.5v1M6 12v.5"/></svg>;
+        const Cloud = (props) => <svg {...props} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>;
+        const Wrench = (props) => <svg {...props} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>;
+        const BarChart3 = (props) => <svg {...props} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 3v18h18M13 17V9m-4 8V5m8 12v-4"/></svg>;
+        const ChevronDown = (props) => <svg {...props} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>;
+        const ChevronUp = (props) => <svg {...props} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></svg>;
+        const Plus = (props) => <svg {...props} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5 12h14m-7-7v14"/></svg>;
+        const Trash2 = (props) => <svg {...props} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>;
+        const Edit = (props) => <svg {...props} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>;
+        const Mic = (props) => <svg {...props} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>;
+
+        const InputField = ({ label, value, onChange, type = "text", placeholder = "", min, max, step }) => (
+            <div className="mb-4">
+                <label className="block text-cyan-400 text-sm font-semibold mb-2">{label}</label>
+                <input type={type} value={value} onChange={onChange} placeholder={placeholder} min={min} max={max} step={step}
+                    className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white text-lg focus:border-cyan-500 focus:outline-none" style={{colorScheme: 'dark'}} />
+            </div>
+        );
+
+        const SelectField = ({ label, value, onChange, options, placeholder }) => (
+            <div className="mb-4">
+                <label className="block text-cyan-400 text-sm font-semibold mb-2">{label}</label>
+                <input list={`${label}-list`} value={value} onChange={onChange} placeholder={placeholder}
+                    className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white text-lg focus:border-cyan-500 focus:outline-none" />
+                <datalist id={`${label}-list`}>{[...options].sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })).map((opt, i) => <option key={i} value={opt} />)}</datalist>
+            </div>
+        );
+
+        const Section = ({ icon: Icon, title, isActive, onToggle, children }) => (
+            <div className="mb-4 rounded-xl overflow-hidden bg-gray-900 border-2 border-gray-700">
+                <button onClick={onToggle} className="w-full flex items-center justify-between p-5 active:bg-gray-800">
+                    <div className="flex items-center gap-4">
+                        <Icon className="text-cyan-400" width={28} height={28} />
+                        <h2 className="text-2xl font-bold text-cyan-400">{title}</h2>
+                    </div>
+                    {isActive ? <ChevronUp className="text-cyan-400" width={28} height={28} /> : <ChevronDown className="text-cyan-400" width={28} height={28} />}
+                </button>
+                {isActive && <div className="p-6 border-t-2 border-gray-700 bg-black/30">{children}</div>}
+            </div>
+        );
+
+        function DiarioPesca() {
+            const [activeSection, setActiveSection] = useState(null);
+            
+            const [catture, setCatture] = useState(() => {
+                try {
+                    const salvate = localStorage.getItem('diarioPesca_catture');
+                    return salvate ? JSON.parse(salvate) : [];
+                } catch (e) {
+                    console.error('Errore caricamento catture:', e);
+                    return [];
+                }
+            });
+            const [specieMemorizzate, setSpecieMemorizzate] = useState(() => {
+                try {
+                    const salvate = localStorage.getItem('diarioPesca_specie');
+                    const specieDefault = ['Cefalo', 'Gronco', 'Leccia stella', 'Marmora', 'Occhiata', 'Ombrina', 'Opa', 'Orata', 'Pesce serra', 'Sarago', 'Spigola', 'Sughero'];
+                    const array = salvate ? JSON.parse(salvate) : specieDefault;
+                    return array.sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }));
+                } catch (e) {
+                    console.error('Errore caricamento specie:', e);
+                    return ['Cefalo', 'Gronco', 'Leccia stella', 'Marmora', 'Occhiata', 'Ombrina', 'Opa', 'Orata', 'Pesce serra', 'Sarago', 'Spigola', 'Sughero'];
+                }
+            });
+            const [escheMemorizzate, setEscheMemorizzate] = useState(() => {
+                try {
+                    const salvate = localStorage.getItem('diarioPesca_esche');
+                    const escheDefault = ['Americano', 'Arenicola', 'Bibi', 'Canolicchio', 'Cefalo', 'Coreano', 'Gambero', 'Granchio', 'Muriddu', 'Seppia'];
+                    const array = salvate ? JSON.parse(salvate) : escheDefault;
+                    return array.sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }));
+                } catch (e) {
+                    console.error('Errore caricamento esche:', e);
+                    return ['Americano', 'Arenicola', 'Bibi', 'Canolicchio', 'Cefalo', 'Coreano', 'Gambero', 'Granachio', 'Muriddu', 'Seppia'];
+                }
+            });
+            const [localitaMemorizzate, setLocalitaMemorizzate] = useState(() => {
+                try {
+                    const salvate = localStorage.getItem('diarioPesca_localita');
+                    const array = salvate ? JSON.parse(salvate) : [];
+                    return array.sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }));
+                } catch (e) {
+                    console.error('Errore caricamento località:', e);
+                    return [];
+                }
+            });
+            const [noteMemorizzate, setNoteMemorizzate] = useState(() => {
+                try {
+                    const salvate = localStorage.getItem('diarioPesca_note');
+                    const array = salvate ? JSON.parse(salvate) : [];
+                    return array.sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }));
+                } catch (e) {
+                    console.error('Errore caricamento note:', e);
+                    return [];
+                }
+            });
+            const [canneMemorizzate, setCanneMemorizzate] = useState(() => {
+                try {
+                    const salvate = localStorage.getItem('diarioPesca_canne');
+                    const array = salvate ? JSON.parse(salvate) : [];
+                    return array.sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }));
+                } catch (e) {
+                    console.error('Errore caricamento canne:', e);
+                    return [];
+                }
+            });
+            const [traviMemorizzate, setTraviMemorizzate] = useState(() => {
+                try {
+                    const salvate = localStorage.getItem('diarioPesca_travi');
+                    const array = salvate ? JSON.parse(salvate) : [];
+                    return array.sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }));
+                } catch (e) {
+                    console.error('Errore caricamento travi:', e);
+                    return [];
+                }
+            });
+            const [amiMemorizzati, setAmiMemorizzati] = useState(() => {
+                try {
+                    const salvate = localStorage.getItem('diarioPesca_ami');
+                    const amiDefault = ['1/0', '2/0', '2', '4', '6', '8', '10'];
+                    const array = salvate ? JSON.parse(salvate) : amiDefault;
+                    return array.sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }));
+                } catch (e) {
+                    console.error('Errore caricamento ami:', e);
+                    return ['1/0', '2/0', '2', '4', '6', '8', '10'];
+                }
+            });
+            const [piombiMemorizzati, setPiombiMemorizzati] = useState(() => {
+                try {
+                    const salvate = localStorage.getItem('diarioPesca_piombi');
+                    const piombiDefault = ['Idropiramide 100', 'Idropiramide 125', 'Idropiramide 150', 'Idropiramide 175', 'Ogiva 50', 'Ogiva 75', 'Ogiva 100', 'Ogiva 125', 'Ogiva 150', 'Ogiva 175', 'Palla 100', 'Palla 125', 'Palla 150', 'Palla 175', 'Sporten 100', 'Sporten 125', 'Sporten 150', 'Sporten 175'];
+                    const array = salvate ? JSON.parse(salvate) : piombiDefault;
+                    return array.sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }));
+                } catch (e) {
+                    console.error('Errore caricamento piombi:', e);
+                    return ['Idropiramide 100', 'Idropiramide 125', 'Idropiramide 150', 'Idropiramide 175', 'Ogiva 50', 'Ogiva 75', 'Ogiva 100', 'Ogiva 125', 'Ogiva 150', 'Ogiva 175', 'Palla 100', 'Palla 125', 'Palla 150', 'Palla 175', 'Sporten 100', 'Sporten 125', 'Sporten 150', 'Sporten 175'];
+                }
+            });
+            const [sessioneAttiva, setSessioneAttiva] = useState(() => {
+                try {
+                    const salvata = localStorage.getItem('diarioPesca_sessioneAttiva');
+                    return salvata ? JSON.parse(salvata) : false;
+                } catch (e) {
+                    console.error('Errore caricamento sessione attiva:', e);
+                    return false;
+                }
+            });
+            const [datiSessione, setDatiSessione] = useState(() => {
+                try {
+                    const salvati = localStorage.getItem('diarioPesca_datiSessione');
+                    return salvati ? JSON.parse(salvati) : { localita: '', latitudine: '', longitudine: '' };
+                } catch (e) {
+                    console.error('Errore caricamento dati sessione:', e);
+                    return { localita: '', latitudine: '', longitudine: '' };
+                }
+            });
+            const [sessioneCorrente, setSessioneCorrente] = useState(() => {
+                try {
+                    const salvata = localStorage.getItem('diarioPesca_sessioneCorrente');
+                    return salvata ? JSON.parse(salvata) : null;
+                } catch (e) {
+                    console.error('Errore caricamento sessione corrente:', e);
+                    return null;
+                }
+            });
+            const [sessioniCompletate, setSessioniCompletate] = useState(() => {
+                try {
+                    const salvate = localStorage.getItem('diarioPesca_sessioniCompletate');
+                    return salvate ? JSON.parse(salvate) : [];
+                } catch (e) {
+                    console.error('Errore caricamento sessioni completate:', e);
+                    return [];
+                }
+            });
+
+            const [mostraRegistro, setMostraRegistro] = useState(false); // Collassabile
+            const [mostraGestioneSessioni, setMostraGestioneSessioni] = useState(false); // Collassabile: gestione sessioni
+            const [mostraCatture, setMostraCatture] = useState(false); // Collassabile: mostra catture
+            const [mostraSplash, setMostraSplash] = useState(true); // Splash screen iniziale
+
+            // Stati collassabili per sezioni gestione
+            const [mostraLocalita, setMostraLocalita] = useState(false);
+            const [mostraSpecie, setMostraSpecie] = useState(false);
+            const [mostraEsche, setMostraEsche] = useState(false);
+            const [mostraCanne, setMostraCanne] = useState(false);
+            const [mostraTravi, setMostraTravi] = useState(false);
+            const [mostraAmi, setMostraAmi] = useState(false);
+            const [mostraPiombi, setMostraPiombi] = useState(false);
+
+            // Stati collassabili per filtri e mappa
+            const [mostraFiltri, setMostraFiltri] = useState(false);
+            const [mostraMappa, setMostraMappa] = useState(false);
+
+            // Stato collassabile per sessione di pesca
+            const [mostraSessionePesca, setMostraSessionePesca] = useState(false);
+
+            // Stati per paginazione e viste espanse
+            const [paginaCatture, setPaginaCatture] = useState(0);
+            const [paginaSessioni, setPaginaSessioni] = useState(0);
+            const [cattureEspanse, setCattureEspanse] = useState({});
+            const [sessioniEspanse, setSessioniEspanse] = useState({});
+            const [messaggioErrore, setMessaggioErrore] = useState('');
+            const [nuovaSpecie, setNuovaSpecie] = useState('');
+            const [nuovaEsca, setNuovaEsca] = useState('');
+            const [nuovaCanna, setNuovaCanna] = useState('');
+            const [nuovoTrave, setNuovoTrave] = useState('');
+            const [nuovoAmo, setNuovoAmo] = useState('');
+            const [nuovoPiombo, setNuovoPiombo] = useState('');
+            const [nuovaLocalita, setNuovaLocalita] = useState('');
+            const [editandoLocalita, setEditandoLocalita] = useState(null);
+            const [valoreEditLocalita, setValoreEditLocalita] = useState('');
+            const [editandoSpecie, setEditandoSpecie] = useState(null);
+            const [valoreEditSpecie, setValoreEditSpecie] = useState('');
+            const [editandoEsca, setEditandoEsca] = useState(null);
+            const [valoreEditEsca, setValoreEditEsca] = useState('');
+            const [editandoCanna, setEditandoCanna] = useState(null);
+            const [valoreEditCanna, setValoreEditCanna] = useState('');
+            const [editandoTrave, setEditandoTrave] = useState(null);
+            const [valoreEditTrave, setValoreEditTrave] = useState('');
+            const [editandoAmo, setEditandoAmo] = useState(null);
+            const [valoreEditAmo, setValoreEditAmo] = useState('');
+            const [editandoPiombo, setEditandoPiombo] = useState(null);
+            const [valoreEditPiombo, setValoreEditPiombo] = useState('');
+
+            // Stati Assistente Vocale
+            const [assistenteVocaleAttivo, setAssistenteVocaleAttivo] = useState(false);
+            const [statoConversazione, setStatoConversazione] = useState('INATTIVO'); // INATTIVO, SPECIE, LUNGHEZZA, ESCA, CONFERMA_REGISTRA
+            const [messaggioVocale, setMessaggioVocale] = useState('');
+            const [riconoscimentoAttivo, setRiconoscimentoAttivo] = useState(false);
+            const recognitionRef = useRef(null);
+            const datiCatturaVocaleRef = useRef({ specie: '', lunghezza: '', esca: '' }); // Fix: per sincronizzare dati cattura
+            const specieMemorizzateVocaleRef = useRef([]); // Fix: per sincronizzare lista specie aggiornata
+            const escheMemorizzateVocaleRef = useRef([]); // Fix: per sincronizzare lista esche aggiornata
+
+            const mapRef = useRef(null);
+
+            // Sincronizza ref con liste specie/esche quando cambiano (fix bug riconoscimento vocale dopo aggiunta)
+            useEffect(() => { specieMemorizzateVocaleRef.current = specieMemorizzate; }, [specieMemorizzate]);
+            useEffect(() => { escheMemorizzateVocaleRef.current = escheMemorizzate; }, [escheMemorizzate]);
+
+            useEffect(() => { try { localStorage.setItem('diarioPesca_catture', JSON.stringify(catture)); } catch (e) { console.error('Errore salvataggio catture:', e); } }, [catture]);
+            useEffect(() => { try { localStorage.setItem('diarioPesca_specie', JSON.stringify(specieMemorizzate)); } catch (e) { console.error('Errore salvataggio specie:', e); } }, [specieMemorizzate]);
+            useEffect(() => { try { localStorage.setItem('diarioPesca_esche', JSON.stringify(escheMemorizzate)); } catch (e) { console.error('Errore salvataggio esche:', e); } }, [escheMemorizzate]);
+            useEffect(() => { try { localStorage.setItem('diarioPesca_localita', JSON.stringify(localitaMemorizzate)); } catch (e) { console.error('Errore salvataggio località:', e); } }, [localitaMemorizzate]);
+            useEffect(() => { try { localStorage.setItem('diarioPesca_note', JSON.stringify(noteMemorizzate)); } catch (e) { console.error('Errore salvataggio note:', e); } }, [noteMemorizzate]);
+            useEffect(() => { try { localStorage.setItem('diarioPesca_canne', JSON.stringify(canneMemorizzate)); } catch (e) { console.error('Errore salvataggio canne:', e); } }, [canneMemorizzate]);
+            useEffect(() => { try { localStorage.setItem('diarioPesca_travi', JSON.stringify(traviMemorizzate)); } catch (e) { console.error('Errore salvataggio travi:', e); } }, [traviMemorizzate]);
+            useEffect(() => { try { localStorage.setItem('diarioPesca_ami', JSON.stringify(amiMemorizzati)); } catch (e) { console.error('Errore salvataggio ami:', e); } }, [amiMemorizzati]);
+            useEffect(() => { try { localStorage.setItem('diarioPesca_piombi', JSON.stringify(piombiMemorizzati)); } catch (e) { console.error('Errore salvataggio piombi:', e); } }, [piombiMemorizzati]);
+            useEffect(() => { try { localStorage.setItem('diarioPesca_sessioneAttiva', JSON.stringify(sessioneAttiva)); } catch (e) { console.error('Errore salvataggio sessione attiva:', e); } }, [sessioneAttiva]);
+            useEffect(() => { try { localStorage.setItem('diarioPesca_datiSessione', JSON.stringify(datiSessione)); } catch (e) { console.error('Errore salvataggio dati sessione:', e); } }, [datiSessione]);
+            useEffect(() => { try { localStorage.setItem('diarioPesca_sessioneCorrente', JSON.stringify(sessioneCorrente)); } catch (e) { console.error('Errore salvataggio sessione corrente:', e); } }, [sessioneCorrente]);
+            useEffect(() => { try { localStorage.setItem('diarioPesca_sessioniCompletate', JSON.stringify(sessioniCompletate)); } catch (e) { console.error('Errore salvataggio sessioni completate:', e); } }, [sessioniCompletate]);
+
+            // Timer splash screen: mostra per 5 secondi poi nasconde
+            useEffect(() => {
+                const timer = setTimeout(() => {
+                    setMostraSplash(false);
+                }, 5000);
+                return () => clearTimeout(timer);
+            }, []);
+
+            // Reset pagine quando cambiano i filtri
+            useEffect(() => {
+                setPaginaCatture(0);
+                setPaginaSessioni(0);
+            }, [filtri]);
+
+            const getOraItalianaAttuale = () => {
+                try {
+                    return new Date().toLocaleTimeString('it-IT', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', hour12: false });
+                } catch (e) {
+                    // Fallback senza timezone specifico
+                    console.error('Errore timezone:', e);
+                    return new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', hour12: false });
+                }
+            };
+            const getDataItalianaAttuale = () => new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0];
+
+            const [nuovaCattura, setNuovaCattura] = useState({
+                data: getDataItalianaAttuale(), ora: getOraItalianaAttuale(), specie: '', peso: '', lunghezza: '', 
+                localita: '', latitudine: '', longitudine: '', esca: '', canna: '', trave: '', amo: '', piombo: '', note: ''
+            });
+
+            const [meteo, setMeteo] = useState({
+                data: getDataItalianaAttuale(), localita: '', temperatura: '', temperaturaAcqua: '', pressione: '', 
+                vento: '', direzioneVento: '', condizioni: '', faseLunare: '', altaMareaOra: '', bassaMareaOra: '',
+                altezzaOnde: '', frequenzaOnde: ''
+            });
+
+            const [filtri, setFiltri] = useState({ anno: 'tutti', mese: 'tutti', specie: 'tutte', direzioneVento: 'tutte', condizioni: 'tutte', localita: 'tutte', temperatura: 'tutte', pressione: 'tutte', vento: 'tutti', faseLunare: 'tutte' });
+
+            const ventiRosaDeiVenti = [
+                'N (Tramontana - 4°/1° Quadrante - 0°)',
+                'NNE (Tramontana-Grecale - 1° Quadrante - 22,5°)',
+                'NE (Grecale - 1° Quadrante - 45°)',
+                'ENE (Grecale-Levante - 1° Quadrante - 67,5°)',
+                'E (Levante - 1°/2° Quadrante - 90°)',
+                'ESE (Levante-Scirocco - 2° Quadrante - 112,5°)',
+                'SE (Scirocco - 2° Quadrante - 135°)',
+                'SSE (Scirocco-Ostro - 2° Quadrante - 157,5°)',
+                'S (Ostro - 2°/3° Quadrante - 180°)',
+                'SSW (Ostro-Libeccio - 3° Quadrante - 202,5°)',
+                'SW (Libeccio - 3° Quadrante - 225°)',
+                'WSW (Libeccio-Ponente - 3° Quadrante - 247,5°)',
+                'W (Ponente - 3°/4° Quadrante - 270°)',
+                'WNW (Ponente-Maestrale - 4° Quadrante - 292,5°)',
+                'NW (Maestrale - 4° Quadrante - 315°)',
+                'NNW (Maestrale-Tramontana - 4° Quadrante - 337,5°)'
+            ];
+            const fasiLunari = ['luna nuova', 'crescente', 'primo quarto', 'gibbosa crescente', 'piena', 'gibbosa calante', 'ultimo quarto', 'calante'];
+            const condizioniMeteo = ['sereno', 'nuvoloso', 'coperto', 'pioggia', 'temporale', 'nebbia'];
+
+            const avviaSessione = () => {
+                if (!datiSessione.localita || !datiSessione.latitudine || !datiSessione.longitudine) {
+                    alert('compila tutti i campi!'); return;
+                }
+                
+                // Valida coordinate
+                const validazione = validaCoordinate(datiSessione.latitudine, datiSessione.longitudine);
+                if (!validazione.valid) {
+                    alert(`⚠️ ATTENZIONE: ${validazione.error}\n\nVerifica le coordinate prima di continuare!`);
+                    return;
+                }
+                
+                if (datiSessione.localita.trim() && !localitaMemorizzate.includes(datiSessione.localita.trim())) {
+                    setLocalitaMemorizzate([...localitaMemorizzate, datiSessione.localita.trim()]);
+                }
+                
+                // Crea nuova sessione
+                const nuovaSessione = {
+                    id: Date.now(),
+                    localita: datiSessione.localita,
+                    latitudine: parseFloat(datiSessione.latitudine),
+                    longitudine: parseFloat(datiSessione.longitudine),
+                    dataInizio: getDataItalianaAttuale(),
+                    oraInizio: getOraItalianaAttuale(),
+                    dataFine: null,
+                    oraFine: null,
+                    numeroCatture: 0
+                };
+                
+                setSessioneCorrente(nuovaSessione);
+                setSessioneAttiva(true);
+                setNuovaCattura(p => ({...p, localita: datiSessione.localita, latitudine: datiSessione.latitudine, longitudine: datiSessione.longitudine}));
+                setMeteo(p => ({...p, localita: datiSessione.localita}));
+            };
+
+            const terminaSessione = () => {
+                // Fix: chiudi assistente vocale se attivo quando termina sessione
+                if (assistenteVocaleAttivo) {
+                    fermaAssistenteVocale();
+                }
+
+                if (sessioneCorrente) {
+                    // Conta SOLO le catture con l'ID di questa sessione specifica
+                    const cattureQuesta = catture.filter(c => c.sessioneId === sessioneCorrente.id).length;
+
+                    // Completa la sessione
+                    const sessioneCompletata = {
+                        ...sessioneCorrente,
+                        dataFine: getDataItalianaAttuale(),
+                        oraFine: getOraItalianaAttuale(),
+                        numeroCatture: cattureQuesta
+                    };
+
+                    // Aggiungi alle sessioni completate
+                    setSessioniCompletate([...sessioniCompletate, sessioneCompletata]);
+                }
+
+                setSessioneAttiva(false);
+                setSessioneCorrente(null);
+                setDatiSessione({ localita: '', latitudine: '', longitudine: '' });
+            };
+            
+            const ottieniPosizioneGPS = () => {
+                if (!navigator.geolocation) {
+                    alert('❌ Geolocalizzazione non supportata dal tuo browser!');
+                    return;
+                }
+
+                alert('📍 Richiesta posizione GPS in corso...');
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+
+                        setDatiSessione(p => ({
+                            ...p,
+                            latitudine: lat.toFixed(6),
+                            longitudine: lng.toFixed(6)
+                        }));
+
+                        alert(`✅ Posizione GPS acquisita con successo!\n\nPrecisione: ±${Math.round(position.coords.accuracy)}m`);
+                    },
+                    (error) => {
+                        let testoErrore = '❌ Impossibile ottenere la posizione GPS!\n\n';
+
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                testoErrore += 'Hai negato l\'accesso alla posizione. Abilita i permessi nelle impostazioni del browser.';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                testoErrore += 'Posizione non disponibile. Verifica di essere all\'aperto con GPS attivo.';
+                                break;
+                            case error.TIMEOUT:
+                                testoErrore += 'Timeout nella richiesta GPS. Riprova.';
+                                break;
+                            default:
+                                testoErrore += 'Errore sconosciuto.';
+                        }
+
+                        alert(testoErrore);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            };
+            const applicaFiltri = () => setMostraRegistro(true);
+
+            const aggiungiCattura = () => {
+                if (!sessioneAttiva) {
+                    setMessaggioErrore('avvia prima una sessione di pesca');
+                    return;
+                }
+                if (!nuovaCattura.specie) {
+                    setMessaggioErrore('inserisci la specie della cattura');
+                    return;
+                }
+
+                // Valida coordinate se presenti
+                if (nuovaCattura.latitudine && nuovaCattura.longitudine) {
+                    const validazione = validaCoordinate(nuovaCattura.latitudine, nuovaCattura.longitudine);
+                    if (!validazione.valid) {
+                        setMessaggioErrore(`⚠️ Coordinate non valide: ${validazione.error}`);
+                        return;
+                    }
+                }
+
+                setMessaggioErrore('');
+                
+                if (nuovaCattura.specie && !specieMemorizzate.includes(nuovaCattura.specie)) setSpecieMemorizzate([...specieMemorizzate, nuovaCattura.specie]);
+                if (nuovaCattura.esca && !escheMemorizzate.includes(nuovaCattura.esca)) setEscheMemorizzate([...escheMemorizzate, nuovaCattura.esca]);
+                if (nuovaCattura.localita && !localitaMemorizzate.includes(nuovaCattura.localita)) setLocalitaMemorizzate([...localitaMemorizzate, nuovaCattura.localita]);
+                if (nuovaCattura.note && !noteMemorizzate.includes(nuovaCattura.note)) setNoteMemorizzate([...noteMemorizzate, nuovaCattura.note]);
+                if (nuovaCattura.canna && !canneMemorizzate.includes(nuovaCattura.canna)) setCanneMemorizzate([...canneMemorizzate, nuovaCattura.canna]);
+                if (nuovaCattura.trave && !traviMemorizzate.includes(nuovaCattura.trave)) setTraviMemorizzate([...traviMemorizzate, nuovaCattura.trave]);
+                if (nuovaCattura.amo && !amiMemorizzati.includes(nuovaCattura.amo)) setAmiMemorizzati([...amiMemorizzati, nuovaCattura.amo]);
+                if (nuovaCattura.piombo && !piombiMemorizzati.includes(nuovaCattura.piombo)) setPiombiMemorizzati([...piombiMemorizzati, nuovaCattura.piombo]);
+
+                setCatture([...catture, {...nuovaCattura, meteo: {...meteo}, id: Date.now(), sessioneId: sessioneCorrente.id}]);
+
+                setNuovaCattura({
+                    data: getDataItalianaAttuale(), ora: getOraItalianaAttuale(), specie: '', peso: '', lunghezza: '',
+                    localita: sessioneAttiva ? datiSessione.localita : '', latitudine: sessioneAttiva ? datiSessione.latitudine : '',
+                    longitudine: sessioneAttiva ? datiSessione.longitudine : '', esca: '',
+                    canna: nuovaCattura.canna, trave: nuovaCattura.trave, amo: nuovaCattura.amo, piombo: nuovaCattura.piombo, note: nuovaCattura.note
+                });
+                
+                // Messaggio di conferma
+                alert('✅ Cattura registrata con successo!');
+            };
+
+            const aggiungiSpecie = () => { if (nuovaSpecie.trim() && !specieMemorizzate.includes(nuovaSpecie.trim())) { setSpecieMemorizzate([...specieMemorizzate, nuovaSpecie.trim()].sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }))); setNuovaSpecie(''); }};
+            const aggiungiEsca = () => { if (nuovaEsca.trim() && !escheMemorizzate.includes(nuovaEsca.trim())) { setEscheMemorizzate([...escheMemorizzate, nuovaEsca.trim()].sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }))); setNuovaEsca(''); }};
+            const aggiungiCanna = () => { if (nuovaCanna.trim() && !canneMemorizzate.includes(nuovaCanna.trim())) { setCanneMemorizzate([...canneMemorizzate, nuovaCanna.trim()].sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }))); setNuovaCanna(''); }};
+            const aggiungiTrave = () => { if (nuovoTrave.trim() && !traviMemorizzate.includes(nuovoTrave.trim())) { setTraviMemorizzate([...traviMemorizzate, nuovoTrave.trim()].sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }))); setNuovoTrave(''); }};
+            const aggiungiAmo = () => { if (nuovoAmo.trim() && !amiMemorizzati.includes(nuovoAmo.trim())) { setAmiMemorizzati([...amiMemorizzati, nuovoAmo.trim()].sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }))); setNuovoAmo(''); }};
+            const aggiungiPiombo = () => { if (nuovoPiombo.trim() && !piombiMemorizzati.includes(nuovoPiombo.trim())) { setPiombiMemorizzati([...piombiMemorizzati, nuovoPiombo.trim()].sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }))); setNuovoPiombo(''); }};
+            const aggiungiLocalita = () => { if (nuovaLocalita.trim() && !localitaMemorizzate.includes(nuovaLocalita.trim())) { setLocalitaMemorizzate([...localitaMemorizzate, nuovaLocalita.trim()].sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }))); setNuovaLocalita(''); }};
+            
+            const modificaLocalita = (vecchioNome, nuovoNome) => {
+                if (!nuovoNome || !nuovoNome.trim()) {
+                    alert('Il nome non può essere vuoto!');
+                    return;
+                }
+                const nuovoNomeTrim = nuovoNome.trim();
+                if (localitaMemorizzate.includes(nuovoNomeTrim) && nuovoNomeTrim !== vecchioNome) {
+                    alert('Questa località esiste già!');
+                    return;
+                }
+                const nuoveLocalita = localitaMemorizzate.map(l => l === vecchioNome ? nuovoNomeTrim : l);
+                setLocalitaMemorizzate(nuoveLocalita.sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })));
+                setEditandoLocalita(null);
+            };
+
+            const modificaSpecie = (vecchioNome, nuovoNome) => {
+                if (!nuovoNome || !nuovoNome.trim()) {
+                    alert('Il nome non può essere vuoto!');
+                    return;
+                }
+                const nuovoNomeTrim = nuovoNome.trim();
+                if (specieMemorizzate.includes(nuovoNomeTrim) && nuovoNomeTrim !== vecchioNome) {
+                    alert('Questa specie esiste già!');
+                    return;
+                }
+                const nuoveSpecie = specieMemorizzate.map(s => s === vecchioNome ? nuovoNomeTrim : s);
+                setSpecieMemorizzate(nuoveSpecie.sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })));
+                setEditandoSpecie(null);
+            };
+
+            const modificaEsca = (vecchioNome, nuovoNome) => {
+                if (!nuovoNome || !nuovoNome.trim()) {
+                    alert('Il nome non può essere vuoto!');
+                    return;
+                }
+                const nuovoNomeTrim = nuovoNome.trim();
+                if (escheMemorizzate.includes(nuovoNomeTrim) && nuovoNomeTrim !== vecchioNome) {
+                    alert('Questa esca esiste già!');
+                    return;
+                }
+                const nuoveEsche = escheMemorizzate.map(e => e === vecchioNome ? nuovoNomeTrim : e);
+                setEscheMemorizzate(nuoveEsche.sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })));
+                setEditandoEsca(null);
+            };
+
+            const modificaCanna = (vecchioNome, nuovoNome) => {
+                if (!nuovoNome || !nuovoNome.trim()) {
+                    alert('Il nome non può essere vuoto!');
+                    return;
+                }
+                const nuovoNomeTrim = nuovoNome.trim();
+                if (canneMemorizzate.includes(nuovoNomeTrim) && nuovoNomeTrim !== vecchioNome) {
+                    alert('Questa canna esiste già!');
+                    return;
+                }
+                const nuoveCanne = canneMemorizzate.map(c => c === vecchioNome ? nuovoNomeTrim : c);
+                setCanneMemorizzate(nuoveCanne.sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })));
+                setEditandoCanna(null);
+            };
+
+            const modificaTrave = (vecchioNome, nuovoNome) => {
+                if (!nuovoNome || !nuovoNome.trim()) {
+                    alert('Il nome non può essere vuoto!');
+                    return;
+                }
+                const nuovoNomeTrim = nuovoNome.trim();
+                if (traviMemorizzate.includes(nuovoNomeTrim) && nuovoNomeTrim !== vecchioNome) {
+                    alert('Questo trave esiste già!');
+                    return;
+                }
+                const nuoviTravi = traviMemorizzate.map(t => t === vecchioNome ? nuovoNomeTrim : t);
+                setTraviMemorizzate(nuoviTravi.sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })));
+                setEditandoTrave(null);
+            };
+
+            const modificaAmo = (vecchioNome, nuovoNome) => {
+                if (!nuovoNome || !nuovoNome.trim()) {
+                    alert('Il nome non può essere vuoto!');
+                    return;
+                }
+                const nuovoNomeTrim = nuovoNome.trim();
+                if (amiMemorizzati.includes(nuovoNomeTrim) && nuovoNomeTrim !== vecchioNome) {
+                    alert('Questo amo esiste già!');
+                    return;
+                }
+                const nuoviAmi = amiMemorizzati.map(a => a === vecchioNome ? nuovoNomeTrim : a);
+                setAmiMemorizzati(nuoviAmi.sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })));
+                setEditandoAmo(null);
+            };
+
+            const modificaPiombo = (vecchioNome, nuovoNome) => {
+                if (!nuovoNome || !nuovoNome.trim()) {
+                    alert('Il nome non può essere vuoto!');
+                    return;
+                }
+                const nuovoNomeTrim = nuovoNome.trim();
+                if (piombiMemorizzati.includes(nuovoNomeTrim) && nuovoNomeTrim !== vecchioNome) {
+                    alert('Questo piombo esiste già!');
+                    return;
+                }
+                const nuoviPiombi = piombiMemorizzati.map(p => p === vecchioNome ? nuovoNomeTrim : p);
+                setPiombiMemorizzati(nuoviPiombi.sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })));
+                setEditandoPiombo(null);
+            };
+
+            // ======== FUNZIONI ASSISTENTE VOCALE ========
+
+            // Sintesi vocale: l'app PARLA
+            const parla = (testo) => {
+                return new Promise((resolve) => {
+                    try {
+                        if (!('speechSynthesis' in window)) {
+                            console.warn('Sintesi vocale non supportata');
+                            resolve();
+                            return;
+                        }
+
+                        // Ferma eventuali speech in corso
+                        window.speechSynthesis.cancel();
+
+                        const utterance = new SpeechSynthesisUtterance(testo);
+                        utterance.lang = 'it-IT';
+                        utterance.rate = 0.9; // Velocità leggermente più lenta per chiarezza
+                        utterance.pitch = 1.0;
+                        utterance.volume = 1.0;
+
+                        utterance.onend = () => resolve();
+                        utterance.onerror = () => resolve();
+
+                        setMessaggioVocale(`🗣️ ${testo}`);
+                        window.speechSynthesis.speak(utterance);
+                    } catch (e) {
+                        console.error('Errore sintesi vocale:', e);
+                        resolve();
+                    }
+                });
+            };
+
+            // Riconoscimento vocale: l'app ASCOLTA
+            const ascolta = () => {
+                return new Promise((resolve, reject) => {
+                    try {
+                        // Supporto cross-browser
+                        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+                        if (!SpeechRecognition) {
+                            reject(new Error('Riconoscimento vocale non supportato'));
+                            return;
+                        }
+
+                        const recognition = new SpeechRecognition();
+                        recognition.lang = 'it-IT';
+                        recognition.continuous = false;
+                        recognition.interimResults = false;
+                        recognition.maxAlternatives = 1;
+
+                        recognitionRef.current = recognition;
+
+                        recognition.onstart = () => {
+                            setRiconoscimentoAttivo(true);
+                            setMessaggioVocale('🎤 In ascolto...');
+                        };
+
+                        recognition.onresult = (event) => {
+                            const risposta = event.results[0][0].transcript.toLowerCase().trim();
+                            console.log('🎤 Risposta ricevuta:', risposta);
+                            setMessaggioVocale(`✅ Hai detto: "${risposta}"`);
+                            setRiconoscimentoAttivo(false);
+                            resolve(risposta);
+                        };
+
+                        recognition.onerror = (event) => {
+                            console.error('Errore riconoscimento:', event.error);
+                            setRiconoscimentoAttivo(false);
+
+                            if (event.error === 'no-speech') {
+                                setMessaggioVocale('⚠️ Nessuna voce rilevata');
+                            } else if (event.error === 'not-allowed') {
+                                setMessaggioVocale('❌ Permesso microfono negato');
+                            } else {
+                                setMessaggioVocale('❌ Errore ascolto');
+                            }
+
+                            reject(new Error(event.error));
+                        };
+
+                        recognition.onend = () => {
+                            setRiconoscimentoAttivo(false);
+                        };
+
+                        recognition.start();
+                    } catch (e) {
+                        console.error('Errore avvio riconoscimento:', e);
+                        setRiconoscimentoAttivo(false);
+                        reject(e);
+                    }
+                });
+            };
+
+            // Parsing risposta intelligente per lunghezza
+            const estraiLunghezza = (testo) => {
+                // Cerca numeri nel testo
+                const match = testo.match(/(\d+)/);
+                if (match) {
+                    return match[1];
+                }
+
+                // Converti parole in numeri (es: "quaranta" -> "40")
+                const numeriParole = {
+                    'zero': '0', 'uno': '1', 'due': '2', 'tre': '3', 'quattro': '4',
+                    'cinque': '5', 'sei': '6', 'sette': '7', 'otto': '8', 'nove': '9',
+                    'dieci': '10', 'venti': '20', 'trenta': '30', 'quaranta': '40',
+                    'cinquanta': '50', 'sessanta': '60', 'settanta': '70', 'ottanta': '80', 'novanta': '90'
+                };
+
+                for (const [parola, numero] of Object.entries(numeriParole)) {
+                    if (testo.includes(parola)) {
+                        return numero;
+                    }
+                }
+
+                return testo; // Ritorna testo originale se non trova numeri
+            };
+
+            // Riconosce conferma (sì/no)
+            const èConferma = (testo) => {
+                const affermazioni = ['sì', 'si', 'ok', 'okay', 'va bene', 'conferma', 'confermo', 'yes', 'certo', 'esatto'];
+                return affermazioni.some(parola => testo.includes(parola));
+            };
+
+            // Sinonimi e varianti fonetiche per specie ed esche difficili
+            const sinonimiSpecie = {
+                'gronco': ['gronco', 'grongo', 'gronghi', 'bronco'],
+                'leccia stella': ['leccia stella', 'leccia', 'licia stella', 'letcia stella'],
+                'pesce serra': ['pesce serra', 'serra', 'pesci serra'],
+                'marmora': ['marmora', 'marmona', 'armora'],
+                'occhiata': ['occhiata', 'occhiatta', 'ochiata'],
+                'ombrina': ['ombrina', 'umbrina', 'ombina'],
+                'sughero': ['sughero', 'sugaro', 'subero']
+            };
+
+            const sinonimiEsche = {
+                'canolicchio': ['canolicchio', 'canolichio', 'cannolicchio', 'cannocchio', 'canolinchi'],
+                'muriddu': ['muriddu', 'muriddi', 'muriddù', 'muriddo', 'muridu'],
+                'arenicola': ['arenicola', 'arenicula', 'arenichola'],
+                'granchio': ['granchio', 'granciporro', 'grancio']
+            };
+
+            // Calcola similarità tra due stringhe (Levenshtein semplificato)
+            const calcolaSimilarita = (str1, str2) => {
+                str1 = str1.toLowerCase().trim();
+                str2 = str2.toLowerCase().trim();
+
+                if (str1 === str2) return 1.0;
+
+                // Controlla se una stringa contiene l'altra
+                if (str1.includes(str2) || str2.includes(str1)) return 0.8;
+
+                // Calcola distanza Levenshtein semplificata
+                const len1 = str1.length;
+                const len2 = str2.length;
+                const maxLen = Math.max(len1, len2);
+
+                if (maxLen === 0) return 1.0;
+
+                let matches = 0;
+                const range = Math.floor(Math.max(len1, len2) / 2) - 1;
+                const str1Matches = new Array(len1);
+                const str2Matches = new Array(len2);
+
+                for (let i = 0; i < len1; i++) {
+                    const start = Math.max(0, i - range);
+                    const end = Math.min(i + range + 1, len2);
+
+                    for (let j = start; j < end; j++) {
+                        if (str2Matches[j] || str1[i] !== str2[j]) continue;
+                        str1Matches[i] = true;
+                        str2Matches[j] = true;
+                        matches++;
+                        break;
+                    }
+                }
+
+                if (matches === 0) return 0;
+
+                return matches / maxLen;
+            };
+
+            // Trova corrispondenza migliore in lista con fuzzy matching e sinonimi
+            const trovaCorrispondenza = (testoRiconosciuto, lista, mapSinonimi = {}) => {
+                const testo = testoRiconosciuto.toLowerCase().trim();
+
+                // 1. Cerca corrispondenza esatta
+                const corrispondenzaEsatta = lista.find(item => item.toLowerCase() === testo);
+                if (corrispondenzaEsatta) return { trovato: corrispondenzaEsatta, confidenza: 1.0 };
+
+                // 2. Cerca nei sinonimi
+                for (const [chiave, sinonimi] of Object.entries(mapSinonimi)) {
+                    if (sinonimi.some(sin => testo.includes(sin.toLowerCase()) || sin.toLowerCase().includes(testo))) {
+                        const itemLista = lista.find(item => item.toLowerCase().includes(chiave.toLowerCase()));
+                        if (itemLista) return { trovato: itemLista, confidenza: 0.9 };
+                    }
+                }
+
+                // 3. Fuzzy matching con threshold di similarità
+                let miglioreMatch = null;
+                let miglioreScore = 0;
+
+                for (const item of lista) {
+                    const similarita = calcolaSimilarita(testo, item);
+
+                    // Se similarità > 0.7 (70%), considera come match valido
+                    if (similarita > miglioreScore && similarita >= 0.7) {
+                        miglioreScore = similarita;
+                        miglioreMatch = item;
+                    }
+                }
+
+                if (miglioreMatch) {
+                    return { trovato: miglioreMatch, confidenza: miglioreScore };
+                }
+
+                return null;
+            };
+
+            // Macchina a stati conversazionale
+            const gestisciStatoConversazione = async (stato, risposta = null, tentativoAttesa = 1) => {
+                try {
+                    switch (stato) {
+                        case 'SPECIE':
+                            let specieTrovata = null;
+
+                            for (let tentativo = 1; tentativo <= 3; tentativo++) {
+                                // Prima domanda o ripetizione
+                                if (tentativo === 1) {
+                                    await parla('Specie?');
+                                } else {
+                                    await parla('Non ho capito bene. Ripeti la specie?');
+                                }
+
+                                const rispostaSpecie = await ascolta();
+
+                                if (rispostaSpecie && rispostaSpecie !== 'salta' && rispostaSpecie !== 'vuoto') {
+                                    // Debug: mostra cosa viene riconosciuto e cosa c'è nella lista
+                                    console.log(`🎤 Tentativo ${tentativo} - Risposta riconosciuta:`, rispostaSpecie);
+                                    console.log('📋 Specie disponibili (ref):', specieMemorizzateVocaleRef.current);
+
+                                    // Validazione con fuzzy matching e sinonimi
+                                    const risultato = trovaCorrispondenza(rispostaSpecie, specieMemorizzateVocaleRef.current, sinonimiSpecie);
+
+                                    if (risultato) {
+                                        specieTrovata = risultato.trovato;
+                                        // Specie trovata! Compila e esci dal loop
+                                        setNuovaCattura(prev => ({ ...prev, specie: specieTrovata }));
+                                        datiCatturaVocaleRef.current.specie = specieTrovata;
+                                        console.log(`✅ Specie compilata: ${specieTrovata} (confidenza: ${(risultato.confidenza * 100).toFixed(0)}%)`);
+                                        await parla(`Specie registrata: ${specieTrovata}`);
+                                        break; // Esci dal loop
+                                    } else {
+                                        // Specie non trovata
+                                        console.log(`⚠️ Tentativo ${tentativo} - Specie non trovata:`, rispostaSpecie);
+
+                                        if (tentativo === 3) {
+                                            // Ultimo tentativo fallito
+                                            console.log('❌ Specie non riconosciuta dopo 3 tentativi');
+                                            await parla('Specie non riconosciuta dopo tre tentativi. Aggiungila manualmente.');
+                                        }
+                                        // Se tentativo < 3, il loop continua e chiederà "Ripeti la specie?"
+                                    }
+                                }
+                            }
+
+                            setStatoConversazione('LUNGHEZZA');
+                            await new Promise(resolve => setTimeout(resolve, 400));
+                            await gestisciStatoConversazione('LUNGHEZZA');
+                            break;
+
+                        case 'LUNGHEZZA':
+                            await parla('Lunghezza?');
+                            const rispostaLunghezza = await ascolta();
+
+                            if (rispostaLunghezza && rispostaLunghezza !== 'salta' && rispostaLunghezza !== 'vuoto') {
+                                const lunghezzaEstratta = estraiLunghezza(rispostaLunghezza);
+                                setNuovaCattura(prev => ({ ...prev, lunghezza: lunghezzaEstratta }));
+                                datiCatturaVocaleRef.current.lunghezza = lunghezzaEstratta; // Fix: salva in ref sincrono
+                                console.log('✅ Lunghezza compilata:', lunghezzaEstratta);
+                            }
+
+                            setStatoConversazione('ESCA');
+                            await new Promise(resolve => setTimeout(resolve, 400));
+                            await gestisciStatoConversazione('ESCA');
+                            break;
+
+                        case 'ESCA':
+                            let escaTrovata = null;
+
+                            for (let tentativo = 1; tentativo <= 3; tentativo++) {
+                                // Prima domanda o ripetizione
+                                if (tentativo === 1) {
+                                    await parla('Esca?');
+                                } else {
+                                    await parla('Non ho capito bene. Ripeti l\'esca?');
+                                }
+
+                                const rispostaEsca = await ascolta();
+
+                                if (rispostaEsca && rispostaEsca !== 'salta' && rispostaEsca !== 'vuoto') {
+                                    // Debug: mostra cosa viene riconosciuto e cosa c'è nella lista
+                                    console.log(`🎤 Tentativo ${tentativo} - Risposta riconosciuta:`, rispostaEsca);
+                                    console.log('📋 Esche disponibili (ref):', escheMemorizzateVocaleRef.current);
+
+                                    // Validazione con fuzzy matching e sinonimi
+                                    const risultato = trovaCorrispondenza(rispostaEsca, escheMemorizzateVocaleRef.current, sinonimiEsche);
+
+                                    if (risultato) {
+                                        escaTrovata = risultato.trovato;
+                                        // Esca trovata! Compila e esci dal loop
+                                        setNuovaCattura(prev => ({ ...prev, esca: escaTrovata }));
+                                        datiCatturaVocaleRef.current.esca = escaTrovata;
+                                        console.log(`✅ Esca compilata: ${escaTrovata} (confidenza: ${(risultato.confidenza * 100).toFixed(0)}%)`);
+                                        await parla(`Esca registrata: ${escaTrovata}`);
+                                        break; // Esci dal loop
+                                    } else {
+                                        // Esca non trovata
+                                        console.log(`⚠️ Tentativo ${tentativo} - Esca non trovata:`, rispostaEsca);
+
+                                        if (tentativo === 3) {
+                                            // Ultimo tentativo fallito
+                                            console.log('❌ Esca non riconosciuta dopo 3 tentativi');
+                                            await parla('Esca non riconosciuta dopo tre tentativi. Aggiungila manualmente.');
+                                        }
+                                        // Se tentativo < 3, il loop continua e chiederà "Ripeti l'esca?"
+                                    }
+                                }
+                            }
+
+                            setStatoConversazione('CONFERMA_REGISTRA');
+                            await new Promise(resolve => setTimeout(resolve, 400));
+                            await gestisciStatoConversazione('CONFERMA_REGISTRA');
+                            break;
+
+                        case 'CONFERMA_REGISTRA':
+                            await parla('Registra cattura?');
+                            const rispostaRegistra = await ascolta();
+
+                            if (èConferma(rispostaRegistra)) {
+                                // Esegui la registrazione
+                                await registraCatturaVocale();
+                            } else {
+                                await parla('Cattura non registrata. Puoi registrarla manualmente.');
+                                fermaAssistenteVocale();
+                            }
+                            break;
+
+                        case 'IN_ATTESA_COMANDO':
+                            // Fix loop infinito: limite massimo di 5 tentativi in attesa
+                            const MAX_TENTATIVI_ATTESA = 5;
+
+                            if (tentativoAttesa > MAX_TENTATIVI_ATTESA) {
+                                console.log(`❌ Raggiunto limite di ${MAX_TENTATIVI_ATTESA} tentativi in attesa comando`);
+                                await parla('Nessun comando ricevuto. Assistente vocale terminato.');
+                                fermaAssistenteVocale();
+                                break;
+                            }
+
+                            // Stato di attesa: ascolta solo per comando "nuova cattura"
+                            setMessaggioVocale(`💬 Dì "nuova cattura" per registrare un\'altra cattura (tentativo ${tentativoAttesa}/${MAX_TENTATIVI_ATTESA})`);
+                            const comandoRicevuto = await ascolta();
+
+                            // Riconosce varianti del comando "nuova cattura" (fuzzy matching migliorato)
+                            const riconosciComando = (testo) => {
+                                if (!testo) return false;
+                                const testoLower = testo.toLowerCase().trim();
+
+                                // Varianti esatte prioritarie
+                                const variantiEsatte = [
+                                    'nuova cattura',
+                                    'cattura nuova',
+                                    'altra cattura',
+                                    'registra cattura',
+                                    'ancora una',
+                                    'un altra',
+                                    'continua',
+                                    'si',
+                                    'sì',
+                                    'avanti'
+                                ];
+
+                                if (variantiEsatte.some(v => testoLower.includes(v))) return true;
+
+                                // Fuzzy matching: presenza di parole chiave (threshold più basso)
+                                const paroleChiave = ['nuova', 'cattura', 'ancora', 'altra', 'registra', 'continua'];
+                                const parolePresenti = paroleChiave.filter(p => testoLower.includes(p)).length;
+
+                                // Se almeno 1 parola chiave è presente, considera valido
+                                if (parolePresenti >= 1) return true;
+
+                                return false;
+                            };
+
+                            if (riconosciComando(comandoRicevuto)) {
+                                console.log('✅ Comando "nuova cattura" riconosciuto:', comandoRicevuto);
+                                await parla('Ok, nuova cattura');
+
+                                // Reset ref per nuova cattura
+                                datiCatturaVocaleRef.current = { specie: '', lunghezza: '', esca: '' };
+
+                                // Ricomincia conversazione (reset tentativi)
+                                setStatoConversazione('SPECIE');
+                                await new Promise(resolve => setTimeout(resolve, 400));
+                                await gestisciStatoConversazione('SPECIE');
+                            } else {
+                                // Comando non riconosciuto, continua ad ascoltare con contatore incrementato
+                                console.log(`⚠️ Comando non riconosciuto: "${comandoRicevuto}", resto in attesa (tentativo ${tentativoAttesa}/${MAX_TENTATIVI_ATTESA})`);
+                                await new Promise(resolve => setTimeout(resolve, 1000));
+                                await gestisciStatoConversazione('IN_ATTESA_COMANDO', null, tentativoAttesa + 1);
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+                } catch (error) {
+                    console.error('Errore conversazione:', error);
+                    setMessaggioVocale('⚠️ Errore durante la conversazione. Puoi compilare manualmente.');
+                    fermaAssistenteVocale();
+                }
+            };
+
+            // Registra cattura via vocale
+            const registraCatturaVocale = async () => {
+                try {
+                    // Validazione (simile a aggiungiCattura)
+                    if (!sessioneAttiva) {
+                        await parla('Errore: avvia prima una sessione di pesca');
+                        fermaAssistenteVocale();
+                        return;
+                    }
+
+                    // Fix: usa ref se disponibile (compilato vocalmente), altrimenti usa state (compilato manualmente)
+                    const specieFinale = datiCatturaVocaleRef.current.specie || nuovaCattura.specie;
+
+                    if (!specieFinale) {
+                        await parla('Errore: inserisci la specie della cattura');
+                        fermaAssistenteVocale();
+                        return;
+                    }
+
+                    // Validazione coordinate
+                    if (nuovaCattura.latitudine && nuovaCattura.longitudine) {
+                        const validazione = validaCoordinate(nuovaCattura.latitudine, nuovaCattura.longitudine);
+                        if (!validazione.valid) {
+                            await parla(`Errore coordinate: ${validazione.error}`);
+                            fermaAssistenteVocale();
+                            return;
+                        }
+                    }
+
+                    // Fix: usa dati da ref per specie, lunghezza, esca se compilati vocalmente
+                    const lunghezzaFinale = datiCatturaVocaleRef.current.lunghezza || nuovaCattura.lunghezza;
+                    const escaFinale = datiCatturaVocaleRef.current.esca || nuovaCattura.esca;
+
+                    // Aggiungi a liste memorizzate (usa valori finali)
+                    if (specieFinale && !specieMemorizzate.includes(specieFinale)) {
+                        setSpecieMemorizzate([...specieMemorizzate, specieFinale]);
+                    }
+                    if (escaFinale && !escheMemorizzate.includes(escaFinale)) {
+                        setEscheMemorizzate([...escheMemorizzate, escaFinale]);
+                    }
+                    if (nuovaCattura.localita && !localitaMemorizzate.includes(nuovaCattura.localita)) {
+                        setLocalitaMemorizzate([...localitaMemorizzate, nuovaCattura.localita]);
+                    }
+                    if (nuovaCattura.note && !noteMemorizzate.includes(nuovaCattura.note)) {
+                        setNoteMemorizzate([...noteMemorizzate, nuovaCattura.note]);
+                    }
+                    if (nuovaCattura.canna && !canneMemorizzate.includes(nuovaCattura.canna)) {
+                        setCanneMemorizzate([...canneMemorizzate, nuovaCattura.canna]);
+                    }
+                    if (nuovaCattura.trave && !traviMemorizzate.includes(nuovaCattura.trave)) {
+                        setTraviMemorizzate([...traviMemorizzate, nuovaCattura.trave]);
+                    }
+                    if (nuovaCattura.amo && !amiMemorizzati.includes(nuovaCattura.amo)) {
+                        setAmiMemorizzati([...amiMemorizzati, nuovaCattura.amo]);
+                    }
+                    if (nuovaCattura.piombo && !piombiMemorizzati.includes(nuovaCattura.piombo)) {
+                        setPiombiMemorizzati([...piombiMemorizzati, nuovaCattura.piombo]);
+                    }
+
+                    // Salva cattura con valori finali
+                    const catturaFinale = {
+                        ...nuovaCattura,
+                        specie: specieFinale,
+                        lunghezza: lunghezzaFinale,
+                        esca: escaFinale,
+                        meteo: {...meteo},
+                        id: Date.now(),
+                        sessioneId: sessioneCorrente.id
+                    };
+                    // Fix: usa forma funzionale per evitare sovrascrittura con registrazioni multiple
+                    setCatture(prev => [...prev, catturaFinale]);
+
+                    // Reset form
+                    setNuovaCattura({
+                        data: getDataItalianaAttuale(),
+                        ora: getOraItalianaAttuale(),
+                        specie: '',
+                        peso: '',
+                        lunghezza: '',
+                        localita: sessioneAttiva ? datiSessione.localita : '',
+                        latitudine: sessioneAttiva ? datiSessione.latitudine : '',
+                        longitudine: sessioneAttiva ? datiSessione.longitudine : '',
+                        esca: '',
+                        canna: '',
+                        trave: '',
+                        amo: '',
+                        piombo: '',
+                        note: ''
+                    });
+
+                    // Feedback vocale
+                    await parla('Cattura registrata!');
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Passa in modalità attesa comando "nuova cattura"
+                    setStatoConversazione('IN_ATTESA_COMANDO');
+                    await parla('Dì nuova cattura per continuare');
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    await gestisciStatoConversazione('IN_ATTESA_COMANDO');
+
+                } catch (error) {
+                    console.error('Errore registrazione vocale:', error);
+                    await parla('Errore durante la registrazione');
+                    fermaAssistenteVocale();
+                }
+            };
+
+            // Avvia assistente vocale
+            const avviaAssistenteVocale = async () => {
+                try {
+                    // Verifica supporto browser
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    if (!SpeechRecognition) {
+                        alert('❌ Riconoscimento vocale non supportato dal tuo browser.\n\nProva con Chrome o Safari.');
+                        return;
+                    }
+
+                    if (!('speechSynthesis' in window)) {
+                        alert('⚠️ Sintesi vocale non supportata. L\'assistente funzionerà solo in modalità ascolto.');
+                    }
+
+                    setAssistenteVocaleAttivo(true);
+                    setStatoConversazione('SPECIE');
+                    setMessaggioVocale('🎤 Assistente vocale avviato');
+
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await gestisciStatoConversazione('SPECIE');
+
+                } catch (error) {
+                    console.error('Errore avvio assistente:', error);
+                    alert('❌ Errore avvio assistente vocale: ' + error.message);
+                    fermaAssistenteVocale();
+                }
+            };
+
+            // Ferma assistente vocale
+            const fermaAssistenteVocale = () => {
+                // Ferma riconoscimento vocale
+                if (recognitionRef.current) {
+                    try {
+                        recognitionRef.current.abort();
+                    } catch (e) {
+                        console.error('Errore stop recognition:', e);
+                    }
+                }
+
+                // Ferma sintesi vocale
+                if (window.speechSynthesis) {
+                    window.speechSynthesis.cancel();
+                }
+
+                setAssistenteVocaleAttivo(false);
+                setStatoConversazione('INATTIVO');
+                setMessaggioVocale('');
+                setRiconoscimentoAttivo(false);
+                datiCatturaVocaleRef.current = { specie: '', lunghezza: '', esca: '' }; // Reset ref dati cattura vocale
+            };
+
+            // ======== FINE FUNZIONI ASSISTENTE VOCALE ========
+
+            const validaCoordinate = (lat, lng) => {
+                const latNum = parseFloat(lat);
+                const lngNum = parseFloat(lng);
+                
+                // Range Italia approssimativo: lat 35-47, long 6-19
+                if (isNaN(latNum) || isNaN(lngNum)) {
+                    return { valid: false, error: 'Coordinate non numeriche' };
+                }
+                if (latNum < 35 || latNum > 47) {
+                    return { valid: false, error: `Latitudine ${latNum} fuori range Italia (35-47)` };
+                }
+                if (lngNum < 6 || lngNum > 19) {
+                    return { valid: false, error: `Longitudine ${lngNum} fuori range Italia (6-19)` };
+                }
+                return { valid: true };
+            };
+
+            const calcolaStatistiche = () => {
+                if (catture.length === 0) return null;
+                const specieCount = {};
+                let pesoTotale = 0, numPesi = 0;
+                catture.forEach(c => {
+                    if (c.specie) specieCount[c.specie] = (specieCount[c.specie] || 0) + 1;
+                    if (c.peso) {
+                        const pesoNum = parseFloat(c.peso);
+                        if (!isNaN(pesoNum) && pesoNum > 0) {
+                            pesoTotale += pesoNum;
+                            numPesi++;
+                        }
+                    }
+                });
+                const speciePiuCatturata = Object.entries(specieCount).length > 0 ? Object.entries(specieCount).sort((a,b) => b[1] - a[1])[0] : null;
+                const pesoMedio = numPesi > 0 ? ((pesoTotale / numPesi) / 1000).toFixed(2) : 0;
+                return { speciePiuCatturata, pesoMedio, totaleCatture: catture.length };
+            };
+
+            const getCattureFiltrate = () => catture.filter(c => {
+                const [anno, mese] = c.data.split('-');
+                return (filtri.anno === 'tutti' || anno === filtri.anno) &&
+                       (filtri.mese === 'tutti' || mese === filtri.mese) &&
+                       (filtri.specie === 'tutte' || c.specie === filtri.specie) &&
+                       (filtri.direzioneVento === 'tutte' || c.meteo?.direzioneVento === filtri.direzioneVento) &&
+                       (filtri.condizioni === 'tutte' || c.meteo?.condizioni === filtri.condizioni) &&
+                       (filtri.localita === 'tutte' || c.localita === filtri.localita) &&
+                       (filtri.temperatura === 'tutte' || c.meteo?.temperatura === filtri.temperatura) &&
+                       (filtri.pressione === 'tutte' || c.meteo?.pressione === filtri.pressione) &&
+                       (filtri.vento === 'tutti' || c.meteo?.vento === filtri.vento) &&
+                       (filtri.faseLunare === 'tutte' || c.meteo?.faseLunare === filtri.faseLunare);
+            });
+
+            // Filtra sessioni in base ai filtri attivi (anno, mese, località + catture corrispondenti)
+            const getSessioniFiltrate = () => sessioniCompletate.filter(sessione => {
+                const [anno, mese] = sessione.dataInizio.split('-');
+
+                // Filtri base sessione (anno, mese, località)
+                const filtrataBase = (filtri.anno === 'tutti' || anno === filtri.anno) &&
+                                     (filtri.mese === 'tutti' || mese === filtri.mese) &&
+                                     (filtri.localita === 'tutte' || sessione.localita === filtri.localita);
+
+                if (!filtrataBase) return false;
+
+                // Se non ci sono filtri su specie/vento/meteo, la sessione passa
+                const haFiltriCatture = filtri.specie !== 'tutte' ||
+                                       filtri.direzioneVento !== 'tutte' ||
+                                       filtri.condizioni !== 'tutte' ||
+                                       filtri.temperatura !== 'tutte' ||
+                                       filtri.pressione !== 'tutte' ||
+                                       filtri.vento !== 'tutti' ||
+                                       filtri.faseLunare !== 'tutte';
+
+                if (!haFiltriCatture) return true;
+
+                // Controlla se ALMENO UNA cattura della sessione corrisponde ai filtri specie/vento/meteo
+                const cattureSessione = catture.filter(c => {
+                    // Catture appartenenti a questa sessione
+                    return c.sessioneId === sessione.id;
+                });
+
+                return cattureSessione.some(c => {
+                    return (filtri.specie === 'tutte' || c.specie === filtri.specie) &&
+                           (filtri.direzioneVento === 'tutte' || c.meteo?.direzioneVento === filtri.direzioneVento) &&
+                           (filtri.condizioni === 'tutte' || c.meteo?.condizioni === filtri.condizioni) &&
+                           (filtri.temperatura === 'tutte' || c.meteo?.temperatura === filtri.temperatura) &&
+                           (filtri.pressione === 'tutte' || c.meteo?.pressione === filtri.pressione) &&
+                           (filtri.vento === 'tutti' || c.meteo?.vento === filtri.vento) &&
+                           (filtri.faseLunare === 'tutte' || c.meteo?.faseLunare === filtri.faseLunare);
+                });
+            });
+
+            const getAnniDisponibili = () => [...new Set(catture.map(c => c.data.split('-')[0]))].sort();
+
+            const esportaDati = () => {
+                if (catture.length === 0) { alert('nessuna cattura!'); return; }
+                const data = JSON.stringify({
+                    catture,
+                    sessioni: sessioniCompletate,
+                    attrezzature: {
+                        canne: canneMemorizzate,
+                        travi: traviMemorizzate,
+                        ami: amiMemorizzati,
+                        piombi: piombiMemorizzati
+                    },
+                    localita: localitaMemorizzate,
+                    specie: specieMemorizzate,
+                    esche: escheMemorizzate
+                }, null, 2);
+                const blob = new Blob([data], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `diario-pesca-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                alert('esportato!');
+            };
+
+            // Funzioni per paginazione e toggle espansione
+            const ITEMS_PER_PAGE = 10;
+
+            const toggleCatturaEspansa = (id) => {
+                setCattureEspanse(prev => ({
+                    ...prev,
+                    [id]: !prev[id]
+                }));
+            };
+
+            const toggleSessioneEspansa = (id) => {
+                setSessioniEspanse(prev => ({
+                    ...prev,
+                    [id]: !prev[id]
+                }));
+            };
+
+            const getCatturePaginate = () => {
+                const filtrate = getCattureFiltrate().reverse();
+                const inizio = paginaCatture * ITEMS_PER_PAGE;
+                const fine = inizio + ITEMS_PER_PAGE;
+                return filtrate.slice(inizio, fine);
+            };
+
+            const getSessioniPaginate = () => {
+                const filtrate = getSessioniFiltrate().reverse();
+                const inizio = paginaSessioni * ITEMS_PER_PAGE;
+                const fine = inizio + ITEMS_PER_PAGE;
+                return filtrate.slice(inizio, fine);
+            };
+
+            const totalePagineCatture = Math.max(1, Math.ceil(getCattureFiltrate().length / ITEMS_PER_PAGE));
+            const totalePagineSessioni = Math.max(1, Math.ceil(getSessioniFiltrate().length / ITEMS_PER_PAGE));
+
+            // Crea mappa con Leaflet - MIGLIORATO PER IPHONE E MARKER VISIBILI
+            useEffect(() => {
+                if (activeSection === 'analisi' && sessioniCompletate.length > 0) {
+                    console.log('🗺️ Tentativo creazione mappa...');
+                    console.log('📍 Sessioni completate:', sessioniCompletate.length);
+                    
+                    // Verifica che Leaflet sia caricato
+                    if (typeof L === 'undefined') {
+                        console.error('❌ Leaflet non caricato!');
+                        return;
+                    }
+                    
+                    console.log('✅ Leaflet caricato correttamente');
+                    
+                    // Delay più lungo per iPhone
+                    setTimeout(() => {
+                        const container = document.getElementById('map-container');
+                        if (!container) {
+                            console.error('❌ Container mappa non trovato!');
+                            return;
+                        }
+                        
+                        console.log('✅ Container mappa trovato');
+                        
+                        // Pulisci mappa precedente se esiste
+                        if (mapRef.current) {
+                            console.log('🧹 Rimuovo mappa precedente');
+                            mapRef.current.remove();
+                            mapRef.current = null;
+                        }
+                        
+                        try {
+                            // Filtra SOLO sessioni con coordinate VALIDE
+                            // Usa sessioni filtrate invece di tutte le sessioni
+                            const sessioniFiltrate = getSessioniFiltrate();
+                            const sessioniValide = sessioniFiltrate.filter(s => {
+                                const val = validaCoordinate(s.latitudine, s.longitudine);
+                                if (!val.valid) {
+                                    console.warn(`⚠️ Sessione "${s.localita}" saltata: ${val.error}`);
+                                }
+                                return val.valid;
+                            });
+
+                            console.log(`✅ Sessioni valide: ${sessioniValide.length} su ${sessioniFiltrate.length} (totali: ${sessioniCompletate.length})`);
+                            
+                            if (sessioniValide.length === 0) {
+                                console.error('❌ Nessuna sessione con coordinate valide!');
+                                container.innerHTML = '<div class="flex items-center justify-center h-full text-red-400 text-center p-4">⚠️ Nessuna sessione con coordinate valide.<br>Controlla la sezione "gestione sessioni".</div>';
+                                return;
+                            }
+                            
+                            // Crea nuova mappa
+                            console.log('🎨 Creo nuova mappa...');
+                            const map = L.map('map-container', {
+                                zoomControl: true,
+                                scrollWheelZoom: true,
+                                dragging: true,
+                                tap: true
+                            }).setView([42.0, 12.0], 6);
+                            
+                            mapRef.current = map;
+                            console.log('✅ Mappa creata');
+                            
+                            // Aggiungi tile OpenStreetMap
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '© OpenStreetMap',
+                                maxZoom: 19
+                            }).addTo(map);
+                            console.log('✅ Tile aggiunte');
+                            
+                            // Definisci icona personalizzata GRANDE e COLORATA
+                            const iconaPersonalizzata = (colore, catture) => {
+                                return L.divIcon({
+                                    html: `<div style="
+                                        background-color: ${colore};
+                                        width: 30px;
+                                        height: 30px;
+                                        border-radius: 50%;
+                                        border: 3px solid white;
+                                        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        font-weight: bold;
+                                        color: white;
+                                        font-size: 14px;
+                                    ">${catture}</div>`,
+                                    className: '',
+                                    iconSize: [30, 30],
+                                    iconAnchor: [15, 15],
+                                    popupAnchor: [0, -15]
+                                });
+                            };
+                            
+                            // RAGGRUPPA SESSIONI PER COORDINATE (per gestire sovrapposizioni)
+                            const gruppiCoordinate = {};
+                            sessioniValide.forEach(sessione => {
+                                const chiave = `${sessione.latitudine},${sessione.longitudine}`;
+                                if (!gruppiCoordinate[chiave]) {
+                                    gruppiCoordinate[chiave] = [];
+                                }
+                                gruppiCoordinate[chiave].push(sessione);
+                            });
+
+                            console.log(`🗺️ Gruppi di coordinate: ${Object.keys(gruppiCoordinate).length}`);
+
+                            // Aggiungi marker per ogni sessione VALIDA con offset se necessario
+                            let markersAggiunti = 0;
+                            Object.values(gruppiCoordinate).forEach(gruppo => {
+                                const offsetRadialeGradi = 0.0003; // ~30 metri di offset
+
+                                gruppo.forEach((sessione, indexGruppo) => {
+                                    const lat = parseFloat(sessione.latitudine);
+                                    const lng = parseFloat(sessione.longitudine);
+
+                                    // Calcola offset se ci sono più sessioni nella stessa posizione
+                                    let latConOffset = lat;
+                                    let lngConOffset = lng;
+
+                                    if (gruppo.length > 1) {
+                                        // Distribuisci i marker in cerchio attorno alla posizione originale
+                                        const angolo = (2 * Math.PI * indexGruppo) / gruppo.length;
+                                        latConOffset = lat + (offsetRadialeGradi * Math.cos(angolo));
+                                        lngConOffset = lng + (offsetRadialeGradi * Math.sin(angolo));
+                                        console.log(`📍 Marker con offset: ${sessione.localita} (${indexGruppo + 1}/${gruppo.length})`);
+                                    }
+
+                                    // Colore in base al numero di catture
+                                    let colore = '#ef4444'; // rosso = 0-1 catture
+                                    if (sessione.numeroCatture >= 5) colore = '#22c55e'; // verde = 5+ catture
+                                    else if (sessione.numeroCatture >= 2) colore = '#eab308'; // giallo = 2-4 catture
+
+                                    const marker = L.marker(
+                                        [latConOffset, lngConOffset],
+                                        { icon: iconaPersonalizzata(colore, sessione.numeroCatture) }
+                                    ).addTo(map);
+
+                                    markersAggiunti++;
+
+                                    // Popup con info sessione (mostra coordinate ORIGINALI)
+                                    marker.bindPopup(`
+                                        <div style="color: black; min-width: 220px;">
+                                            <b style="font-size: 18px; color: #0891b2;">
+                                                ${sessione.localita}
+                                            </b><br><br>
+                                            📅 ${sessione.dataInizio}<br>
+                                            ⏰ ${sessione.oraInizio} - ${sessione.oraFine || 'in corso'}<br>
+                                            🎣 <b style="color: ${colore}; font-size: 20px;">${sessione.numeroCatture}</b> catture<br><br>
+                                            <small style="color: #666;">📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}</small>
+                                        </div>
+                                    `);
+                                });
+                            });
+                            
+                            console.log(`✅ Marker aggiunti: ${markersAggiunti}`);
+                            
+                            // Centra mappa per mostrare tutti i marker
+                            if (markersAggiunti > 0) {
+                                const bounds = sessioniValide.map(s => [parseFloat(s.latitudine), parseFloat(s.longitudine)]);
+                                
+                                if (bounds.length === 1) {
+                                    // Se c'è solo un marker, centra e zoom fisso
+                                    map.setView(bounds[0], 13);
+                                } else {
+                                    map.fitBounds(bounds, { 
+                                        padding: [50, 50],
+                                        maxZoom: 15
+                                    });
+                                }
+                                console.log('✅ Mappa centrata sui marker');
+                            }
+                            
+                            // Force re-render della mappa (importante per Safari/iPhone)
+                            setTimeout(() => {
+                                map.invalidateSize();
+                                console.log('✅ Mappa ridimensionata (invalidateSize)');
+                            }, 250);
+                            
+                            console.log('🎉 Mappa completata con successo!');
+                            
+                        } catch (error) {
+                            console.error('❌ Errore creazione mappa:', error);
+                        }
+                    }, 500);
+                }
+            }, [activeSection, sessioniCompletate, filtri]);
+
+            const stats = calcolaStatistiche();
+
+            return (
+                <>
+                    {/* Splash screen: visibile per 4 secondi con fade in/out */}
+                    {mostraSplash && (
+                        <div style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            width: '100vw',
+                            height: '100vh',
+                            backgroundColor: 'black',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 9999,
+                            animation: 'splashFade 5s ease-in-out'
+                        }}>
+                            <img
+                                src="https://github.com/gpleoo/FishAI/blob/main/splash-screen.png?raw=true"
+                                alt="Fish File Splash"
+                                style={{
+                                    maxWidth: '100%',
+                                    maxHeight: '100%',
+                                    objectFit: 'contain'
+                                }}
+                            />
+                        </div>
+                    )}
+
+                    {/* App principale */}
+                    <div className="min-h-screen bg-black p-4">
+                        <div className="max-w-4xl mx-auto">
+                        <div className="text-center mb-8">
+                            <img
+                                src="https://github.com/gpleoo/FishAI/blob/main/logoFishAI.png?raw=true"
+                                alt="Fish File Logo"
+                                className="mx-auto mb-4"
+                                style={{maxWidth: '300px', width: '100%', height: 'auto'}}
+                            />
+                            <p className="text-gray-400">registra le tue battute di pesca</p>
+                            {catture.length > 0 && <p className="text-cyan-400 text-sm mt-2">{catture.length} catture salvate</p>}
+                        </div>
+
+                        <div className="mb-6 bg-gray-900 border-2 border-cyan-600 rounded-xl">
+                            <button
+                                onClick={() => setMostraSessionePesca(!mostraSessionePesca)}
+                                className="w-full flex items-center justify-between p-6 active:bg-gray-800"
+                            >
+                                <h2 className="text-2xl font-bold text-cyan-400">🎣 sessione di pesca</h2>
+                                {mostraSessionePesca ?
+                                    <ChevronUp className="text-cyan-400" width={24} height={24} /> :
+                                    <ChevronDown className="text-cyan-400" width={24} height={24} />
+                                }
+                            </button>
+                            {mostraSessionePesca && (
+                                <div className="p-6 pt-0">
+                                    {!sessioneAttiva ? (
+                                        <div>
+                                            <p className="text-yellow-400 text-sm mb-4 text-center">obbligatoria per registrare catture</p>
+                                    
+                                    {localitaMemorizzate.length > 0 && (
+                                        <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500 rounded-lg">
+                                            <p className="text-blue-300 text-xs font-semibold mb-2">Località memorizzate ({localitaMemorizzate.length}):</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {localitaMemorizzate.map((loc, i) => (
+                                                    <button
+                                                        key={i}
+                                                        onClick={() => setDatiSessione(p => ({...p, localita: loc}))}
+                                                        className="bg-blue-600 text-white px-3 py-1 rounded text-sm active:bg-blue-700"
+                                                    >
+                                                        {loc}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    
+                                    <SelectField label="località" value={datiSessione.localita} onChange={(e) => setDatiSessione(p => ({...p, localita: e.target.value}))} options={localitaMemorizzate} placeholder="es: molo di ostia" />
+
+                                    <div className="mb-4 p-4 bg-green-900/20 border-2 border-green-500 rounded-lg">
+                                        <label className="block text-green-400 text-sm font-semibold mb-2">
+                                            📍 Ottieni Posizione GPS
+                                        </label>
+                                        <p className="text-gray-400 text-xs mb-3">
+                                            Premi il pulsante per acquisire automaticamente le coordinate dalla tua posizione attuale
+                                        </p>
+                                        <button
+                                            onClick={ottieniPosizioneGPS}
+                                            className="w-full bg-green-600 text-white py-3 rounded-lg font-bold active:bg-green-700 flex items-center justify-center gap-2"
+                                        >
+                                            <span style={{fontSize: '24px'}}>📡</span> Usa GPS Dispositivo
+                                        </button>
+                                    </div>
+
+                                    <InputField label="latitudine" type="number" value={datiSessione.latitudine} onChange={(e) => setDatiSessione(p => ({...p, latitudine: e.target.value}))} placeholder="41.415611" step="0.000001" />
+                                    <InputField label="longitudine" type="number" value={datiSessione.longitudine} onChange={(e) => setDatiSessione(p => ({...p, longitudine: e.target.value}))} placeholder="12.800750" step="0.000001" />
+                                    <button onClick={avviaSessione} className="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-xl">avvia sessione</button>
+                                </div>
+                            ) : (
+                                <div>
+                                    <div className="bg-green-900/30 border-2 border-green-500 rounded-lg p-4 mb-4">
+                                        <p className="text-green-400 font-bold text-center">sessione attiva</p>
+                                        <p className="text-gray-300 text-sm text-center">{datiSessione.localita}</p>
+                                        <p className="text-gray-400 text-xs text-center">{datiSessione.latitudine}, {datiSessione.longitudine}</p>
+                                    </div>
+                                    <button onClick={terminaSessione} className="w-full bg-red-600 text-white py-3 rounded-lg font-bold">termina sessione</button>
+                                </div>
+                            )}
+                                </div>
+                            )}
+                        </div>
+
+                        <Section icon={Fish} title="aggiungi cattura" isActive={activeSection === 'cattura'} onToggle={() => setActiveSection(activeSection === 'cattura' ? null : 'cattura')}>
+                            <div className="bg-yellow-900/30 border-2 border-yellow-500 rounded-lg p-3 mb-4">
+                                <p className="text-yellow-400 text-sm font-semibold text-center">
+                                    obbligatori: sessione + meteo + specie | resto opzionale
+                                </p>
+                            </div>
+
+                            {/* ASSISTENTE VOCALE */}
+                            <div className="mb-6">
+                                {!assistenteVocaleAttivo ? (
+                                    <button
+                                        onClick={avviaAssistenteVocale}
+                                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-lg font-bold text-lg flex items-center justify-center gap-3 shadow-lg hover:from-purple-700 hover:to-blue-700 active:scale-95 transition-all"
+                                    >
+                                        <Mic width={24} height={24} />
+                                        <span>🎤 Assistente Vocale</span>
+                                    </button>
+                                ) : (
+                                    <div className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 border-2 border-purple-500 rounded-lg p-4">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-3 h-3 rounded-full ${riconoscimentoAttivo ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}></div>
+                                                <span className="text-white font-bold">
+                                                    {riconoscimentoAttivo ? '🔴 In ascolto...' : '🟢 Assistente Attivo'}
+                                                </span>
+                                            </div>
+                                            <button
+                                                onClick={fermaAssistenteVocale}
+                                                className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-red-700 active:scale-95 transition-all"
+                                            >
+                                                ❌ Ferma
+                                            </button>
+                                        </div>
+                                        {messaggioVocale && (
+                                            <div className="bg-black/30 rounded-lg p-3 mb-2">
+                                                <p className="text-cyan-400 text-sm font-mono">{messaggioVocale}</p>
+                                            </div>
+                                        )}
+                                        <div className="text-gray-300 text-xs mt-2">
+                                            <p>📍 Stato: {statoConversazione}</p>
+                                            <p className="mt-1 text-yellow-400">💡 Puoi sempre compilare manualmente i campi</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <InputField label="data" type="date" value={nuovaCattura.data} onChange={(e) => setNuovaCattura(p => ({...p, data: e.target.value}))} />
+                            <InputField label="ora" value={nuovaCattura.ora} onChange={(e) => setNuovaCattura(p => ({...p, ora: e.target.value}))} />
+                            <SelectField label="specie (obbligatorio)" value={nuovaCattura.specie} onChange={(e) => setNuovaCattura(p => ({...p, specie: e.target.value}))} options={specieMemorizzate} placeholder="spigola, orata..." />
+                            <InputField label="peso (g)" type="number" value={nuovaCattura.peso} onChange={(e) => setNuovaCattura(p => ({...p, peso: e.target.value}))} min="0" step="1" />
+                            <InputField label="lunghezza (cm)" type="number" value={nuovaCattura.lunghezza} onChange={(e) => setNuovaCattura(p => ({...p, lunghezza: e.target.value}))} min="0" step="0.1" />
+                            <SelectField label="località" value={nuovaCattura.localita} onChange={(e) => setNuovaCattura(p => ({...p, localita: e.target.value}))} options={localitaMemorizzate} placeholder="molo..." />
+                            <InputField label="latitudine" type="number" value={nuovaCattura.latitudine} onChange={(e) => setNuovaCattura(p => ({...p, latitudine: e.target.value}))} step="0.000001" />
+                            <InputField label="longitudine" type="number" value={nuovaCattura.longitudine} onChange={(e) => setNuovaCattura(p => ({...p, longitudine: e.target.value}))} step="0.000001" />
+                            <SelectField label="esca" value={nuovaCattura.esca} onChange={(e) => setNuovaCattura(p => ({...p, esca: e.target.value}))} options={escheMemorizzate} placeholder="verme..." />
+                            
+                            <div className="bg-gray-800 rounded-lg p-4 border-2 border-cyan-500 mb-4">
+                                <h3 className="text-cyan-400 font-bold mb-3 text-center">attrezzatura utilizzata</h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <SelectField label="canna" value={nuovaCattura.canna} onChange={(e) => setNuovaCattura(p => ({...p, canna: e.target.value}))} options={canneMemorizzate} placeholder="seleziona..." />
+                                    <SelectField label="trave" value={nuovaCattura.trave} onChange={(e) => setNuovaCattura(p => ({...p, trave: e.target.value}))} options={traviMemorizzate} placeholder="seleziona..." />
+                                    <SelectField label="amo" value={nuovaCattura.amo} onChange={(e) => setNuovaCattura(p => ({...p, amo: e.target.value}))} options={amiMemorizzati} placeholder="seleziona..." />
+                                    <SelectField label="piombo" value={nuovaCattura.piombo} onChange={(e) => setNuovaCattura(p => ({...p, piombo: e.target.value}))} options={piombiMemorizzati} placeholder="seleziona..." />
+                                </div>
+                            </div>
+                            
+                            <SelectField label="note" value={nuovaCattura.note} onChange={(e) => setNuovaCattura(p => ({...p, note: e.target.value}))} options={noteMemorizzate} placeholder="note..." />
+
+                            {messaggioErrore && <div className="mt-4 p-4 bg-red-900/30 border-2 border-red-600 rounded-lg"><p className="text-red-400 font-semibold text-center">{messaggioErrore}</p></div>}
+                            <button onClick={aggiungiCattura} className="w-full mt-4 bg-cyan-600 text-white py-4 rounded-lg font-bold text-xl">registra cattura</button>
+                        </Section>
+
+                        <Section icon={Cloud} title="dati meteo" isActive={activeSection === 'meteo'} onToggle={() => setActiveSection(activeSection === 'meteo' ? null : 'meteo')}>
+                            <p className="text-yellow-400 text-sm mb-4 text-center">dati obbligatori per registrare catture</p>
+                            
+                            <InputField label="data" type="date" value={meteo.data} onChange={(e) => setMeteo(p => ({...p, data: e.target.value}))} />
+                            <SelectField label="località" value={meteo.localita} onChange={(e) => setMeteo(p => ({...p, localita: e.target.value}))} options={localitaMemorizzate} placeholder="località..." />
+                            <InputField label="temperatura (°C)" type="number" value={meteo.temperatura} onChange={(e) => setMeteo(p => ({...p, temperatura: e.target.value}))} step="0.1" />
+                            <InputField label="temp. acqua (°C)" type="number" value={meteo.temperaturaAcqua} onChange={(e) => setMeteo(p => ({...p, temperaturaAcqua: e.target.value}))} step="0.1" />
+                            <InputField label="pressione (hPa)" type="number" value={meteo.pressione} onChange={(e) => setMeteo(p => ({...p, pressione: e.target.value}))} min="0" step="1" />
+                            <InputField label="vento (nodi)" type="number" value={meteo.vento} onChange={(e) => setMeteo(p => ({...p, vento: e.target.value}))} min="0" step="1" />
+                            
+                            <div className="mb-4">
+                                <label className="block text-cyan-400 text-sm font-semibold mb-2">direzione vento</label>
+                                <select value={meteo.direzioneVento} onChange={(e) => setMeteo(p => ({...p, direzioneVento: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
+                                    <option value="">seleziona...</option>
+                                    {ventiRosaDeiVenti.map(v => <option key={v} value={v}>{v}</option>)}
+                                </select>
+                            </div>
+                            
+                            <div className="mb-4">
+                                <label className="block text-cyan-400 text-sm font-semibold mb-2">condizioni</label>
+                                <select value={meteo.condizioni} onChange={(e) => setMeteo(p => ({...p, condizioni: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
+                                    <option value="">seleziona...</option>
+                                    {condizioniMeteo.map(c => <option key={c} value={c}>{c}</option>)}
+                                </select>
+                            </div>
+                            
+                            <div className="mb-4">
+                                <label className="block text-cyan-400 text-sm font-semibold mb-2">fase lunare</label>
+                                <select value={meteo.faseLunare} onChange={(e) => setMeteo(p => ({...p, faseLunare: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
+                                    <option value="">seleziona...</option>
+                                    {fasiLunari.map(f => <option key={f} value={f}>{f}</option>)}
+                                </select>
+                            </div>
+                            
+                            <InputField label="alta marea" type="time" value={meteo.altaMareaOra} onChange={(e) => setMeteo(p => ({...p, altaMareaOra: e.target.value}))} />
+                            <InputField label="bassa marea" type="time" value={meteo.bassaMareaOra} onChange={(e) => setMeteo(p => ({...p, bassaMareaOra: e.target.value}))} />
+                            <InputField label="altezza onde (cm)" type="number" value={meteo.altezzaOnde} onChange={(e) => setMeteo(p => ({...p, altezzaOnde: e.target.value}))} min="0" step="1" />
+                            <InputField label="frequenza onde (sec)" type="number" value={meteo.frequenzaOnde} onChange={(e) => setMeteo(p => ({...p, frequenzaOnde: e.target.value}))} placeholder="es: 5" min="0" step="0.1" />
+                        </Section>
+
+                        <Section icon={Wrench} title="gestione" isActive={activeSection === 'attrezzature'} onToggle={() => setActiveSection(activeSection === 'attrezzature' ? null : 'attrezzature')}>
+                            <div className="space-y-6">
+                                <div className="bg-gray-800 rounded-lg border border-gray-700">
+                                    <button
+                                        onClick={() => setMostraLocalita(!mostraLocalita)}
+                                        className="w-full flex items-center justify-between p-4 active:bg-gray-700"
+                                    >
+                                        <h3 className="text-lg font-bold text-cyan-400">📍 località</h3>
+                                        {mostraLocalita ?
+                                            <ChevronUp className="text-cyan-400" width={20} height={20} /> :
+                                            <ChevronDown className="text-cyan-400" width={20} height={20} />
+                                        }
+                                    </button>
+                                    {mostraLocalita && (
+                                        <div className="p-4 pt-0">
+                                            <div className="flex justify-between items-center mb-3">
+                                                <button onClick={aggiungiLocalita} className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">+ aggiungi</button>
+                                            </div>
+                                            <input type="text" value={nuovaLocalita} onChange={(e) => setNuovaLocalita(e.target.value)} placeholder="es: molo di fiumicino..."
+                                                className="w-full mb-3 bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-2 text-white" />
+                                            {[...localitaMemorizzate].sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })).map((l, i) => (
+                                        <div key={i} className="flex justify-between items-center bg-gray-900 rounded px-3 py-2 mb-2">
+                                            {editandoLocalita === l ? (
+                                                <input
+                                                    type="text"
+                                                    value={valoreEditLocalita}
+                                                    onChange={(e) => setValoreEditLocalita(e.target.value)}
+                                                    onBlur={() => { modificaLocalita(l, valoreEditLocalita); setEditandoLocalita(null); }}
+                                                    onKeyPress={(e) => { if (e.key === 'Enter') { modificaLocalita(l, valoreEditLocalita); setEditandoLocalita(null); }}}
+                                                    autoFocus
+                                                    className="flex-1 bg-gray-800 border border-cyan-500 rounded px-2 py-1 text-white mr-2"
+                                                />
+                                            ) : (
+                                                <span className="text-gray-300 flex-1">{l}</span>
+                                            )}
+                                            <div className="flex gap-2">
+                                                <button onClick={() => { setEditandoLocalita(l); setValoreEditLocalita(l); }} className="text-blue-500 active:text-blue-400">
+                                                    <Edit width={16} height={16} />
+                                                </button>
+                                                <button onClick={() => setLocalitaMemorizzate(localitaMemorizzate.filter(x => x !== l))} className="text-red-500 active:text-red-400">
+                                                    <Trash2 width={16} height={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="bg-gray-800 rounded-lg border border-gray-700">
+                                    <button
+                                        onClick={() => setMostraSpecie(!mostraSpecie)}
+                                        className="w-full flex items-center justify-between p-4 active:bg-gray-700"
+                                    >
+                                        <h3 className="text-lg font-bold text-cyan-400">🐟 specie</h3>
+                                        {mostraSpecie ?
+                                            <ChevronUp className="text-cyan-400" width={20} height={20} /> :
+                                            <ChevronDown className="text-cyan-400" width={20} height={20} />
+                                        }
+                                    </button>
+                                    {mostraSpecie && (
+                                        <div className="p-4 pt-0">
+                                            <div className="flex justify-between items-center mb-3">
+                                        <button onClick={aggiungiSpecie} className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">+ aggiungi</button>
+                                    </div>
+                                    <input type="text" value={nuovaSpecie} onChange={(e) => setNuovaSpecie(e.target.value)} placeholder="es: spigola, orata..."
+                                        className="w-full mb-3 bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-2 text-white" />
+                                    {[...specieMemorizzate].sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })).map((s, i) => (
+                                        <div key={i} className="flex justify-between items-center bg-gray-900 rounded px-3 py-2 mb-2">
+                                            {editandoSpecie === s ? (
+                                                <input
+                                                    type="text"
+                                                    value={valoreEditSpecie}
+                                                    onChange={(e) => setValoreEditSpecie(e.target.value)}
+                                                    onBlur={() => { modificaSpecie(s, valoreEditSpecie); setEditandoSpecie(null); }}
+                                                    onKeyPress={(e) => { if (e.key === 'Enter') { modificaSpecie(s, valoreEditSpecie); setEditandoSpecie(null); }}}
+                                                    autoFocus
+                                                    className="flex-1 bg-gray-800 border border-cyan-500 rounded px-2 py-1 text-white mr-2"
+                                                />
+                                            ) : (
+                                                <span className="text-gray-300 flex-1">{s}</span>
+                                            )}
+                                            <div className="flex gap-2">
+                                                <button onClick={() => { setEditandoSpecie(s); setValoreEditSpecie(s); }} className="text-blue-500 active:text-blue-400">
+                                                    <Edit width={16} height={16} />
+                                                </button>
+                                                <button onClick={() => setSpecieMemorizzate(specieMemorizzate.filter(x => x !== s))} className="text-red-500 active:text-red-400">
+                                                    <Trash2 width={16} height={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="bg-gray-800 rounded-lg border border-gray-700">
+                                    <button
+                                        onClick={() => setMostraEsche(!mostraEsche)}
+                                        className="w-full flex items-center justify-between p-4 active:bg-gray-700"
+                                    >
+                                        <h3 className="text-lg font-bold text-cyan-400">🪱 esche</h3>
+                                        {mostraEsche ?
+                                            <ChevronUp className="text-cyan-400" width={20} height={20} /> :
+                                            <ChevronDown className="text-cyan-400" width={20} height={20} />
+                                        }
+                                    </button>
+                                    {mostraEsche && (
+                                        <div className="p-4 pt-0">
+                                            <div className="flex justify-between items-center mb-3">
+                                                <button onClick={aggiungiEsca} className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">+ aggiungi</button>
+                                            </div>
+                                            <input type="text" value={nuovaEsca} onChange={(e) => setNuovaEsca(e.target.value)} placeholder="es: minnow, sardina..."
+                                        className="w-full mb-3 bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-2 text-white" />
+                                    {[...escheMemorizzate].sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })).map((e, i) => (
+                                        <div key={i} className="flex justify-between items-center bg-gray-900 rounded px-3 py-2 mb-2">
+                                            {editandoEsca === e ? (
+                                                <input
+                                                    type="text"
+                                                    value={valoreEditEsca}
+                                                    onChange={(ev) => setValoreEditEsca(ev.target.value)}
+                                                    onBlur={() => { modificaEsca(e, valoreEditEsca); setEditandoEsca(null); }}
+                                                    onKeyPress={(ev) => { if (ev.key === 'Enter') { modificaEsca(e, valoreEditEsca); setEditandoEsca(null); }}}
+                                                    autoFocus
+                                                    className="flex-1 bg-gray-800 border border-cyan-500 rounded px-2 py-1 text-white mr-2"
+                                                />
+                                            ) : (
+                                                <span className="text-gray-300 flex-1">{e}</span>
+                                            )}
+                                            <div className="flex gap-2">
+                                                <button onClick={() => { setEditandoEsca(e); setValoreEditEsca(e); }} className="text-blue-500 active:text-blue-400">
+                                                    <Edit width={16} height={16} />
+                                                </button>
+                                                <button onClick={() => setEscheMemorizzate(escheMemorizzate.filter(x => x !== e))} className="text-red-500 active:text-red-400">
+                                                    <Trash2 width={16} height={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="bg-gray-800 rounded-lg border border-gray-700">
+                                    <button
+                                        onClick={() => setMostraCanne(!mostraCanne)}
+                                        className="w-full flex items-center justify-between p-4 active:bg-gray-700"
+                                    >
+                                        <h3 className="text-lg font-bold text-cyan-400">🎣 canne</h3>
+                                        {mostraCanne ?
+                                            <ChevronUp className="text-cyan-400" width={20} height={20} /> :
+                                            <ChevronDown className="text-cyan-400" width={20} height={20} />
+                                        }
+                                    </button>
+                                    {mostraCanne && (
+                                        <div className="p-4 pt-0">
+                                            <div className="flex justify-between items-center mb-3">
+                                                <button onClick={aggiungiCanna} className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">+ aggiungi</button>
+                                            </div>
+                                            <input type="text" value={nuovaCanna} onChange={(e) => setNuovaCanna(e.target.value)} placeholder="es: bolognese 6m..." 
+                                        className="w-full mb-3 bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-2 text-white" />
+                                    {[...canneMemorizzate].sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })).map((c, i) => (
+                                        <div key={i} className="flex justify-between items-center bg-gray-900 rounded px-3 py-2 mb-2">
+                                            {editandoCanna === c ? (
+                                                <input
+                                                    type="text"
+                                                    value={valoreEditCanna}
+                                                    onChange={(ev) => setValoreEditCanna(ev.target.value)}
+                                                    onBlur={() => { modificaCanna(c, valoreEditCanna); setEditandoCanna(null); }}
+                                                    onKeyPress={(ev) => { if (ev.key === 'Enter') { modificaCanna(c, valoreEditCanna); setEditandoCanna(null); }}}
+                                                    autoFocus
+                                                    className="flex-1 bg-gray-800 border border-cyan-500 rounded px-2 py-1 text-white mr-2"
+                                                />
+                                            ) : (
+                                                <span className="text-gray-300 flex-1">{c}</span>
+                                            )}
+                                            <div className="flex gap-2">
+                                                <button onClick={() => { setEditandoCanna(c); setValoreEditCanna(c); }} className="text-blue-500 active:text-blue-400">
+                                                    <Edit width={16} height={16} />
+                                                </button>
+                                                <button onClick={() => setCanneMemorizzate(canneMemorizzate.filter(x => x !== c))} className="text-red-500 active:text-red-400">
+                                                    <Trash2 width={16} height={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="bg-gray-800 rounded-lg border border-gray-700">
+                                    <button
+                                        onClick={() => setMostraTravi(!mostraTravi)}
+                                        className="w-full flex items-center justify-between p-4 active:bg-gray-700"
+                                    >
+                                        <h3 className="text-lg font-bold text-cyan-400">🧵 travi</h3>
+                                        {mostraTravi ?
+                                            <ChevronUp className="text-cyan-400" width={20} height={20} /> :
+                                            <ChevronDown className="text-cyan-400" width={20} height={20} />
+                                        }
+                                    </button>
+                                    {mostraTravi && (
+                                        <div className="p-4 pt-0">
+                                            <div className="flex justify-between items-center mb-3">
+                                                <button onClick={aggiungiTrave} className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">+ aggiungi</button>
+                                            </div>
+                                            <input type="text" value={nuovoTrave} onChange={(e) => setNuovoTrave(e.target.value)} placeholder="es: 0.20mm..."
+                                                className="w-full mb-3 bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-2 text-white" />
+                                            {[...traviMemorizzate].sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })).map((t, i) => (
+                                                <div key={i} className="flex justify-between items-center bg-gray-900 rounded px-3 py-2 mb-2">
+                                                    {editandoTrave === t ? (
+                                                        <input
+                                                            type="text"
+                                                            value={valoreEditTrave}
+                                                            onChange={(ev) => setValoreEditTrave(ev.target.value)}
+                                                            onBlur={() => { modificaTrave(t, valoreEditTrave); setEditandoTrave(null); }}
+                                                            onKeyPress={(ev) => { if (ev.key === 'Enter') { modificaTrave(t, valoreEditTrave); setEditandoTrave(null); }}}
+                                                            autoFocus
+                                                            className="flex-1 bg-gray-800 border border-cyan-500 rounded px-2 py-1 text-white mr-2"
+                                                        />
+                                                    ) : (
+                                                        <span className="text-gray-300 flex-1">{t}</span>
+                                                    )}
+                                                    <div className="flex gap-2">
+                                                        <button onClick={() => { setEditandoTrave(t); setValoreEditTrave(t); }} className="text-blue-500 active:text-blue-400">
+                                                            <Edit width={16} height={16} />
+                                                        </button>
+                                                        <button onClick={() => setTraviMemorizzate(traviMemorizzate.filter(x => x !== t))} className="text-red-500 active:text-red-400">
+                                                            <Trash2 width={16} height={16} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="bg-gray-800 rounded-lg border border-gray-700">
+                                    <button
+                                        onClick={() => setMostraAmi(!mostraAmi)}
+                                        className="w-full flex items-center justify-between p-4 active:bg-gray-700"
+                                    >
+                                        <h3 className="text-lg font-bold text-cyan-400">🪝 ami</h3>
+                                        {mostraAmi ?
+                                            <ChevronUp className="text-cyan-400" width={20} height={20} /> :
+                                            <ChevronDown className="text-cyan-400" width={20} height={20} />
+                                        }
+                                    </button>
+                                    {mostraAmi && (
+                                        <div className="p-4 pt-0">
+                                            <div className="flex justify-between items-center mb-3">
+                                                <button onClick={aggiungiAmo} className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">+ aggiungi</button>
+                                            </div>
+                                            <input type="text" value={nuovoAmo} onChange={(e) => setNuovoAmo(e.target.value)} placeholder="es: n.8..." 
+                                        className="w-full mb-3 bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-2 text-white" />
+                                    {[...amiMemorizzati].sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })).map((a, i) => (
+                                        <div key={i} className="flex justify-between items-center bg-gray-900 rounded px-3 py-2 mb-2">
+                                            {editandoAmo === a ? (
+                                                <input
+                                                    type="text"
+                                                    value={valoreEditAmo}
+                                                    onChange={(ev) => setValoreEditAmo(ev.target.value)}
+                                                    onBlur={() => { modificaAmo(a, valoreEditAmo); setEditandoAmo(null); }}
+                                                    onKeyPress={(ev) => { if (ev.key === 'Enter') { modificaAmo(a, valoreEditAmo); setEditandoAmo(null); }}}
+                                                    autoFocus
+                                                    className="flex-1 bg-gray-800 border border-cyan-500 rounded px-2 py-1 text-white mr-2"
+                                                />
+                                            ) : (
+                                                <span className="text-gray-300 flex-1">{a}</span>
+                                            )}
+                                            <div className="flex gap-2">
+                                                <button onClick={() => { setEditandoAmo(a); setValoreEditAmo(a); }} className="text-blue-500 active:text-blue-400">
+                                                    <Edit width={16} height={16} />
+                                                </button>
+                                                <button onClick={() => setAmiMemorizzati(amiMemorizzati.filter(x => x !== a))} className="text-red-500 active:text-red-400">
+                                                    <Trash2 width={16} height={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="bg-gray-800 rounded-lg border border-gray-700">
+                                    <button
+                                        onClick={() => setMostraPiombi(!mostraPiombi)}
+                                        className="w-full flex items-center justify-between p-4 active:bg-gray-700"
+                                    >
+                                        <h3 className="text-lg font-bold text-cyan-400">⚓ piombi</h3>
+                                        {mostraPiombi ?
+                                            <ChevronUp className="text-cyan-400" width={20} height={20} /> :
+                                            <ChevronDown className="text-cyan-400" width={20} height={20} />
+                                        }
+                                    </button>
+                                    {mostraPiombi && (
+                                        <div className="p-4 pt-0">
+                                            <div className="flex justify-between items-center mb-3">
+                                                <button onClick={aggiungiPiombo} className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">+ aggiungi</button>
+                                            </div>
+                                            <input type="text" value={nuovoPiombo} onChange={(e) => setNuovoPiombo(e.target.value)} placeholder="es: 50g..."
+                                                className="w-full mb-3 bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-2 text-white" />
+                                            {[...piombiMemorizzati].sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })).map((p, i) => (
+                                                <div key={i} className="flex justify-between items-center bg-gray-900 rounded px-3 py-2 mb-2">
+                                                    {editandoPiombo === p ? (
+                                                        <input
+                                                            type="text"
+                                                            value={valoreEditPiombo}
+                                                            onChange={(ev) => setValoreEditPiombo(ev.target.value)}
+                                                            onBlur={() => { modificaPiombo(p, valoreEditPiombo); setEditandoPiombo(null); }}
+                                                            onKeyPress={(ev) => { if (ev.key === 'Enter') { modificaPiombo(p, valoreEditPiombo); setEditandoPiombo(null); }}}
+                                                            autoFocus
+                                                            className="flex-1 bg-gray-800 border border-cyan-500 rounded px-2 py-1 text-white mr-2"
+                                                        />
+                                                    ) : (
+                                                        <span className="text-gray-300 flex-1">{p}</span>
+                                                    )}
+                                                    <div className="flex gap-2">
+                                                        <button onClick={() => { setEditandoPiombo(p); setValoreEditPiombo(p); }} className="text-blue-500 active:text-blue-400">
+                                                            <Edit width={16} height={16} />
+                                                        </button>
+                                                        <button onClick={() => setPiombiMemorizzati(piombiMemorizzati.filter(x => x !== p))} className="text-red-500 active:text-red-400">
+                                                            <Trash2 width={16} height={16} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </Section>
+
+                        <Section icon={BarChart3} title="analizza dati" isActive={activeSection === 'analisi'} onToggle={() => setActiveSection(activeSection === 'analisi' ? null : 'analisi')}>
+                            {catture.length === 0 ? (
+                                <p className="text-gray-400 text-center py-8">nessuna cattura registrata</p>
+                            ) : (
+                                <>
+                                    <div className="bg-gray-800 rounded-lg border-2 border-purple-500 mb-6">
+                                        <button
+                                            onClick={() => setMostraFiltri(!mostraFiltri)}
+                                            className="w-full flex items-center justify-between p-4 active:bg-gray-700"
+                                        >
+                                            <h3 className="text-purple-400 font-bold text-xl">🔍 filtri ricerca</h3>
+                                            {mostraFiltri ?
+                                                <ChevronUp className="text-cyan-400" width={24} height={24} /> :
+                                                <ChevronDown className="text-cyan-400" width={24} height={24} />
+                                            }
+                                        </button>
+                                        {mostraFiltri && (
+                                            <div className="p-4 pt-0">
+                                                <div className="space-y-4">
+                                            <div>
+                                                <label className="block text-cyan-400 text-sm font-semibold mb-2">anno</label>
+                                                <select value={filtri.anno} onChange={(e) => setFiltri(p => ({...p, anno: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
+                                                    <option value="tutti">tutti gli anni</option>
+                                                    {getAnniDisponibili().map(a => <option key={a} value={a}>{a}</option>)}
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-cyan-400 text-sm font-semibold mb-2">mese</label>
+                                                <select value={filtri.mese} onChange={(e) => setFiltri(p => ({...p, mese: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
+                                                    <option value="tutti">tutti i mesi</option>
+                                                    <option value="01">gennaio</option>
+                                                    <option value="02">febbraio</option>
+                                                    <option value="03">marzo</option>
+                                                    <option value="04">aprile</option>
+                                                    <option value="05">maggio</option>
+                                                    <option value="06">giugno</option>
+                                                    <option value="07">luglio</option>
+                                                    <option value="08">agosto</option>
+                                                    <option value="09">settembre</option>
+                                                    <option value="10">ottobre</option>
+                                                    <option value="11">novembre</option>
+                                                    <option value="12">dicembre</option>
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-cyan-400 text-sm font-semibold mb-2">specie</label>
+                                                <select value={filtri.specie} onChange={(e) => setFiltri(p => ({...p, specie: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
+                                                    <option value="tutte">tutte le specie</option>
+                                                    {[...new Set(catture.map(c => c.specie).filter(Boolean))].sort().map(s => <option key={s} value={s}>{s}</option>)}
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-cyan-400 text-sm font-semibold mb-2">località</label>
+                                                <select value={filtri.localita} onChange={(e) => setFiltri(p => ({...p, localita: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
+                                                    <option value="tutte">tutte le località</option>
+                                                    {[...new Set(catture.map(c => c.localita).filter(Boolean))].sort().map(l => <option key={l} value={l}>{l}</option>)}
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-cyan-400 text-sm font-semibold mb-2">direzione vento</label>
+                                                <select value={filtri.direzioneVento} onChange={(e) => setFiltri(p => ({...p, direzioneVento: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
+                                                    <option value="tutte">tutte le direzioni</option>
+                                                    {ventiRosaDeiVenti.map(v => <option key={v} value={v}>{v}</option>)}
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-cyan-400 text-sm font-semibold mb-2">condizioni meteo</label>
+                                                <select value={filtri.condizioni} onChange={(e) => setFiltri(p => ({...p, condizioni: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
+                                                    <option value="tutte">tutte le condizioni</option>
+                                                    {condizioniMeteo.map(c => <option key={c} value={c}>{c}</option>)}
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-cyan-400 text-sm font-semibold mb-2">temperatura</label>
+                                                <select value={filtri.temperatura} onChange={(e) => setFiltri(p => ({...p, temperatura: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
+                                                    <option value="tutte">tutte le temperature</option>
+                                                    {[...new Set(catture.map(c => c.meteo?.temperatura).filter(Boolean))].sort().map(t => <option key={t} value={t}>{t}°C</option>)}
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-cyan-400 text-sm font-semibold mb-2">pressione</label>
+                                                <select value={filtri.pressione} onChange={(e) => setFiltri(p => ({...p, pressione: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
+                                                    <option value="tutte">tutte le pressioni</option>
+                                                    {[...new Set(catture.map(c => c.meteo?.pressione).filter(Boolean))].sort().map(p => <option key={p} value={p}>{p} hPa</option>)}
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-cyan-400 text-sm font-semibold mb-2">intensità vento</label>
+                                                <select value={filtri.vento} onChange={(e) => setFiltri(p => ({...p, vento: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
+                                                    <option value="tutti">tutte le intensità</option>
+                                                    {[...new Set(catture.map(c => c.meteo?.vento).filter(Boolean))].sort().map(v => <option key={v} value={v}>{v} km/h</option>)}
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-cyan-400 text-sm font-semibold mb-2">fase lunare</label>
+                                                <select value={filtri.faseLunare} onChange={(e) => setFiltri(p => ({...p, faseLunare: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
+                                                    <option value="tutte">tutte le fasi</option>
+                                                    {fasiLunari.map(f => <option key={f} value={f}>{f}</option>)}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <button onClick={() => setFiltri({ anno: 'tutti', mese: 'tutti', specie: 'tutte', direzioneVento: 'tutte', condizioni: 'tutte', localita: 'tutte', temperatura: 'tutte', pressione: 'tutte', vento: 'tutti', faseLunare: 'tutte' })}
+                                            className="w-full mt-4 bg-red-600 text-white py-2 rounded-lg font-bold">
+                                            reset filtri
+                                        </button>
+                                                </div>
+                                            )}
+                                    </div>
+
+                                    {sessioniCompletate.length > 0 && (
+                                        <div className="mb-6 bg-gray-800 rounded-lg border-2 border-orange-500">
+                                            <button
+                                                onClick={() => setMostraGestioneSessioni(!mostraGestioneSessioni)}
+                                                className="w-full flex items-center justify-between p-4 active:bg-gray-700"
+                                            >
+                                                <h3 className="text-orange-400 font-bold text-xl flex items-center gap-2">
+                                                    📋 gestione sessioni registrate ({getSessioniFiltrate().length}/{sessioniCompletate.length})
+                                                </h3>
+                                                {mostraGestioneSessioni ?
+                                                    <ChevronUp className="text-cyan-400" width={24} height={24} /> :
+                                                    <ChevronDown className="text-cyan-400" width={24} height={24} />
+                                                }
+                                            </button>
+                                            {mostraGestioneSessioni && (
+                                                <div className="p-4 pt-0">
+                                                    <p className="text-gray-400 text-sm mb-4 text-center">
+                                                        Cancella sessioni con coordinate errate
+                                                    </p>
+                                                    {getSessioniFiltrate().length === 0 ? (
+                                                        <p className="text-yellow-400 text-center py-6">
+                                                            ⚠️ Nessuna sessione corrisponde ai filtri selezionati
+                                                        </p>
+                                                    ) : (
+                                                    <>
+                                                    <div className="space-y-2">
+                                                {getSessioniPaginate().map((sessione) => {
+                                                    const validazione = validaCoordinate(sessione.latitudine, sessione.longitudine);
+                                                    const isEspansa = sessioniEspanse[sessione.id];
+                                                    return (
+                                                        <div
+                                                            key={sessione.id}
+                                                            className={`rounded-lg ${validazione.valid ? 'bg-gray-900 border border-gray-700' : 'bg-red-900/30 border-2 border-red-500'}`}
+                                                        >
+                                                            <div
+                                                                onClick={() => toggleSessioneEspansa(sessione.id)}
+                                                                className="flex justify-between items-center p-3 cursor-pointer active:bg-gray-800"
+                                                            >
+                                                                <div className="flex-1">
+                                                                    <p className="text-white font-semibold">{sessione.localita}</p>
+                                                                    {isEspansa && (
+                                                                        <>
+                                                                        <p className="text-gray-400 text-sm mt-2">
+                                                                            📅 {sessione.dataInizio} • ⏰ {sessione.oraInizio}-{sessione.oraFine} • 🎣 {sessione.numeroCatture} catture
+                                                                        </p>
+                                                                        <p className={`text-xs mt-1 ${validazione.valid ? 'text-green-400' : 'text-red-400'}`}>
+                                                                            📍 Lat: {sessione.latitudine}, Long: {sessione.longitudine}
+                                                                            {!validazione.valid && <span className="ml-2">⚠️ {validazione.error}</span>}
+                                                                        </p>
+                                                                        {(() => {
+                                                                            const cattureSessione = catture.filter(c => c.sessioneId === sessione.id);
+                                                                            const specieCount = {};
+                                                                            cattureSessione.forEach(c => {
+                                                                                if (c.specie) {
+                                                                                    specieCount[c.specie] = (specieCount[c.specie] || 0) + 1;
+                                                                                }
+                                                                            });
+                                                                            const specieArray = Object.entries(specieCount).sort((a, b) => b[1] - a[1]);
+                                                                            return specieArray.length > 0 && (
+                                                                                <div className="mt-2 p-2 bg-blue-900/20 border border-blue-500/50 rounded">
+                                                                                    <p className="text-blue-300 text-xs font-semibold mb-1">🐟 Specie catturate:</p>
+                                                                                    <div className="flex flex-wrap gap-1">
+                                                                                        {specieArray.map(([specie, numero]) => (
+                                                                                            <span key={specie} className="text-cyan-400 text-xs bg-cyan-900/30 px-2 py-1 rounded">
+                                                                                                {specie} ({numero})
+                                                                                            </span>
+                                                                                        ))}
+                                                                                    </div>
+                                                                                </div>
+                                                                            );
+                                                                        })()}
+                                                                        </>
+                                                                    )}
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    {isEspansa ? <ChevronUp className="text-cyan-400" width={20} height={20} /> : <ChevronDown className="text-cyan-400" width={20} height={20} />}
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            if (window.confirm(`Cancellare la sessione "${sessione.localita}" del ${sessione.dataInizio}?`)) {
+                                                                                setSessioniCompletate(sessioniCompletate.filter(s => s.id !== sessione.id));
+                                                                            }
+                                                                        }}
+                                                                        className="text-red-500 active:text-red-400"
+                                                                    >
+                                                                        <Trash2 width={20} height={20} />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                                    </div>
+
+                                                    {/* Paginazione Sessioni */}
+                                                    {totalePagineSessioni > 1 && (
+                                                        <div className="flex items-center justify-center gap-3 mt-4">
+                                                            <button
+                                                                onClick={() => setPaginaSessioni(Math.max(0, paginaSessioni - 1))}
+                                                                disabled={paginaSessioni === 0}
+                                                                className="bg-cyan-600 text-white px-4 py-2 rounded-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed active:bg-cyan-700"
+                                                            >
+                                                                ← Precedente
+                                                            </button>
+                                                            <span className="text-gray-300 text-sm">
+                                                                Pagina {paginaSessioni + 1} di {totalePagineSessioni}
+                                                            </span>
+                                                            <button
+                                                                onClick={() => setPaginaSessioni(Math.min(totalePagineSessioni - 1, paginaSessioni + 1))}
+                                                                disabled={paginaSessioni >= totalePagineSessioni - 1}
+                                                                className="bg-cyan-600 text-white px-4 py-2 rounded-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed active:bg-cyan-700"
+                                                            >
+                                                                Successiva →
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                    </>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {stats && (
+                                        <div className="grid grid-cols-3 gap-4 mb-6">
+                                            <div className="bg-cyan-900 rounded-lg p-4 border border-cyan-600">
+                                                <p className="text-cyan-300 text-xs font-semibold">totale</p>
+                                                <p className="text-white text-2xl font-bold">{stats.totaleCatture}</p>
+                                            </div>
+                                            <div className="bg-blue-900 rounded-lg p-4 border border-blue-600">
+                                                <p className="text-blue-300 text-xs font-semibold">più catturata</p>
+                                                {stats.speciePiuCatturata && (
+                                                    <>
+                                                        <p className="text-white text-lg font-bold">{stats.speciePiuCatturata[0]}</p>
+                                                        <p className="text-blue-300 text-xs">({stats.speciePiuCatturata[1]})</p>
+                                                    </>
+                                                )}
+                                            </div>
+                                            <div className="bg-green-900 rounded-lg p-4 border border-green-600">
+                                                <p className="text-green-300 text-xs font-semibold">peso medio</p>
+                                                <p className="text-white text-2xl font-bold">{stats.pesoMedio} kg</p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {mostraRegistro && (
+                                        <div className="bg-gray-800 rounded-lg border-2 border-cyan-500 mb-6">
+                                            <button
+                                                onClick={() => setMostraCatture(!mostraCatture)}
+                                                className="w-full flex items-center justify-between p-4 active:bg-gray-700"
+                                            >
+                                                <h3 className="text-cyan-400 font-bold text-xl flex items-center gap-2">
+                                                    📊 registro catture ({getCattureFiltrate().length})
+                                                </h3>
+                                                {mostraCatture ?
+                                                    <ChevronUp className="text-cyan-400" width={24} height={24} /> :
+                                                    <ChevronDown className="text-cyan-400" width={24} height={24} />
+                                                }
+                                            </button>
+                                            {mostraCatture && (
+                                                <div className="p-4 pt-0">
+                                                    <div className="space-y-3">
+                                            {getCatturePaginate().map(c => {
+                                                const isEspansa = cattureEspanse[c.id];
+                                                return (
+                                                <div key={c.id} className="bg-gray-900 rounded-lg border border-gray-700">
+                                                    <div
+                                                        onClick={() => toggleCatturaEspansa(c.id)}
+                                                        className="flex justify-between items-start p-4 cursor-pointer active:bg-gray-800"
+                                                    >
+                                                        <div className="flex-1">
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <h4 className="text-white font-bold text-xl">{c.specie}</h4>
+                                                                {isEspansa ? <ChevronUp className="text-cyan-400" width={20} height={20} /> : <ChevronDown className="text-cyan-400" width={20} height={20} />}
+                                                            </div>
+                                                            <p className="text-gray-400 text-sm">{c.data} - {c.ora}</p>
+                                                            {c.meteo?.direzioneVento && (
+                                                                <p className="text-cyan-300 text-sm mt-1">
+                                                                    🌬️ {c.meteo.direzioneVento.split(' ')[0]}
+                                                                </p>
+                                                            )}
+
+                                                            {isEspansa && (
+                                                                <>
+                                                                <div className="mt-3 pt-3 border-t border-gray-700">
+                                                                    <h5 className="text-cyan-400 font-semibold mb-2 text-sm">dati cattura</h5>
+                                                                    <div className="grid grid-cols-2 gap-2 text-sm">
+                                                                        {c.peso && <p className="text-gray-300"><span className="text-cyan-400">peso:</span> {(parseFloat(c.peso)/1000).toFixed(2)} kg</p>}
+                                                                        {c.lunghezza && <p className="text-gray-300"><span className="text-cyan-400">lunghezza:</span> {c.lunghezza} cm</p>}
+                                                                        {c.localita && <p className="text-gray-300"><span className="text-cyan-400">località:</span> {c.localita}</p>}
+                                                                        {c.esca && <p className="text-gray-300"><span className="text-cyan-400">esca:</span> {c.esca}</p>}
+                                                                        {c.latitudine && <p className="text-gray-300"><span className="text-cyan-400">lat:</span> {c.latitudine}</p>}
+                                                                        {c.longitudine && <p className="text-gray-300"><span className="text-cyan-400">long:</span> {c.longitudine}</p>}
+                                                                        {c.canna && <p className="text-gray-300"><span className="text-cyan-400">canna:</span> {c.canna}</p>}
+                                                                        {c.trave && <p className="text-gray-300"><span className="text-cyan-400">trave:</span> {c.trave}</p>}
+                                                                        {c.amo && <p className="text-gray-300"><span className="text-cyan-400">amo:</span> {c.amo}</p>}
+                                                                        {c.piombo && <p className="text-gray-300"><span className="text-cyan-400">piombo:</span> {c.piombo}</p>}
+                                                                    </div>
+                                                                    {c.note && <p className="text-gray-400 text-sm mt-2 italic"><span className="text-cyan-400">note:</span> {c.note}</p>}
+                                                                </div>
+
+                                                                {c.meteo && Object.values(c.meteo).some(Boolean) && (
+                                                                    <div className="mt-3 pt-3 border-t border-gray-700">
+                                                                        <h5 className="text-cyan-400 font-semibold mb-2 text-sm">dati meteo</h5>
+                                                                        <div className="grid grid-cols-2 gap-2 text-sm">
+                                                                            {c.meteo.temperatura && <p className="text-gray-300"><span className="text-cyan-400">temp aria:</span> {c.meteo.temperatura}°C</p>}
+                                                                            {c.meteo.temperaturaAcqua && <p className="text-gray-300"><span className="text-cyan-400">temp acqua:</span> {c.meteo.temperaturaAcqua}°C</p>}
+                                                                            {c.meteo.pressione && <p className="text-gray-300"><span className="text-cyan-400">pressione:</span> {c.meteo.pressione} hPa</p>}
+                                                                            {c.meteo.vento && <p className="text-gray-300"><span className="text-cyan-400">vento:</span> {c.meteo.vento} nodi</p>}
+                                                                            {c.meteo.direzioneVento && <p className="text-gray-300 col-span-2"><span className="text-cyan-400">direzione:</span> {c.meteo.direzioneVento}</p>}
+                                                                            {c.meteo.condizioni && <p className="text-gray-300"><span className="text-cyan-400">condizioni:</span> {c.meteo.condizioni}</p>}
+                                                                            {c.meteo.faseLunare && <p className="text-gray-300"><span className="text-cyan-400">luna:</span> {c.meteo.faseLunare}</p>}
+                                                                            {c.meteo.altaMareaOra && <p className="text-gray-300"><span className="text-cyan-400">alta marea:</span> {c.meteo.altaMareaOra}</p>}
+                                                                            {c.meteo.bassaMareaOra && <p className="text-gray-300"><span className="text-cyan-400">bassa marea:</span> {c.meteo.bassaMareaOra}</p>}
+                                                                            {c.meteo.altezzaOnde && <p className="text-gray-300"><span className="text-cyan-400">altezza onde:</span> {c.meteo.altezzaOnde} cm</p>}
+                                                                            {c.meteo.frequenzaOnde && <p className="text-gray-300"><span className="text-cyan-400">frequenza onde:</span> {c.meteo.frequenzaOnde} sec</p>}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (window.confirm(`Cancellare la cattura di ${c.specie}?`)) {
+                                                                    setCatture(catture.filter(x => x.id !== c.id));
+                                                                }
+                                                            }}
+                                                            className="text-red-500 ml-3"
+                                                        >
+                                                            <Trash2 width={20} height={20} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                );
+                                            })}
+                                                    </div>
+
+                                                    {/* Paginazione Catture */}
+                                                    {totalePagineCatture > 1 && (
+                                                        <div className="flex items-center justify-center gap-3 mt-4">
+                                                            <button
+                                                                onClick={() => setPaginaCatture(Math.max(0, paginaCatture - 1))}
+                                                                disabled={paginaCatture === 0}
+                                                                className="bg-cyan-600 text-white px-4 py-2 rounded-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed active:bg-cyan-700"
+                                                            >
+                                                                ← Precedente
+                                                            </button>
+                                                            <span className="text-gray-300 text-sm">
+                                                                Pagina {paginaCatture + 1} di {totalePagineCatture}
+                                                            </span>
+                                                            <button
+                                                                onClick={() => setPaginaCatture(Math.min(totalePagineCatture - 1, paginaCatture + 1))}
+                                                                disabled={paginaCatture >= totalePagineCatture - 1}
+                                                                className="bg-cyan-600 text-white px-4 py-2 rounded-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed active:bg-cyan-700"
+                                                            >
+                                                                Successiva →
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {sessioniCompletate.length > 0 && (
+                                        <div className="mb-6 bg-gray-800 rounded-lg border-2 border-green-500">
+                                            <button
+                                                onClick={() => setMostraMappa(!mostraMappa)}
+                                                className="w-full flex items-center justify-between p-4 active:bg-gray-700"
+                                            >
+                                                <div className="flex-1">
+                                                    <h3 className="text-cyan-400 font-bold text-center text-xl">
+                                                        🗺️ mappa sessioni di pesca
+                                                    </h3>
+                                                    <p className="text-gray-400 text-center text-sm mt-1">
+                                                        {sessioniCompletate.length} {sessioniCompletate.length === 1 ? 'sessione registrata' : 'sessioni registrate'}
+                                                    </p>
+                                                </div>
+                                                {mostraMappa ?
+                                                    <ChevronUp className="text-cyan-400" width={24} height={24} /> :
+                                                    <ChevronDown className="text-cyan-400" width={24} height={24} />
+                                                }
+                                            </button>
+                                            {mostraMappa && (
+                                                <div className="p-4 pt-0">
+                                                    <div className="bg-blue-900/20 border border-blue-500 rounded-lg p-3 mb-3 text-center">
+                                                        <p className="text-blue-400 text-xs">
+                                                            💡 Apri la console del browser (F12) per vedere i dettagli del caricamento
+                                                        </p>
+                                                    </div>
+                                                    <div
+                                                        id="map-container"
+                                                        className="w-full h-96 rounded-lg border-2 border-cyan-500"
+                                                        style={{minHeight: '400px'}}
+                                                    ></div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </Section>
+
+                        {catture.length > 0 && (
+                            <div className="mt-8 p-6 bg-gray-900 border-2 border-purple-600 rounded-xl">
+                                <h2 className="text-2xl font-bold text-purple-400 mb-3 text-center">esportazione</h2>
+                                <button onClick={esportaDati} className="w-full bg-purple-600 text-white py-4 rounded-lg font-bold text-xl">
+                                    esporta dati ({catture.length})
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+                </>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<DiarioPesca />);
+    </script>
+</body>
+</html>
+ 
