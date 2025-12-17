@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>FishAI - Manuale Utente</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            overscroll-behavior: none;
+            scroll-behavior: smooth;
+        }
+        .section-link {
+            transition: all 0.2s;
+        }
+        .section-link:hover {
+            transform: translateX(8px);
+        }
+        .image-placeholder {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px dashed #0891b2;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #374151;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #1e293b;
+            color: #22d3ee;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #0f172a;
+        }
+        code {
+            background-color: #1e293b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        .toc-item {
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .toc-item:hover {
+            border-left-color: #22d3ee;
+            background-color: #1e293b;
+        }
+    </style>
+</head>
+<body class="bg-black text-gray-100">
+    <div class="min-h-screen bg-black">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-cyan-900 to-blue-900 p-6 sticky top-0 z-50 shadow-lg border-b-2 border-cyan-500">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold text-white mb-1">📱 FishAI - Manuale Utente</h1>
+                        <p class="text-cyan-200 text-sm">Il tuo diario di pesca intelligente</p>
+                    </div>
+                    <a href="index.html" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all">
+                        Apri App
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="max-w-6xl mx-auto p-4 lg:p-8">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+                <!-- Sidebar - Table of Contents -->
+                <aside class="lg:col-span-1">
+                    <div class="sticky top-24 bg-gray-900 rounded-xl border-2 border-cyan-600 p-4">
+                        <h2 class="text-xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                            📖 Indice
+                        </h2>
+                        <nav class="space-y-1">
+                            <a href="#intro" class="toc-item block px-3 py-2 text-sm text-gray-300 rounded hover:text-cyan-400">🎯 Perché FishAI</a>
+                            <a href="#sec1" class="toc-item block px-3 py-2 text-sm text-gray-300 rounded hover:text-cyan-400">1. Prima Configurazione</a>
+                            <a href="#sec2" class="toc-item block px-3 py-2 text-sm text-gray-300 rounded hover:text-cyan-400">2. Avviare una Sessione</a>
+                            <a href="#sec3" class="toc-item block px-3 py-2 text-sm text-gray-300 rounded hover:text-cyan-400">3. Condizioni Meteo</a>
+                            <a href="#sec4" class="toc-item block px-3 py-2 text-sm text-gray-300 rounded hover:text-cyan-400">4. Registrare Cattura</a>
+                            <a href="#sec5" class="toc-item block px-3 py-2 text-sm text-gray-300 rounded hover:text-cyan-400">5. Assistente Vocale</a>
+                            <a href="#sec6" class="toc-item block px-3 py-2 text-sm text-gray-300 rounded hover:text-cyan-400">6. Analizzare i Dati</a>
+                            <a href="#sec7" class="toc-item block px-3 py-2 text-sm text-gray-300 rounded hover:text-cyan-400">7. Gestire Attrezzature</a>
+                            <a href="#sec8" class="toc-item block px-3 py-2 text-sm text-gray-300 rounded hover:text-cyan-400">8. Esportare Dati</a>
+                            <a href="#sec9" class="toc-item block px-3 py-2 text-sm text-gray-300 rounded hover:text-cyan-400">9. FAQ</a>
+                        </nav>
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <main class="lg:col-span-3 space-y-8">
+
+                    <!-- Intro -->
+                    <section id="intro" class="bg-gradient-to-br from-blue-900/30 to-cyan-900/30 rounded-xl border-2 border-cyan-500 p-6">
+                        <h2 class="text-3xl font-bold text-cyan-400 mb-4">🎯 Perché usare FishAI?</h2>
+                        <div class="text-gray-200 space-y-4">
+                            <p class="text-lg">Ogni pescatore sa che <strong class="text-cyan-400">il successo non è questione di fortuna, ma di esperienza e dati</strong>.</p>
+
+                            <p>Quante volte ti sei chiesto:</p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300 ml-4">
+                                <li><em>"Dove avevo pescato quella bella spigola?"</em></li>
+                                <li><em>"Con che vento pescavo meglio in questo spot?"</em></li>
+                                <li><em>"Quale esca funziona meglio con mare mosso?"</em></li>
+                                <li><em>"In che fase lunare ho fatto più catture?"</em></li>
+                            </ul>
+
+                            <div class="bg-cyan-900/30 border-2 border-cyan-500 rounded-lg p-4 mt-4">
+                                <p class="text-lg font-bold text-cyan-300 mb-2">FishAI trasforma la tua esperienza in conoscenza.</p>
+                                <p class="text-gray-300">Registrando ogni uscita con condizioni meteo, posizione GPS e risultati, costruisci un <strong>database personale</strong> che ti dirà esattamente:</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+                                <div class="bg-green-900/20 border border-green-500 rounded-lg p-3">
+                                    <p class="text-green-400">✅ Dove andare in base alle previsioni meteo di oggi</p>
+                                </div>
+                                <div class="bg-green-900/20 border border-green-500 rounded-lg p-3">
+                                    <p class="text-green-400">✅ Quale attrezzatura usare</p>
+                                </div>
+                                <div class="bg-green-900/20 border border-green-500 rounded-lg p-3">
+                                    <p class="text-green-400">✅ Quali esche funzionano meglio</p>
+                                </div>
+                                <div class="bg-green-900/20 border border-green-500 rounded-lg p-3">
+                                    <p class="text-green-400">✅ Quando i pesci sono più attivi</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-yellow-900/30 border-2 border-yellow-500 rounded-lg p-4 mt-4 text-center">
+                                <p class="text-xl font-bold text-yellow-300">Non pescare più al buio. Pesca con i dati.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Sezione 1 -->
+                    <section id="sec1" class="bg-gray-900 rounded-xl border-2 border-gray-700 p-6">
+                        <h2 class="text-2xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                            <span class="text-3xl">1️⃣</span> Prima Configurazione
+                        </h2>
+
+                        <p class="text-gray-300 mb-6">Prima di iniziare a pescare, configura le tue liste personalizzate.</p>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Passo 1: Accedi alla sezione "Gestione"</h3>
+                                <p class="text-gray-300 mb-3">Tocca la sezione <strong class="text-cyan-400">"gestione"</strong> (icona chiave inglese 🔧).</p>
+                                <div class="image-placeholder rounded-lg p-8 text-center">
+                                    <p class="text-gray-500 italic">📸 Immagine: Screenshot della schermata principale con la sezione "gestione" evidenziata</p>
+                                    <p class="text-sm text-gray-600 mt-2">File: <code>01-sezione-gestione.png</code></p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Passo 2: Aggiungi le tue Specie</h3>
+                                <ol class="list-decimal list-inside space-y-2 text-gray-300 ml-4">
+                                    <li>Scorri fino alla sezione <strong>"specie"</strong></li>
+                                    <li>Scrivi il nome della specie nel campo (es: "spigola")</li>
+                                    <li>Tocca <strong>"+ aggiungi"</strong></li>
+                                    <li>Ripeti per tutte le specie che peschi</li>
+                                </ol>
+                                <div class="image-placeholder rounded-lg p-8 text-center mt-3">
+                                    <p class="text-gray-500 italic">📸 Immagine: Campo input "specie" con esempio "spigola" e pulsante "+ aggiungi"</p>
+                                    <p class="text-sm text-gray-600 mt-2">File: <code>02-aggiungi-specie.png</code></p>
+                                </div>
+                                <div class="bg-blue-900/20 border border-blue-500 rounded-lg p-3 mt-3">
+                                    <p class="text-blue-300 text-sm"><strong>💡 Consiglio:</strong> Aggiungi tutte le specie comuni della tua zona (spigola, orata, sarago, mormora, ombrina, etc.)</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Passo 3: Aggiungi le tue Esche</h3>
+                                <p class="text-gray-300 mb-3">Stessa procedura per le esche.</p>
+                                <div class="image-placeholder rounded-lg p-8 text-center">
+                                    <p class="text-gray-500 italic">📸 Immagine: Lista esche con esempi</p>
+                                    <p class="text-sm text-gray-600 mt-2">File: <code>03-aggiungi-esche.png</code></p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Passo 4: Aggiungi le tue Località</h3>
+                                <p class="text-gray-300">Inserisci i tuoi spot preferiti (es: "Molo di Ostia").</p>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Passo 5: Aggiungi la tua Attrezzatura</h3>
+                                <p class="text-gray-300 mb-2">Configura anche:</p>
+                                <ul class="list-disc list-inside space-y-1 text-gray-300 ml-4">
+                                    <li><strong>Canne</strong> (es: "Bolognese 6m", "Spinning 2.70m")</li>
+                                    <li><strong>Travi</strong> (es: "0.20mm fluorocarbon")</li>
+                                    <li><strong>Ami</strong> (es: "n.8 Aberdeen")</li>
+                                    <li><strong>Piombi</strong> (es: "50g piramide")</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Sezione 2 -->
+                    <section id="sec2" class="bg-gray-900 rounded-xl border-2 border-gray-700 p-6">
+                        <h2 class="text-2xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                            <span class="text-3xl">2️⃣</span> Avviare una Sessione di Pesca
+                        </h2>
+
+                        <div class="bg-red-900/30 border-2 border-red-500 rounded-lg p-4 mb-6">
+                            <p class="text-red-300 font-bold">⚠️ IMPORTANTE: Devi avviare una sessione PRIMA di poter registrare catture.</p>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Passo 1: Compila i Dati della Sessione</h3>
+                                <p class="text-gray-300 mb-3">Quando arrivi al tuo spot di pesca:</p>
+                                <ol class="list-decimal list-inside space-y-2 text-gray-300 ml-4">
+                                    <li>Seleziona o scrivi la <strong>località</strong> (es: "Molo di Fiumicino")</li>
+                                    <li>Premi il pulsante <strong class="text-green-400">"📡 Usa GPS Dispositivo"</strong> per ottenere coordinate automatiche</li>
+                                    <li>Il telefono ti chiederà il permesso → Accetta</li>
+                                    <li>Dopo pochi secondi vedrai latitudine e longitudine compilate</li>
+                                </ol>
+                                <div class="image-placeholder rounded-lg p-8 text-center mt-3">
+                                    <p class="text-gray-500 italic">📸 Immagine: Pulsante "Usa GPS Dispositivo" e campi compilati</p>
+                                    <p class="text-sm text-gray-600 mt-2">File: <code>06-gps-automatico.png</code></p>
+                                </div>
+                                <div class="bg-blue-900/20 border border-blue-500 rounded-lg p-3 mt-3">
+                                    <p class="text-blue-300 text-sm"><strong>💡 Alternativa:</strong> Se il GPS non funziona, puoi inserire le coordinate manualmente (usa Google Maps).</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Passo 2: Avvia la Sessione</h3>
+                                <p class="text-gray-300 mb-3">Premi il pulsante verde <strong>"avvia sessione"</strong>.</p>
+                                <div class="image-placeholder rounded-lg p-8 text-center">
+                                    <p class="text-gray-500 italic">📸 Immagine: Riquadro verde "sessione attiva"</p>
+                                    <p class="text-sm text-gray-600 mt-2">File: <code>07-sessione-attiva.png</code></p>
+                                </div>
+                                <div class="bg-green-900/30 border-2 border-green-500 rounded-lg p-4 mt-3">
+                                    <p class="text-green-300">✅ La sessione è ora attiva! Vedrai un riquadro verde con nome località, coordinate GPS e pulsante rosso "termina sessione".</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Sezione 3 -->
+                    <section id="sec3" class="bg-gray-900 rounded-xl border-2 border-gray-700 p-6">
+                        <h2 class="text-2xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                            <span class="text-3xl">3️⃣</span> Registrare le Condizioni Meteo
+                        </h2>
+
+                        <div class="bg-red-900/30 border-2 border-red-500 rounded-lg p-4 mb-6">
+                            <p class="text-red-300 font-bold">⚠️ OBBLIGATORIO: Prima di registrare catture devi confermare i dati meteo.</p>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Passo 1: Apri la Sezione "Dati Meteo"</h3>
+                                <p class="text-gray-300">Tocca la sezione <strong>"dati meteo"</strong> (icona nuvola ☁️).</p>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Passo 2: Compila le Condizioni</h3>
+                                <p class="text-gray-300 mb-3">Registra le condizioni attuali:</p>
+
+                                <div class="bg-gray-800 rounded-lg p-4 mb-3">
+                                    <p class="text-cyan-400 font-semibold mb-2">Dati essenziali:</p>
+                                    <ul class="list-disc list-inside space-y-1 text-gray-300 ml-4">
+                                        <li>Temperatura aria (°C)</li>
+                                        <li>Temperatura acqua (°C)</li>
+                                        <li>Pressione atmosferica (hPa)</li>
+                                        <li>Vento (nodi) e direzione</li>
+                                        <li>Condizioni (sereno, nuvoloso, pioggia)</li>
+                                    </ul>
+                                </div>
+
+                                <div class="bg-gray-800 rounded-lg p-4">
+                                    <p class="text-cyan-400 font-semibold mb-2">Dati avanzati (opzionali ma utili!):</p>
+                                    <ul class="list-disc list-inside space-y-1 text-gray-300 ml-4">
+                                        <li>Fase lunare</li>
+                                        <li>Orari alta/bassa marea</li>
+                                        <li>Altezza e frequenza onde</li>
+                                    </ul>
+                                </div>
+
+                                <div class="bg-blue-900/20 border border-blue-500 rounded-lg p-3 mt-3">
+                                    <p class="text-blue-300 text-sm"><strong>💡 Dove trovare i dati meteo:</strong></p>
+                                    <ul class="list-disc list-inside text-blue-300 text-sm ml-4 mt-1">
+                                        <li>App meteo del telefono</li>
+                                        <li>WindFinder, Windy, iLMeteo</li>
+                                        <li>Tabelle maree online (maregrafico.it)</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Passo 3: Conferma i Dati Meteo</h3>
+                                <p class="text-gray-300 mb-3">Vai alla sezione "aggiungi cattura" e premi il pulsante blu <strong>"conferma dati meteo (obbligatorio)"</strong>.</p>
+                                <div class="bg-green-900/30 border-2 border-green-500 rounded-lg p-4">
+                                    <p class="text-green-300">✅ Apparirà un riquadro verde di conferma. Ora puoi registrare catture!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Sezione 4 -->
+                    <section id="sec4" class="bg-gray-900 rounded-xl border-2 border-gray-700 p-6">
+                        <h2 class="text-2xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                            <span class="text-3xl">4️⃣</span> Registrare una Cattura
+                        </h2>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Passo 1: Apri la Sezione "Aggiungi Cattura"</h3>
+                                <p class="text-gray-300">Tocca la sezione <strong>"aggiungi cattura"</strong> (icona pesce 🐟).</p>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Passo 2: Compila i Dati</h3>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-red-900/20 border border-red-500 rounded-lg p-3">
+                                        <p class="text-red-300 font-semibold mb-2">Obbligatorio:</p>
+                                        <p class="text-red-300">✅ Specie (seleziona dalla lista)</p>
+                                    </div>
+                                    <div class="bg-blue-900/20 border border-blue-500 rounded-lg p-3">
+                                        <p class="text-blue-300 font-semibold mb-2">Opzionale (ma consigliato):</p>
+                                        <ul class="list-disc list-inside text-blue-300 text-sm">
+                                            <li>Peso, lunghezza</li>
+                                            <li>Esca utilizzata</li>
+                                            <li>Attrezzatura</li>
+                                            <li>Note</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="image-placeholder rounded-lg p-8 text-center mt-3">
+                                    <p class="text-gray-500 italic">📸 Immagine: Form cattura compilato</p>
+                                    <p class="text-sm text-gray-600 mt-2">File: <code>12-compila-cattura.png</code></p>
+                                </div>
+
+                                <div class="bg-blue-900/20 border border-blue-500 rounded-lg p-3 mt-3">
+                                    <p class="text-blue-300 text-sm"><strong>💡 Nota:</strong> Data, ora, località e coordinate GPS sono già pre-compilate dalla sessione!</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Passo 3: Registra la Cattura</h3>
+                                <p class="text-gray-300 mb-3">Scorri in basso e premi il pulsante cyan <strong>"registra cattura"</strong>.</p>
+                                <div class="bg-green-900/30 border-2 border-green-500 rounded-lg p-4">
+                                    <p class="text-green-300">✅ Vedrai un messaggio di conferma "Cattura registrata con successo!" e il registro si aprirà automaticamente.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Sezione 5 -->
+                    <section id="sec5" class="bg-gradient-to-br from-purple-900/30 to-blue-900/30 rounded-xl border-2 border-purple-500 p-6">
+                        <h2 class="text-2xl font-bold text-purple-400 mb-4 flex items-center gap-2">
+                            <span class="text-3xl">5️⃣</span> 🎤 Usare l'Assistente Vocale
+                        </h2>
+
+                        <div class="bg-purple-900/30 border-2 border-purple-400 rounded-lg p-4 mb-6">
+                            <p class="text-purple-200 font-bold">🎤 Novità: Registra catture a voce senza toccare il telefono (perfetto con mani bagnate!)</p>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-purple-300 mb-3">Come Funziona</h3>
+                                <ol class="list-decimal list-inside space-y-3 text-gray-300 ml-4">
+                                    <li>Nella sezione "aggiungi cattura", premi il pulsante viola <strong>"🎤 Assistente Vocale"</strong></li>
+                                    <li>Il browser ti chiederà il permesso di usare il microfono → <strong>Accetta</strong></li>
+                                    <li>L'assistente ti farà domande a cui rispondere a voce</li>
+                                </ol>
+
+                                <div class="bg-gray-800 rounded-lg p-4 mt-4">
+                                    <table class="w-full text-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Domanda</th>
+                                                <th>Cosa Rispondere</th>
+                                                <th>Esempio</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-gray-300">
+                                            <tr>
+                                                <td><strong class="text-purple-400">"Specie?"</strong></td>
+                                                <td>Nome della specie</td>
+                                                <td><code>"spigola"</code></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong class="text-purple-400">"Lunghezza?"</strong></td>
+                                                <td>Centimetri</td>
+                                                <td><code>"quaranta"</code> o <code>"40"</code></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong class="text-purple-400">"Esca?"</strong></td>
+                                                <td>Nome dell'esca</td>
+                                                <td><code>"verme coreano"</code></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong class="text-purple-400">"Confermi dati meteo?"</strong></td>
+                                                <td>"sì" o "no"</td>
+                                                <td><code>"sì"</code></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong class="text-purple-400">"Registra cattura?"</strong></td>
+                                                <td>"sì" o "no"</td>
+                                                <td><code>"sì"</code></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="bg-yellow-900/30 border-2 border-yellow-500 rounded-lg p-4 mt-4">
+                                    <p class="text-yellow-300 font-semibold mb-2">⚠️ Limitazioni:</p>
+                                    <ul class="list-disc list-inside text-yellow-300 text-sm space-y-1">
+                                        <li>Funziona solo con specie/esche già memorizzate</li>
+                                        <li>Hai 3 tentativi per farti capire</li>
+                                        <li>Se non riconosce, compila manualmente</li>
+                                    </ul>
+                                </div>
+
+                                <div class="bg-blue-900/20 border border-blue-500 rounded-lg p-3 mt-3">
+                                    <p class="text-blue-300 text-sm"><strong>💡 Consiglio:</strong> Parla chiaramente e lentamente, soprattutto se c'è vento!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Sezione 6 -->
+                    <section id="sec6" class="bg-gray-900 rounded-xl border-2 border-gray-700 p-6">
+                        <h2 class="text-2xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                            <span class="text-3xl">6️⃣</span> 📊 Analizzare i Dati
+                        </h2>
+
+                        <div class="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border-2 border-cyan-500 rounded-lg p-4 mb-6">
+                            <p class="text-cyan-200 text-lg font-bold">Qui sta la magia di FishAI: trasformare i dati in conoscenza.</p>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">🗺️ Mappa Interattiva delle Sessioni</h3>
+                                <p class="text-gray-300 mb-3">Vedrai una mappa con tutti i tuoi spot di pesca:</p>
+
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div class="bg-red-900/20 border border-red-500 rounded-lg p-3 text-center">
+                                        <p class="text-red-400 font-bold text-3xl">🔴</p>
+                                        <p class="text-red-300 text-sm">0-1 catture</p>
+                                        <p class="text-gray-400 text-xs">Spot poco produttivo</p>
+                                    </div>
+                                    <div class="bg-yellow-900/20 border border-yellow-500 rounded-lg p-3 text-center">
+                                        <p class="text-yellow-400 font-bold text-3xl">🟡</p>
+                                        <p class="text-yellow-300 text-sm">2-4 catture</p>
+                                        <p class="text-gray-400 text-xs">Spot discreto</p>
+                                    </div>
+                                    <div class="bg-green-900/20 border border-green-500 rounded-lg p-3 text-center">
+                                        <p class="text-green-400 font-bold text-3xl">🟢</p>
+                                        <p class="text-green-300 text-sm">5+ catture</p>
+                                        <p class="text-gray-400 text-xs">Spot eccellente!</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-cyan-900/30 border border-cyan-500 rounded-lg p-4 mt-4">
+                                    <p class="text-cyan-300 font-semibold mb-2">🎯 Strategia:</p>
+                                    <p class="text-gray-300 text-sm">Prima di uscire, guarda le previsioni meteo e cerca sulla mappa dove hai pescato meglio con quelle condizioni!</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">📊 Statistiche Generali</h3>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div class="bg-cyan-900 rounded-lg p-4 border border-cyan-600 text-center">
+                                        <p class="text-cyan-300 text-xs font-semibold">Totale</p>
+                                        <p class="text-white text-2xl font-bold">42</p>
+                                    </div>
+                                    <div class="bg-blue-900 rounded-lg p-4 border border-blue-600 text-center">
+                                        <p class="text-blue-300 text-xs font-semibold">Più catturata</p>
+                                        <p class="text-white text-lg font-bold">Spigola</p>
+                                        <p class="text-blue-300 text-xs">(18)</p>
+                                    </div>
+                                    <div class="bg-green-900 rounded-lg p-4 border border-green-600 text-center">
+                                        <p class="text-green-300 text-xs font-semibold">Peso medio</p>
+                                        <p class="text-white text-2xl font-bold">0.85 kg</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">🔍 Filtri Avanzati (Funzione più Potente!)</h3>
+
+                                <div class="bg-gradient-to-r from-orange-900/30 to-red-900/30 border-2 border-orange-500 rounded-lg p-4 mb-4">
+                                    <p class="text-orange-300 font-bold mb-2">📖 Esempio pratico:</p>
+                                    <p class="text-gray-300 italic mb-2">"Domani c'è Maestrale (NW) e mare mosso. Dove vado a pescare spigole?"</p>
+                                    <ol class="list-decimal list-inside text-gray-300 text-sm space-y-1 ml-4">
+                                        <li>Imposta filtri: Specie: "spigola", Direzione vento: "NW (Maestrale)"</li>
+                                        <li>Premi "mostra registro"</li>
+                                        <li>Vedrai SOLO le catture che corrispondono → scopri dove hai preso spigole con Maestrale!</li>
+                                    </ol>
+                                </div>
+
+                                <div class="bg-gray-800 rounded-lg p-4">
+                                    <p class="text-cyan-400 font-semibold mb-2">Filtri disponibili:</p>
+                                    <ul class="list-disc list-inside text-gray-300 text-sm space-y-1 ml-4">
+                                        <li>Anno e mese</li>
+                                        <li>Specie</li>
+                                        <li>Località</li>
+                                        <li>Direzione vento (16 direzioni rosa dei venti)</li>
+                                        <li>Condizioni meteo</li>
+                                    </ul>
+                                </div>
+
+                                <div class="bg-blue-900/20 border border-blue-500 rounded-lg p-3 mt-3">
+                                    <p class="text-blue-300 font-semibold text-sm mb-2">💡 Combinazioni utili:</p>
+                                    <ul class="list-disc list-inside text-blue-300 text-sm space-y-1 ml-4">
+                                        <li>"Spigole + luna piena" → quando è più produttiva</li>
+                                        <li>"Orate + estate + Tramontana" → migliori condizioni</li>
+                                        <li>"Località X + ottobre" → cosa pescare dove e quando</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">📋 Registro Catture Dettagliato</h3>
+                                <p class="text-gray-300">Ogni cattura mostra:</p>
+                                <ul class="list-disc list-inside text-gray-300 text-sm space-y-1 ml-4 mt-2">
+                                    <li>Specie, data, ora</li>
+                                    <li>Peso, lunghezza, esca</li>
+                                    <li>Attrezzatura usata</li>
+                                    <li><strong class="text-cyan-400">Tutti i dati meteo</strong> (temperatura, vento, luna, maree, onde)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Sezione 7 -->
+                    <section id="sec7" class="bg-gray-900 rounded-xl border-2 border-gray-700 p-6">
+                        <h2 class="text-2xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                            <span class="text-3xl">7️⃣</span> 🔧 Gestire Attrezzature e Liste
+                        </h2>
+
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-cyan-300 mb-2">✏️ Modificare Voci Esistenti</h3>
+                                <ol class="list-decimal list-inside text-gray-300 text-sm space-y-1 ml-4">
+                                    <li>Tocca l'icona matita ✏️ accanto alla voce</li>
+                                    <li>Modifica il testo</li>
+                                    <li>Premi Invio o tocca fuori dal campo</li>
+                                </ol>
+                            </div>
+
+                            <div>
+                                <h3 class="text-lg font-semibold text-cyan-300 mb-2">🗑️ Eliminare Voci</h3>
+                                <p class="text-gray-300 text-sm">Tocca l'icona cestino 🗑️ per eliminare.</p>
+                                <div class="bg-red-900/30 border border-red-500 rounded-lg p-3 mt-2">
+                                    <p class="text-red-300 text-sm">⚠️ Attenzione: L'eliminazione è immediata, non c'è conferma!</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-lg font-semibold text-cyan-300 mb-2">📝 Ordinamento Automatico</h3>
+                                <p class="text-gray-300 text-sm">Tutte le liste sono ordinate alfabeticamente in automatico.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Sezione 8 -->
+                    <section id="sec8" class="bg-gray-900 rounded-xl border-2 border-gray-700 p-6">
+                        <h2 class="text-2xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                            <span class="text-3xl">8️⃣</span> 💾 Esportare i Dati
+                        </h2>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Perché Esportare?</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div class="bg-blue-900/20 border border-blue-500 rounded-lg p-3">
+                                        <p class="text-blue-300 text-sm">✅ Backup di sicurezza</p>
+                                    </div>
+                                    <div class="bg-blue-900/20 border border-blue-500 rounded-lg p-3">
+                                        <p class="text-blue-300 text-sm">✅ Trasferire su altro dispositivo</p>
+                                    </div>
+                                    <div class="bg-blue-900/20 border border-blue-500 rounded-lg p-3">
+                                        <p class="text-blue-300 text-sm">✅ Analisi avanzate (Excel)</p>
+                                    </div>
+                                    <div class="bg-blue-900/20 border border-blue-500 rounded-lg p-3">
+                                        <p class="text-blue-300 text-sm">✅ Condividere con amici</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Come Esportare</h3>
+                                <ol class="list-decimal list-inside text-gray-300 space-y-2 ml-4">
+                                    <li>Scorri in fondo alla pagina</li>
+                                    <li>Premi il pulsante viola <strong>"esporta dati"</strong></li>
+                                    <li>Verrà scaricato un file JSON: <code>diario-pesca-2025-01-15.json</code></li>
+                                </ol>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-semibold text-cyan-300 mb-3">Cosa Contiene il File?</h3>
+                                <ul class="list-disc list-inside text-gray-300 space-y-1 ml-4">
+                                    <li>✅ Tutte le catture con dati meteo</li>
+                                    <li>✅ Tutte le sessioni completate</li>
+                                    <li>✅ Liste attrezzature (canne, ami, travi, piombi)</li>
+                                    <li>✅ Liste località, specie, esche</li>
+                                </ul>
+                                <div class="bg-blue-900/20 border border-blue-500 rounded-lg p-3 mt-3">
+                                    <p class="text-blue-300 text-sm"><strong>💡 Consiglio:</strong> Esporta i dati regolarmente (es: una volta al mese) e conserva il file in cloud (Google Drive, Dropbox).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Sezione 9 - FAQ -->
+                    <section id="sec9" class="bg-gray-900 rounded-xl border-2 border-gray-700 p-6">
+                        <h2 class="text-2xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                            <span class="text-3xl">9️⃣</span> ❓ Domande Frequenti
+                        </h2>
+
+                        <div class="space-y-4">
+                            <div class="bg-gray-800 rounded-lg p-4">
+                                <h4 class="text-cyan-300 font-semibold mb-2">❓ Ho dimenticato di avviare la sessione, posso registrare comunque?</h4>
+                                <p class="text-gray-300 text-sm">No, la sessione è obbligatoria. Avvia la sessione anche a posteriori (puoi modificare data/ora manualmente se necessario).</p>
+                            </div>
+
+                            <div class="bg-gray-800 rounded-lg p-4">
+                                <h4 class="text-cyan-300 font-semibold mb-2">❓ I dati sono sincronizzati tra dispositivi?</h4>
+                                <p class="text-gray-300 text-sm">No, FishAI usa LocalStorage del browser. I dati restano solo sul tuo dispositivo. Usa la funzione <strong>"esporta dati"</strong> per backup e trasferimento.</p>
+                            </div>
+
+                            <div class="bg-gray-800 rounded-lg p-4">
+                                <h4 class="text-cyan-300 font-semibold mb-2">❓ Cosa succede se pulisco la cache del browser?</h4>
+                                <p class="text-red-300 text-sm font-semibold">⚠️ Perderai tutti i dati! Esporta regolarmente per sicurezza.</p>
+                            </div>
+
+                            <div class="bg-gray-800 rounded-lg p-4">
+                                <h4 class="text-cyan-300 font-semibold mb-2">❓ Posso usare FishAI offline?</h4>
+                                <p class="text-gray-300 text-sm">Sì per registrare catture, NO per la mappa (serve connessione per scaricare le tile di OpenStreetMap).</p>
+                            </div>
+
+                            <div class="bg-gray-800 rounded-lg p-4">
+                                <h4 class="text-cyan-300 font-semibold mb-2">❓ Il GPS non funziona, cosa faccio?</h4>
+                                <ol class="list-decimal list-inside text-gray-300 text-sm space-y-1 ml-4 mt-2">
+                                    <li>Verifica di aver dato i permessi di geolocalizzazione al browser</li>
+                                    <li>Assicurati di essere all'aperto con GPS attivo</li>
+                                    <li>In alternativa, usa Google Maps per trovare le coordinate manualmente</li>
+                                </ol>
+                            </div>
+
+                            <div class="bg-gray-800 rounded-lg p-4">
+                                <h4 class="text-cyan-300 font-semibold mb-2">❓ A cosa servono i dati meteo così dettagliati?</h4>
+                                <div class="bg-gradient-to-r from-orange-900/30 to-yellow-900/30 border border-orange-500 rounded-lg p-3 mt-2">
+                                    <p class="text-orange-300 font-semibold text-sm mb-2">📖 Esempio pratico:</p>
+                                    <p class="text-gray-300 text-sm mb-2">Dopo 6 mesi di utilizzo scoprirai pattern come:</p>
+                                    <ul class="list-disc list-inside text-gray-300 text-sm space-y-1 ml-4">
+                                        <li><em>"Le spigole abboccano di più con Scirocco 5-10 nodi e marea crescente"</em></li>
+                                        <li><em>"Con Tramontana forte trovo saraghi, non spigole"</em></li>
+                                        <li><em>"Luna piena = più catture di orate"</em></li>
+                                    </ul>
+                                    <p class="text-yellow-300 font-bold text-sm mt-2">Questi dati sono oro! Ti permettono di prevedere dove andare e cosa usare.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Consigli Finali -->
+                    <section class="bg-gradient-to-br from-green-900/30 to-cyan-900/30 rounded-xl border-2 border-green-500 p-6">
+                        <h2 class="text-2xl font-bold text-green-400 mb-4">🎣 Consigli Finali</h2>
+
+                        <div class="space-y-3">
+                            <div class="bg-gray-900/50 rounded-lg p-3">
+                                <p class="text-gray-200"><strong class="text-green-400">1. Sii costante:</strong> Registra OGNI cattura, anche quelle piccole. Più dati = analisi più accurate.</p>
+                            </div>
+                            <div class="bg-gray-900/50 rounded-lg p-3">
+                                <p class="text-gray-200"><strong class="text-green-400">2. Non trascurare il meteo:</strong> Compilare i dati meteo è noioso ma fondamentale. È qui che risiede il vero valore.</p>
+                            </div>
+                            <div class="bg-gray-900/50 rounded-lg p-3">
+                                <p class="text-gray-200"><strong class="text-green-400">3. Usa i filtri:</strong> Prima di ogni uscita, controlla le previsioni e filtra per quelle condizioni. Scoprirai dove andare.</p>
+                            </div>
+                            <div class="bg-gray-900/50 rounded-lg p-3">
+                                <p class="text-gray-200"><strong class="text-green-400">4. Esporta regolarmente:</strong> Una volta al mese, esporta i dati e salvali in cloud.</p>
+                            </div>
+                            <div class="bg-gray-900/50 rounded-lg p-3">
+                                <p class="text-gray-200"><strong class="text-green-400">5. Condividi:</strong> Se hai amici pescatori che usano FishAI, confrontate i dati! Potreste scoprire pattern regionali.</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-cyan-900/50 border-2 border-cyan-400 rounded-lg p-4 mt-6 text-center">
+                            <p class="text-cyan-200 text-xl font-bold italic">"Il miglior pescatore non è quello che ha più fortuna, ma quello che ha più dati."</p>
+                        </div>
+                    </section>
+
+                </main>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-gray-900 border-t-2 border-cyan-600 mt-12 py-6">
+            <div class="max-w-6xl mx-auto px-4 text-center">
+                <p class="text-gray-400 text-sm mb-2">Buona pesca e tight lines! 🎣</p>
+                <p class="text-gray-500 text-xs">© 2025 Giampietro Leonoro - FishAI</p>
+                <p class="text-gray-500 text-xs mt-2">
+                    <a href="https://github.com/gpleoo/FishAI/issues" class="text-cyan-400 hover:text-cyan-300">Supporto & Feedback</a>
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Smooth scroll per i link interni
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offset = 100; // Offset per header sticky
+                    const targetPosition = target.offsetTop - offset;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Evidenzia sezione attiva nella TOC
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.toc-item');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('border-cyan-400', 'bg-gray-800');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('border-cyan-400', 'bg-gray-800');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
