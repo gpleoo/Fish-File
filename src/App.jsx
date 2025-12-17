@@ -9,35 +9,15 @@ import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 
 // Components
-import InputField from './components/InputField'
-import SelectField from './components/SelectField'
 import Section from './components/Section'
-import { Fish, Cloud, Wrench, BarChart3, ChevronDown, ChevronUp, Trash2, Edit, Mic } from './components/Icons'
+import SessionePesca from './components/SessionePesca'
+import CatturaForm from './components/CatturaForm'
+import MeteoForm from './components/MeteoForm'
+import ListaGestione from './components/ListaGestione'
+import { Wrench, BarChart3 } from './components/Icons'
 
 // Constants
 const ITEMS_PER_PAGE = 10
-
-const ventiRosaDeiVenti = [
-    'N (Tramontana - 4°/1° Quadrante - 0°)',
-    'NNE (Tramontana-Grecale - 1° Quadrante - 22,5°)',
-    'NE (Grecale - 1° Quadrante - 45°)',
-    'ENE (Grecale-Levante - 1° Quadrante - 67,5°)',
-    'E (Levante - 1°/2° Quadrante - 90°)',
-    'ESE (Levante-Scirocco - 2° Quadrante - 112,5°)',
-    'SE (Scirocco - 2° Quadrante - 135°)',
-    'SSE (Scirocco-Ostro - 2° Quadrante - 157,5°)',
-    'S (Ostro - 2°/3° Quadrante - 180°)',
-    'SSW (Ostro-Libeccio - 3° Quadrante - 202,5°)',
-    'SW (Libeccio - 3° Quadrante - 225°)',
-    'WSW (Libeccio-Ponente - 3° Quadrante - 247,5°)',
-    'W (Ponente - 3°/4° Quadrante - 270°)',
-    'WNW (Ponente-Maestrale - 4° Quadrante - 292,5°)',
-    'NW (Maestrale - 4° Quadrante - 315°)',
-    'NNW (Maestrale-Tramontana - 4° Quadrante - 337,5°)'
-]
-
-const fasiLunari = ['luna nuova', 'crescente', 'primo quarto', 'gibbosa crescente', 'piena', 'gibbosa calante', 'ultimo quarto', 'calante']
-const condizioniMeteo = ['sereno', 'nuvoloso', 'coperto', 'pioggia', 'temporale', 'nebbia']
 
 // Default data
 const specieDefault = ['Cefalo', 'Gronco', 'Leccia stella', 'Marmora', 'Occhiata', 'Ombrina', 'Opa', 'Orata', 'Pesce serra', 'Sarago', 'Spigola', 'Sughero']
@@ -115,11 +95,7 @@ function App() {
 
     // State - UI
     const [mostraRegistro, setMostraRegistro] = useState(false)
-    const [mostraGestioneSessioni, setMostraGestioneSessioni] = useState(false)
-    const [mostraCatture, setMostraCatture] = useState(false)
     const [mostraSessionePesca, setMostraSessionePesca] = useState(false)
-    const [mostraFiltri, setMostraFiltri] = useState(false)
-    const [mostraMappa, setMostraMappa] = useState(false)
 
     // State - Gestione sezioni collassabili
     const [mostraLocalita, setMostraLocalita] = useState(false)
@@ -129,12 +105,6 @@ function App() {
     const [mostraTravi, setMostraTravi] = useState(false)
     const [mostraAmi, setMostraAmi] = useState(false)
     const [mostraPiombi, setMostraPiombi] = useState(false)
-
-    // State - Paginazione
-    const [paginaCatture, setPaginaCatture] = useState(0)
-    const [paginaSessioni, setPaginaSessioni] = useState(0)
-    const [cattureEspanse, setCattureEspanse] = useState({})
-    const [sessioniEspanse, setSessioniEspanse] = useState({})
 
     // State - Form
     const [messaggioErrore, setMessaggioErrore] = useState('')
@@ -178,15 +148,6 @@ function App() {
         altaMareaOra: '', bassaMareaOra: '', altezzaOnde: '', frequenzaOnde: ''
     })
 
-    const [filtri, setFiltri] = useState({
-        anno: 'tutti', mese: 'tutti', specie: 'tutte',
-        direzioneVento: 'tutte', condizioni: 'tutte', localita: 'tutte',
-        temperatura: 'tutte', pressione: 'tutte', vento: 'tutti', faseLunare: 'tutte'
-    })
-
-    // Refs
-    const mapRef = useRef(null)
-
     // Effects - Salvataggio localStorage
     useEffect(() => { localStorage.setItem('diarioPesca_catture', JSON.stringify(catture)) }, [catture])
     useEffect(() => { localStorage.setItem('diarioPesca_specie', JSON.stringify(specieMemorizzate)) }, [specieMemorizzate])
@@ -204,15 +165,9 @@ function App() {
 
     // Effect - Splash screen
     useEffect(() => {
-        const timer = setTimeout(() => setMostraSplash(false), 3000) // Ridotto a 3 secondi
+        const timer = setTimeout(() => setMostraSplash(false), 3000)
         return () => clearTimeout(timer)
     }, [])
-
-    // Effect - Reset pagine quando cambiano i filtri
-    useEffect(() => {
-        setPaginaCatture(0)
-        setPaginaSessioni(0)
-    }, [filtri])
 
     // Funzioni - Sessione
     const avviaSessione = () => {
@@ -223,7 +178,7 @@ function App() {
 
         const validazione = validaCoordinate(datiSessione.latitudine, datiSessione.longitudine)
         if (!validazione.valid) {
-            alert(`⚠️ ATTENZIONE: ${validazione.error}\n\nVerifica le coordinate prima di continuare!`)
+            alert(`ATTENZIONE: ${validazione.error}\n\nVerifica le coordinate prima di continuare!`)
             return
         }
 
@@ -267,10 +222,10 @@ function App() {
 
     const ottieniPosizioneGPS = () => {
         if (!navigator.geolocation) {
-            alert('❌ Geolocalizzazione non supportata dal tuo browser!')
+            alert('Geolocalizzazione non supportata dal tuo browser!')
             return
         }
-        alert('📍 Richiesta posizione GPS in corso...')
+        alert('Richiesta posizione GPS in corso...')
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 setDatiSessione(p => ({
@@ -278,10 +233,10 @@ function App() {
                     latitudine: position.coords.latitude.toFixed(6),
                     longitudine: position.coords.longitude.toFixed(6)
                 }))
-                alert(`✅ Posizione GPS acquisita!\n\nPrecisione: ±${Math.round(position.coords.accuracy)}m`)
+                alert(`Posizione GPS acquisita!\n\nPrecisione: ±${Math.round(position.coords.accuracy)}m`)
             },
             (error) => {
-                let msg = '❌ Impossibile ottenere la posizione GPS!\n\n'
+                let msg = 'Impossibile ottenere la posizione GPS!\n\n'
                 if (error.code === error.PERMISSION_DENIED) msg += 'Permesso negato.'
                 else if (error.code === error.POSITION_UNAVAILABLE) msg += 'Posizione non disponibile.'
                 else if (error.code === error.TIMEOUT) msg += 'Timeout.'
@@ -306,7 +261,7 @@ function App() {
         if (nuovaCattura.latitudine && nuovaCattura.longitudine) {
             const validazione = validaCoordinate(nuovaCattura.latitudine, nuovaCattura.longitudine)
             if (!validazione.valid) {
-                setMessaggioErrore(`⚠️ Coordinate non valide: ${validazione.error}`)
+                setMessaggioErrore(`Coordinate non valide: ${validazione.error}`)
                 return
             }
         }
@@ -338,7 +293,7 @@ function App() {
             note: nuovaCattura.note
         })
 
-        alert('✅ Cattura registrata con successo!')
+        alert('Cattura registrata con successo!')
     }
 
     // Funzioni - Gestione liste (generiche)
@@ -363,7 +318,7 @@ function App() {
         setEditando(null)
     }
 
-    // Funzioni - Statistiche e filtri
+    // Funzioni - Statistiche
     const calcolaStatistiche = () => {
         if (catture.length === 0) return null
         const specieCount = {}
@@ -382,26 +337,6 @@ function App() {
         const pesoMedio = numPesi > 0 ? ((pesoTotale / numPesi) / 1000).toFixed(2) : 0
         return { speciePiuCatturata, pesoMedio, totaleCatture: catture.length }
     }
-
-    const getCattureFiltrate = () => catture.filter(c => {
-        const [anno, mese] = c.data.split('-')
-        return (filtri.anno === 'tutti' || anno === filtri.anno) &&
-               (filtri.mese === 'tutti' || mese === filtri.mese) &&
-               (filtri.specie === 'tutte' || c.specie === filtri.specie) &&
-               (filtri.direzioneVento === 'tutte' || c.meteo?.direzioneVento === filtri.direzioneVento) &&
-               (filtri.condizioni === 'tutte' || c.meteo?.condizioni === filtri.condizioni) &&
-               (filtri.localita === 'tutte' || c.localita === filtri.localita) &&
-               (filtri.faseLunare === 'tutte' || c.meteo?.faseLunare === filtri.faseLunare)
-    })
-
-    const getSessioniFiltrate = () => sessioniCompletate.filter(sessione => {
-        const [anno, mese] = sessione.dataInizio.split('-')
-        return (filtri.anno === 'tutti' || anno === filtri.anno) &&
-               (filtri.mese === 'tutti' || mese === filtri.mese) &&
-               (filtri.localita === 'tutte' || sessione.localita === filtri.localita)
-    })
-
-    const getAnniDisponibili = () => [...new Set(catture.map(c => c.data.split('-')[0]))].sort()
 
     const esportaDati = () => {
         if (catture.length === 0) { alert('Nessuna cattura!'); return }
@@ -422,63 +357,7 @@ function App() {
         alert('Esportato!')
     }
 
-    // Funzioni - Paginazione
-    const toggleCatturaEspansa = (id) => setCattureEspanse(prev => ({...prev, [id]: !prev[id]}))
-    const toggleSessioneEspansa = (id) => setSessioniEspanse(prev => ({...prev, [id]: !prev[id]}))
-
-    const getCatturePaginate = () => {
-        const filtrate = getCattureFiltrate().reverse()
-        return filtrate.slice(paginaCatture * ITEMS_PER_PAGE, (paginaCatture + 1) * ITEMS_PER_PAGE)
-    }
-
-    const getSessioniPaginate = () => {
-        const filtrate = getSessioniFiltrate().reverse()
-        return filtrate.slice(paginaSessioni * ITEMS_PER_PAGE, (paginaSessioni + 1) * ITEMS_PER_PAGE)
-    }
-
-    const totalePagineCatture = Math.max(1, Math.ceil(getCattureFiltrate().length / ITEMS_PER_PAGE))
-    const totalePagineSessioni = Math.max(1, Math.ceil(getSessioniFiltrate().length / ITEMS_PER_PAGE))
-
     const stats = calcolaStatistiche()
-
-    // Render component per gestione lista
-    const ListaGestione = ({ titolo, emoji, items, nuovoValore, setNuovoValore, placeholder, onAggiungi, onModifica, onElimina, editando, setEditando, valoreEdit, setValoreEdit, mostra, setMostra }) => (
-        <div className="bg-gray-800 rounded-lg border border-gray-700">
-            <button onClick={() => setMostra(!mostra)} className="w-full flex items-center justify-between p-4 active:bg-gray-700">
-                <h3 className="text-lg font-bold text-cyan-400">{emoji} {titolo}</h3>
-                {mostra ? <ChevronUp className="text-cyan-400" width={20} height={20} /> : <ChevronDown className="text-cyan-400" width={20} height={20} />}
-            </button>
-            {mostra && (
-                <div className="p-4 pt-0">
-                    <div className="flex justify-between items-center mb-3">
-                        <button onClick={onAggiungi} className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">+ aggiungi</button>
-                    </div>
-                    <input type="text" value={nuovoValore} onChange={(e) => setNuovoValore(e.target.value)} placeholder={placeholder}
-                        className="w-full mb-3 bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-2 text-white" />
-                    {items.map((item, i) => (
-                        <div key={i} className="flex justify-between items-center bg-gray-900 rounded px-3 py-2 mb-2">
-                            {editando === item ? (
-                                <input type="text" value={valoreEdit} onChange={(e) => setValoreEdit(e.target.value)}
-                                    onBlur={() => onModifica(item, valoreEdit)}
-                                    onKeyPress={(e) => { if (e.key === 'Enter') onModifica(item, valoreEdit) }}
-                                    autoFocus className="flex-1 bg-gray-800 border border-cyan-500 rounded px-2 py-1 text-white mr-2" />
-                            ) : (
-                                <span className="text-gray-300 flex-1">{item}</span>
-                            )}
-                            <div className="flex gap-2">
-                                <button onClick={() => { setEditando(item); setValoreEdit(item) }} className="text-blue-500 active:text-blue-400">
-                                    <Edit width={16} height={16} />
-                                </button>
-                                <button onClick={() => onElimina(item)} className="text-red-500 active:text-red-400">
-                                    <Trash2 width={16} height={16} />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
-    )
 
     return (
         <>
@@ -500,180 +379,145 @@ function App() {
                     </div>
 
                     {/* Sessione di Pesca */}
-                    <div className="mb-6 bg-gray-900 border-2 border-cyan-600 rounded-xl">
-                        <button onClick={() => setMostraSessionePesca(!mostraSessionePesca)} className="w-full flex items-center justify-between p-6 active:bg-gray-800">
-                            <h2 className="text-2xl font-bold text-cyan-400">🎣 sessione di pesca</h2>
-                            {mostraSessionePesca ? <ChevronUp className="text-cyan-400" width={24} height={24} /> : <ChevronDown className="text-cyan-400" width={24} height={24} />}
-                        </button>
-                        {mostraSessionePesca && (
-                            <div className="p-6 pt-0">
-                                {!sessioneAttiva ? (
-                                    <div>
-                                        <p className="text-yellow-400 text-sm mb-4 text-center">obbligatoria per registrare catture</p>
+                    <SessionePesca
+                        mostraSessionePesca={mostraSessionePesca}
+                        setMostraSessionePesca={setMostraSessionePesca}
+                        sessioneAttiva={sessioneAttiva}
+                        datiSessione={datiSessione}
+                        setDatiSessione={setDatiSessione}
+                        localitaMemorizzate={localitaMemorizzate}
+                        avviaSessione={avviaSessione}
+                        terminaSessione={terminaSessione}
+                        ottieniPosizioneGPS={ottieniPosizioneGPS}
+                    />
 
-                                        {localitaMemorizzate.length > 0 && (
-                                            <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500 rounded-lg">
-                                                <p className="text-blue-300 text-xs font-semibold mb-2">Località memorizzate ({localitaMemorizzate.length}):</p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {localitaMemorizzate.map((loc, i) => (
-                                                        <button key={i} onClick={() => setDatiSessione(p => ({...p, localita: loc}))}
-                                                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm active:bg-blue-700">{loc}</button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
+                    {/* Form Cattura */}
+                    <CatturaForm
+                        activeSection={activeSection}
+                        setActiveSection={setActiveSection}
+                        nuovaCattura={nuovaCattura}
+                        setNuovaCattura={setNuovaCattura}
+                        specieMemorizzate={specieMemorizzate}
+                        localitaMemorizzate={localitaMemorizzate}
+                        escheMemorizzate={escheMemorizzate}
+                        canneMemorizzate={canneMemorizzate}
+                        traviMemorizzate={traviMemorizzate}
+                        amiMemorizzati={amiMemorizzati}
+                        piombiMemorizzati={piombiMemorizzati}
+                        noteMemorizzate={noteMemorizzate}
+                        messaggioErrore={messaggioErrore}
+                        aggiungiCattura={aggiungiCattura}
+                    />
 
-                                        <SelectField label="località" value={datiSessione.localita} onChange={(e) => setDatiSessione(p => ({...p, localita: e.target.value}))} options={localitaMemorizzate} placeholder="es: molo di ostia" />
-
-                                        <div className="mb-4 p-4 bg-green-900/20 border-2 border-green-500 rounded-lg">
-                                            <label className="block text-green-400 text-sm font-semibold mb-2">📍 Ottieni Posizione GPS</label>
-                                            <p className="text-gray-400 text-xs mb-3">Premi il pulsante per acquisire automaticamente le coordinate</p>
-                                            <button onClick={ottieniPosizioneGPS} className="w-full bg-green-600 text-white py-3 rounded-lg font-bold active:bg-green-700 flex items-center justify-center gap-2">
-                                                <span style={{fontSize: '24px'}}>📡</span> Usa GPS Dispositivo
-                                            </button>
-                                        </div>
-
-                                        <InputField label="latitudine" type="number" value={datiSessione.latitudine} onChange={(e) => setDatiSessione(p => ({...p, latitudine: e.target.value}))} placeholder="41.415611" step="0.000001" />
-                                        <InputField label="longitudine" type="number" value={datiSessione.longitudine} onChange={(e) => setDatiSessione(p => ({...p, longitudine: e.target.value}))} placeholder="12.800750" step="0.000001" />
-                                        <button onClick={avviaSessione} className="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-xl">avvia sessione</button>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <div className="bg-green-900/30 border-2 border-green-500 rounded-lg p-4 mb-4">
-                                            <p className="text-green-400 font-bold text-center">sessione attiva</p>
-                                            <p className="text-gray-300 text-sm text-center">{datiSessione.localita}</p>
-                                            <p className="text-gray-400 text-xs text-center">{datiSessione.latitudine}, {datiSessione.longitudine}</p>
-                                        </div>
-                                        <button onClick={terminaSessione} className="w-full bg-red-600 text-white py-3 rounded-lg font-bold">termina sessione</button>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Sezione Aggiungi Cattura */}
-                    <Section icon={Fish} title="aggiungi cattura" isActive={activeSection === 'cattura'} onToggle={() => setActiveSection(activeSection === 'cattura' ? null : 'cattura')}>
-                        <div className="bg-yellow-900/30 border-2 border-yellow-500 rounded-lg p-3 mb-4">
-                            <p className="text-yellow-400 text-sm font-semibold text-center">obbligatori: sessione + specie | resto opzionale</p>
-                        </div>
-
-                        <InputField label="data" type="date" value={nuovaCattura.data} onChange={(e) => setNuovaCattura(p => ({...p, data: e.target.value}))} />
-                        <InputField label="ora" value={nuovaCattura.ora} onChange={(e) => setNuovaCattura(p => ({...p, ora: e.target.value}))} />
-                        <SelectField label="specie (obbligatorio)" value={nuovaCattura.specie} onChange={(e) => setNuovaCattura(p => ({...p, specie: e.target.value}))} options={specieMemorizzate} placeholder="spigola, orata..." />
-                        <InputField label="peso (g)" type="number" value={nuovaCattura.peso} onChange={(e) => setNuovaCattura(p => ({...p, peso: e.target.value}))} min="0" step="1" />
-                        <InputField label="lunghezza (cm)" type="number" value={nuovaCattura.lunghezza} onChange={(e) => setNuovaCattura(p => ({...p, lunghezza: e.target.value}))} min="0" step="0.1" />
-                        <SelectField label="località" value={nuovaCattura.localita} onChange={(e) => setNuovaCattura(p => ({...p, localita: e.target.value}))} options={localitaMemorizzate} placeholder="molo..." />
-                        <SelectField label="esca" value={nuovaCattura.esca} onChange={(e) => setNuovaCattura(p => ({...p, esca: e.target.value}))} options={escheMemorizzate} placeholder="verme..." />
-
-                        <div className="bg-gray-800 rounded-lg p-4 border-2 border-cyan-500 mb-4">
-                            <h3 className="text-cyan-400 font-bold mb-3 text-center">attrezzatura utilizzata</h3>
-                            <div className="grid grid-cols-2 gap-4">
-                                <SelectField label="canna" value={nuovaCattura.canna} onChange={(e) => setNuovaCattura(p => ({...p, canna: e.target.value}))} options={canneMemorizzate} placeholder="seleziona..." />
-                                <SelectField label="trave" value={nuovaCattura.trave} onChange={(e) => setNuovaCattura(p => ({...p, trave: e.target.value}))} options={traviMemorizzate} placeholder="seleziona..." />
-                                <SelectField label="amo" value={nuovaCattura.amo} onChange={(e) => setNuovaCattura(p => ({...p, amo: e.target.value}))} options={amiMemorizzati} placeholder="seleziona..." />
-                                <SelectField label="piombo" value={nuovaCattura.piombo} onChange={(e) => setNuovaCattura(p => ({...p, piombo: e.target.value}))} options={piombiMemorizzati} placeholder="seleziona..." />
-                            </div>
-                        </div>
-
-                        <SelectField label="note" value={nuovaCattura.note} onChange={(e) => setNuovaCattura(p => ({...p, note: e.target.value}))} options={noteMemorizzate} placeholder="note..." />
-
-                        {messaggioErrore && <div className="mt-4 p-4 bg-red-900/30 border-2 border-red-600 rounded-lg"><p className="text-red-400 font-semibold text-center">{messaggioErrore}</p></div>}
-                        <button onClick={aggiungiCattura} className="w-full mt-4 bg-cyan-600 text-white py-4 rounded-lg font-bold text-xl">registra cattura</button>
-                    </Section>
-
-                    {/* Sezione Meteo */}
-                    <Section icon={Cloud} title="dati meteo" isActive={activeSection === 'meteo'} onToggle={() => setActiveSection(activeSection === 'meteo' ? null : 'meteo')}>
-                        <p className="text-yellow-400 text-sm mb-4 text-center">dati opzionali ma utili per analisi</p>
-
-                        <InputField label="temperatura (°C)" type="number" value={meteo.temperatura} onChange={(e) => setMeteo(p => ({...p, temperatura: e.target.value}))} step="0.1" />
-                        <InputField label="temp. acqua (°C)" type="number" value={meteo.temperaturaAcqua} onChange={(e) => setMeteo(p => ({...p, temperaturaAcqua: e.target.value}))} step="0.1" />
-                        <InputField label="pressione (hPa)" type="number" value={meteo.pressione} onChange={(e) => setMeteo(p => ({...p, pressione: e.target.value}))} min="0" step="1" />
-                        <InputField label="vento (nodi)" type="number" value={meteo.vento} onChange={(e) => setMeteo(p => ({...p, vento: e.target.value}))} min="0" step="1" />
-
-                        <div className="mb-4">
-                            <label className="block text-cyan-400 text-sm font-semibold mb-2">direzione vento</label>
-                            <select value={meteo.direzioneVento} onChange={(e) => setMeteo(p => ({...p, direzioneVento: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
-                                <option value="">seleziona...</option>
-                                {ventiRosaDeiVenti.map(v => <option key={v} value={v}>{v}</option>)}
-                            </select>
-                        </div>
-
-                        <div className="mb-4">
-                            <label className="block text-cyan-400 text-sm font-semibold mb-2">condizioni</label>
-                            <select value={meteo.condizioni} onChange={(e) => setMeteo(p => ({...p, condizioni: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
-                                <option value="">seleziona...</option>
-                                {condizioniMeteo.map(c => <option key={c} value={c}>{c}</option>)}
-                            </select>
-                        </div>
-
-                        <div className="mb-4">
-                            <label className="block text-cyan-400 text-sm font-semibold mb-2">fase lunare</label>
-                            <select value={meteo.faseLunare} onChange={(e) => setMeteo(p => ({...p, faseLunare: e.target.value}))} className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white">
-                                <option value="">seleziona...</option>
-                                {fasiLunari.map(f => <option key={f} value={f}>{f}</option>)}
-                            </select>
-                        </div>
-
-                        <InputField label="alta marea" type="time" value={meteo.altaMareaOra} onChange={(e) => setMeteo(p => ({...p, altaMareaOra: e.target.value}))} />
-                        <InputField label="bassa marea" type="time" value={meteo.bassaMareaOra} onChange={(e) => setMeteo(p => ({...p, bassaMareaOra: e.target.value}))} />
-                    </Section>
+                    {/* Form Meteo */}
+                    <MeteoForm
+                        activeSection={activeSection}
+                        setActiveSection={setActiveSection}
+                        meteo={meteo}
+                        setMeteo={setMeteo}
+                    />
 
                     {/* Sezione Gestione */}
-                    <Section icon={Wrench} title="gestione" isActive={activeSection === 'attrezzature'} onToggle={() => setActiveSection(activeSection === 'attrezzature' ? null : 'attrezzature')}>
+                    <Section
+                        icon={Wrench}
+                        title="gestione"
+                        isActive={activeSection === 'attrezzature'}
+                        onToggle={() => setActiveSection(activeSection === 'attrezzature' ? null : 'attrezzature')}
+                    >
                         <div className="space-y-6">
-                            <ListaGestione titolo="località" emoji="📍" items={localitaMemorizzate} nuovoValore={nuovaLocalita} setNuovoValore={setNuovaLocalita}
-                                placeholder="es: molo di fiumicino..." onAggiungi={() => aggiungiVoce(nuovaLocalita, localitaMemorizzate, setLocalitaMemorizzate, setNuovaLocalita)}
+                            <ListaGestione
+                                titolo="località" emoji="📍" items={localitaMemorizzate}
+                                nuovoValore={nuovaLocalita} setNuovoValore={setNuovaLocalita}
+                                placeholder="es: molo di fiumicino..."
+                                onAggiungi={() => aggiungiVoce(nuovaLocalita, localitaMemorizzate, setLocalitaMemorizzate, setNuovaLocalita)}
                                 onModifica={(v, n) => modificaVoce(v, n, localitaMemorizzate, setLocalitaMemorizzate, setEditandoLocalita)}
                                 onElimina={(v) => setLocalitaMemorizzate(prev => prev.filter(x => x !== v))}
-                                editando={editandoLocalita} setEditando={setEditandoLocalita} valoreEdit={valoreEditLocalita} setValoreEdit={setValoreEditLocalita}
-                                mostra={mostraLocalita} setMostra={setMostraLocalita} />
+                                editando={editandoLocalita} setEditando={setEditandoLocalita}
+                                valoreEdit={valoreEditLocalita} setValoreEdit={setValoreEditLocalita}
+                                mostra={mostraLocalita} setMostra={setMostraLocalita}
+                            />
 
-                            <ListaGestione titolo="specie" emoji="🐟" items={specieMemorizzate} nuovoValore={nuovaSpecie} setNuovoValore={setNuovaSpecie}
-                                placeholder="es: spigola, orata..." onAggiungi={() => aggiungiVoce(nuovaSpecie, specieMemorizzate, setSpecieMemorizzate, setNuovaSpecie)}
+                            <ListaGestione
+                                titolo="specie" emoji="🐟" items={specieMemorizzate}
+                                nuovoValore={nuovaSpecie} setNuovoValore={setNuovaSpecie}
+                                placeholder="es: spigola, orata..."
+                                onAggiungi={() => aggiungiVoce(nuovaSpecie, specieMemorizzate, setSpecieMemorizzate, setNuovaSpecie)}
                                 onModifica={(v, n) => modificaVoce(v, n, specieMemorizzate, setSpecieMemorizzate, setEditandoSpecie)}
                                 onElimina={(v) => setSpecieMemorizzate(prev => prev.filter(x => x !== v))}
-                                editando={editandoSpecie} setEditando={setEditandoSpecie} valoreEdit={valoreEditSpecie} setValoreEdit={setValoreEditSpecie}
-                                mostra={mostraSpecie} setMostra={setMostraSpecie} />
+                                editando={editandoSpecie} setEditando={setEditandoSpecie}
+                                valoreEdit={valoreEditSpecie} setValoreEdit={setValoreEditSpecie}
+                                mostra={mostraSpecie} setMostra={setMostraSpecie}
+                            />
 
-                            <ListaGestione titolo="esche" emoji="🪱" items={escheMemorizzate} nuovoValore={nuovaEsca} setNuovoValore={setNuovaEsca}
-                                placeholder="es: coreano, gambero..." onAggiungi={() => aggiungiVoce(nuovaEsca, escheMemorizzate, setEscheMemorizzate, setNuovaEsca)}
+                            <ListaGestione
+                                titolo="esche" emoji="🪱" items={escheMemorizzate}
+                                nuovoValore={nuovaEsca} setNuovoValore={setNuovaEsca}
+                                placeholder="es: coreano, gambero..."
+                                onAggiungi={() => aggiungiVoce(nuovaEsca, escheMemorizzate, setEscheMemorizzate, setNuovaEsca)}
                                 onModifica={(v, n) => modificaVoce(v, n, escheMemorizzate, setEscheMemorizzate, setEditandoEsca)}
                                 onElimina={(v) => setEscheMemorizzate(prev => prev.filter(x => x !== v))}
-                                editando={editandoEsca} setEditando={setEditandoEsca} valoreEdit={valoreEditEsca} setValoreEdit={setValoreEditEsca}
-                                mostra={mostraEsche} setMostra={setMostraEsche} />
+                                editando={editandoEsca} setEditando={setEditandoEsca}
+                                valoreEdit={valoreEditEsca} setValoreEdit={setValoreEditEsca}
+                                mostra={mostraEsche} setMostra={setMostraEsche}
+                            />
 
-                            <ListaGestione titolo="canne" emoji="🎣" items={canneMemorizzate} nuovoValore={nuovaCanna} setNuovoValore={setNuovaCanna}
-                                placeholder="es: bolognese 6m..." onAggiungi={() => aggiungiVoce(nuovaCanna, canneMemorizzate, setCanneMemorizzate, setNuovaCanna)}
+                            <ListaGestione
+                                titolo="canne" emoji="🎣" items={canneMemorizzate}
+                                nuovoValore={nuovaCanna} setNuovoValore={setNuovaCanna}
+                                placeholder="es: bolognese 6m..."
+                                onAggiungi={() => aggiungiVoce(nuovaCanna, canneMemorizzate, setCanneMemorizzate, setNuovaCanna)}
                                 onModifica={(v, n) => modificaVoce(v, n, canneMemorizzate, setCanneMemorizzate, setEditandoCanna)}
                                 onElimina={(v) => setCanneMemorizzate(prev => prev.filter(x => x !== v))}
-                                editando={editandoCanna} setEditando={setEditandoCanna} valoreEdit={valoreEditCanna} setValoreEdit={setValoreEditCanna}
-                                mostra={mostraCanne} setMostra={setMostraCanne} />
+                                editando={editandoCanna} setEditando={setEditandoCanna}
+                                valoreEdit={valoreEditCanna} setValoreEdit={setValoreEditCanna}
+                                mostra={mostraCanne} setMostra={setMostraCanne}
+                            />
 
-                            <ListaGestione titolo="travi" emoji="🧵" items={traviMemorizzate} nuovoValore={nuovoTrave} setNuovoValore={setNuovoTrave}
-                                placeholder="es: 0.20mm..." onAggiungi={() => aggiungiVoce(nuovoTrave, traviMemorizzate, setTraviMemorizzate, setNuovoTrave)}
+                            <ListaGestione
+                                titolo="travi" emoji="🧵" items={traviMemorizzate}
+                                nuovoValore={nuovoTrave} setNuovoValore={setNuovoTrave}
+                                placeholder="es: 0.20mm..."
+                                onAggiungi={() => aggiungiVoce(nuovoTrave, traviMemorizzate, setTraviMemorizzate, setNuovoTrave)}
                                 onModifica={(v, n) => modificaVoce(v, n, traviMemorizzate, setTraviMemorizzate, setEditandoTrave)}
                                 onElimina={(v) => setTraviMemorizzate(prev => prev.filter(x => x !== v))}
-                                editando={editandoTrave} setEditando={setEditandoTrave} valoreEdit={valoreEditTrave} setValoreEdit={setValoreEditTrave}
-                                mostra={mostraTravi} setMostra={setMostraTravi} />
+                                editando={editandoTrave} setEditando={setEditandoTrave}
+                                valoreEdit={valoreEditTrave} setValoreEdit={setValoreEditTrave}
+                                mostra={mostraTravi} setMostra={setMostraTravi}
+                            />
 
-                            <ListaGestione titolo="ami" emoji="🪝" items={amiMemorizzati} nuovoValore={nuovoAmo} setNuovoValore={setNuovoAmo}
-                                placeholder="es: n.8..." onAggiungi={() => aggiungiVoce(nuovoAmo, amiMemorizzati, setAmiMemorizzati, setNuovoAmo)}
+                            <ListaGestione
+                                titolo="ami" emoji="🪝" items={amiMemorizzati}
+                                nuovoValore={nuovoAmo} setNuovoValore={setNuovoAmo}
+                                placeholder="es: n.8..."
+                                onAggiungi={() => aggiungiVoce(nuovoAmo, amiMemorizzati, setAmiMemorizzati, setNuovoAmo)}
                                 onModifica={(v, n) => modificaVoce(v, n, amiMemorizzati, setAmiMemorizzati, setEditandoAmo)}
                                 onElimina={(v) => setAmiMemorizzati(prev => prev.filter(x => x !== v))}
-                                editando={editandoAmo} setEditando={setEditandoAmo} valoreEdit={valoreEditAmo} setValoreEdit={setValoreEditAmo}
-                                mostra={mostraAmi} setMostra={setMostraAmi} />
+                                editando={editandoAmo} setEditando={setEditandoAmo}
+                                valoreEdit={valoreEditAmo} setValoreEdit={setValoreEditAmo}
+                                mostra={mostraAmi} setMostra={setMostraAmi}
+                            />
 
-                            <ListaGestione titolo="piombi" emoji="⚓" items={piombiMemorizzati} nuovoValore={nuovoPiombo} setNuovoValore={setNuovoPiombo}
-                                placeholder="es: 50g..." onAggiungi={() => aggiungiVoce(nuovoPiombo, piombiMemorizzati, setPiombiMemorizzati, setNuovoPiombo)}
+                            <ListaGestione
+                                titolo="piombi" emoji="⚓" items={piombiMemorizzati}
+                                nuovoValore={nuovoPiombo} setNuovoValore={setNuovoPiombo}
+                                placeholder="es: 50g..."
+                                onAggiungi={() => aggiungiVoce(nuovoPiombo, piombiMemorizzati, setPiombiMemorizzati, setNuovoPiombo)}
                                 onModifica={(v, n) => modificaVoce(v, n, piombiMemorizzati, setPiombiMemorizzati, setEditandoPiombo)}
                                 onElimina={(v) => setPiombiMemorizzati(prev => prev.filter(x => x !== v))}
-                                editando={editandoPiombo} setEditando={setEditandoPiombo} valoreEdit={valoreEditPiombo} setValoreEdit={setValoreEditPiombo}
-                                mostra={mostraPiombi} setMostra={setMostraPiombi} />
+                                editando={editandoPiombo} setEditando={setEditandoPiombo}
+                                valoreEdit={valoreEditPiombo} setValoreEdit={setValoreEditPiombo}
+                                mostra={mostraPiombi} setMostra={setMostraPiombi}
+                            />
                         </div>
                     </Section>
 
                     {/* Sezione Analisi */}
-                    <Section icon={BarChart3} title="analizza dati" isActive={activeSection === 'analisi'} onToggle={() => setActiveSection(activeSection === 'analisi' ? null : 'analisi')}>
+                    <Section
+                        icon={BarChart3}
+                        title="analizza dati"
+                        isActive={activeSection === 'analisi'}
+                        onToggle={() => setActiveSection(activeSection === 'analisi' ? null : 'analisi')}
+                    >
                         {catture.length === 0 ? (
                             <p className="text-gray-400 text-center py-8">nessuna cattura registrata</p>
                         ) : (
@@ -700,11 +544,17 @@ function App() {
                                     </div>
                                 )}
 
-                                <button onClick={() => setMostraRegistro(!mostraRegistro)} className="w-full bg-cyan-600 text-white py-3 rounded-lg font-bold mb-4">
+                                <button
+                                    onClick={() => setMostraRegistro(!mostraRegistro)}
+                                    className="w-full bg-cyan-600 text-white py-3 rounded-lg font-bold mb-4"
+                                >
                                     {mostraRegistro ? 'nascondi registro' : 'mostra registro'}
                                 </button>
 
-                                <button onClick={esportaDati} className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold">
+                                <button
+                                    onClick={esportaDati}
+                                    className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold"
+                                >
                                     esporta dati ({catture.length} catture)
                                 </button>
                             </>
