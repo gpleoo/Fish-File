@@ -8,7 +8,7 @@ const SessioniRegistrate = ({ sessioni, catture, onDeleteSessione }) => {
     if (!sessioni || sessioni.length === 0) {
         return (
             <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-4">
-                <h4 className="text-cyan-400 font-bold mb-2">📋 sessioni registrate</h4>
+                <h4 className="text-cyan-400 font-bold mb-2">sessioni registrate</h4>
                 <p className="text-gray-500 text-center py-4">Nessuna sessione completata</p>
             </div>
         )
@@ -49,7 +49,7 @@ const SessioniRegistrate = ({ sessioni, catture, onDeleteSessione }) => {
                 onClick={() => setEspansa(!espansa)}
                 className="w-full flex items-center justify-between"
             >
-                <h4 className="text-cyan-400 font-bold">📋 sessioni registrate ({sessioni.length})</h4>
+                <h4 className="text-cyan-400 font-bold">sessioni registrate ({sessioni.length})</h4>
                 {espansa ? (
                     <ChevronUp className="w-5 h-5 text-gray-400" />
                 ) : (

@@ -185,7 +185,7 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
             const popupContent = `
                 <div style="min-width: 200px; font-family: system-ui, sans-serif;">
                     <div style="font-weight: bold; font-size: 16px; color: ${color}; margin-bottom: 8px;">
-                        📍 ${sessione.localita || 'Località sconosciuta'}
+                        ${sessione.localita || 'Località sconosciuta'}
                     </div>
                     <div style="font-size: 13px; color: #e5e7eb; line-height: 1.8;">
                         <div><strong>Catture:</strong> ${count}</div>
@@ -227,7 +227,7 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
     return (
         <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-4">
             <div className="flex items-center justify-between mb-3">
-                <h4 className="text-cyan-400 font-bold">🗺️ mappa sessioni</h4>
+                <h4 className="text-cyan-400 font-bold">mappa sessioni</h4>
                 <span className="text-gray-400 text-sm">
                     {totali.sessioni} sessioni • {totali.catture} catture
                 </span>
