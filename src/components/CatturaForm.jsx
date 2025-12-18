@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Fish } from './Icons'
 import Section from './Section'
 import InputField from './InputField'
 import SelectField from './SelectField'
+import VoiceInput from './VoiceInput'
 
 const CatturaForm = ({
     activeSection,
@@ -20,6 +21,14 @@ const CatturaForm = ({
     messaggioErrore,
     aggiungiCattura
 }) => {
+    // Handler per risultato input vocale
+    const handleVoiceResult = useCallback((parsedData, rawText) => {
+        setNuovaCattura(prev => ({
+            ...prev,
+            ...parsedData
+        }))
+    }, [setNuovaCattura])
+
     return (
         <Section
             icon={Fish}
@@ -33,6 +42,13 @@ const CatturaForm = ({
                     obbligatori: sessione + specie | resto opzionale
                 </p>
             </div>
+
+            {/* Input vocale */}
+            <VoiceInput
+                onResult={handleVoiceResult}
+                specieDisponibili={specieMemorizzate}
+                escheDisponibili={escheMemorizzate}
+            />
 
             {/* Campi data e ora */}
             <InputField
