@@ -2,17 +2,55 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Fish File">
     <meta name="description" content="Fish File - Il tuo diario di pesca intelligente">
     <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
     <title>Fish File - Diario di Pesca</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Icons -->
     <link rel="icon" type="image/png" href="/logoFishFile.png">
     <link rel="apple-touch-icon" href="/logoFishFile.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/logoFishFile.png">
+
+    <!-- Splash screens for iOS -->
+    <link rel="apple-touch-startup-image" href="/splash-screen.png">
 </head>
 <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered:', registration.scope)
+
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New content available, show update notification
+                                    console.log('New content available, refresh to update')
+                                }
+                            })
+                        })
+                    })
+                    .catch((error) => {
+                        console.log('SW registration failed:', error)
+                    })
+            })
+        }
+    </script>
 </body>
 </html>

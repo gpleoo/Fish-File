@@ -4,9 +4,8 @@
  * Tutti i diritti riservati.
  */
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import 'leaflet/dist/leaflet.css'
-import L from 'leaflet'
 
 // Components
 import Section from './components/Section'
@@ -14,10 +13,13 @@ import SessionePesca from './components/SessionePesca'
 import CatturaForm from './components/CatturaForm'
 import MeteoForm from './components/MeteoForm'
 import ListaGestione from './components/ListaGestione'
-import { Wrench, BarChart3 } from './components/Icons'
+import AnalisiDati from './components/AnalisiDati'
+import PWAInstall from './components/PWAInstall'
+import { useToast } from './components/Toast'
+import { Wrench } from './components/Icons'
 
-// Constants
-const ITEMS_PER_PAGE = 10
+// Native utilities (Capacitor)
+import { initNativeFeatures, isNative } from './utils/native'
 
 // Default data
 const specieDefault = ['Cefalo', 'Gronco', 'Leccia stella', 'Marmora', 'Occhiata', 'Ombrina', 'Opa', 'Orata', 'Pesce serra', 'Sarago', 'Spigola', 'Sughero']
@@ -72,6 +74,9 @@ const loadFromStorage = (key, defaultValue) => {
 
 // Main App Component
 function App() {
+    // Toast notifications
+    const toast = useToast()
+
     // State - Sezioni attive
     const [activeSection, setActiveSection] = useState(null)
     const [mostraSplash, setMostraSplash] = useState(true)
@@ -94,7 +99,6 @@ function App() {
     const [sessioniCompletate, setSessioniCompletate] = useState(() => loadFromStorage('diarioPesca_sessioniCompletate', []))
 
     // State - UI
-    const [mostraRegistro, setMostraRegistro] = useState(false)
     const [mostraSessionePesca, setMostraSessionePesca] = useState(false)
 
     // State - Gestione sezioni collassabili
@@ -163,22 +167,27 @@ function App() {
     useEffect(() => { localStorage.setItem('diarioPesca_sessioneCorrente', JSON.stringify(sessioneCorrente)) }, [sessioneCorrente])
     useEffect(() => { localStorage.setItem('diarioPesca_sessioniCompletate', JSON.stringify(sessioniCompletate)) }, [sessioniCompletate])
 
-    // Effect - Splash screen
+    // Effect - Splash screen (2s duration)
     useEffect(() => {
-        const timer = setTimeout(() => setMostraSplash(false), 3000)
+        const timer = setTimeout(() => setMostraSplash(false), 2000)
         return () => clearTimeout(timer)
+    }, [])
+
+    // Effect - Initialize native features (Capacitor)
+    useEffect(() => {
+        initNativeFeatures()
     }, [])
 
     // Funzioni - Sessione
     const avviaSessione = () => {
         if (!datiSessione.localita || !datiSessione.latitudine || !datiSessione.longitudine) {
-            alert('Compila tutti i campi!')
+            toast.warning('Compila tutti i campi!')
             return
         }
 
         const validazione = validaCoordinate(datiSessione.latitudine, datiSessione.longitudine)
         if (!validazione.valid) {
-            alert(`ATTENZIONE: ${validazione.error}\n\nVerifica le coordinate prima di continuare!`)
+            toast.error(`${validazione.error}. Verifica le coordinate prima di continuare!`, 'Coordinate non valide')
             return
         }
 
@@ -222,10 +231,10 @@ function App() {
 
     const ottieniPosizioneGPS = () => {
         if (!navigator.geolocation) {
-            alert('Geolocalizzazione non supportata dal tuo browser!')
+            toast.error('Geolocalizzazione non supportata dal tuo browser!')
             return
         }
-        alert('Richiesta posizione GPS in corso...')
+        toast.info('Richiesta posizione GPS in corso...')
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 setDatiSessione(p => ({
@@ -233,15 +242,15 @@ function App() {
                     latitudine: position.coords.latitude.toFixed(6),
                     longitudine: position.coords.longitude.toFixed(6)
                 }))
-                alert(`Posizione GPS acquisita!\n\nPrecisione: ±${Math.round(position.coords.accuracy)}m`)
+                toast.success(`Precisione: ±${Math.round(position.coords.accuracy)}m`, 'Posizione GPS acquisita!')
             },
             (error) => {
-                let msg = 'Impossibile ottenere la posizione GPS!\n\n'
-                if (error.code === error.PERMISSION_DENIED) msg += 'Permesso negato.'
-                else if (error.code === error.POSITION_UNAVAILABLE) msg += 'Posizione non disponibile.'
-                else if (error.code === error.TIMEOUT) msg += 'Timeout.'
-                else msg += 'Errore sconosciuto.'
-                alert(msg)
+                let msg = ''
+                if (error.code === error.PERMISSION_DENIED) msg = 'Permesso negato.'
+                else if (error.code === error.POSITION_UNAVAILABLE) msg = 'Posizione non disponibile.'
+                else if (error.code === error.TIMEOUT) msg = 'Timeout scaduto.'
+                else msg = 'Errore sconosciuto.'
+                toast.error(msg, 'Errore GPS')
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         )
@@ -293,7 +302,7 @@ function App() {
             note: nuovaCattura.note
         })
 
-        alert('Cattura registrata con successo!')
+        toast.success('Cattura registrata con successo!')
     }
 
     // Funzioni - Gestione liste (generiche)
@@ -306,58 +315,32 @@ function App() {
 
     const modificaVoce = (vecchioNome, nuovoNome, lista, setLista, setEditando) => {
         if (!nuovoNome || !nuovoNome.trim()) {
-            alert('Il nome non può essere vuoto!')
+            toast.warning('Il nome non può essere vuoto!')
             return
         }
         const nuovoNomeTrim = nuovoNome.trim()
         if (lista.includes(nuovoNomeTrim) && nuovoNomeTrim !== vecchioNome) {
-            alert('Questa voce esiste già!')
+            toast.warning('Questa voce esiste già!')
             return
         }
         setLista(prev => prev.map(l => l === vecchioNome ? nuovoNomeTrim : l).sort((a, b) => a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })))
         setEditando(null)
     }
 
-    // Funzioni - Statistiche
-    const calcolaStatistiche = () => {
-        if (catture.length === 0) return null
-        const specieCount = {}
-        let pesoTotale = 0, numPesi = 0
-        catture.forEach(c => {
-            if (c.specie) specieCount[c.specie] = (specieCount[c.specie] || 0) + 1
-            if (c.peso) {
-                const pesoNum = parseFloat(c.peso)
-                if (!isNaN(pesoNum) && pesoNum > 0) {
-                    pesoTotale += pesoNum
-                    numPesi++
-                }
-            }
-        })
-        const speciePiuCatturata = Object.entries(specieCount).length > 0 ? Object.entries(specieCount).sort((a,b) => b[1] - a[1])[0] : null
-        const pesoMedio = numPesi > 0 ? ((pesoTotale / numPesi) / 1000).toFixed(2) : 0
-        return { speciePiuCatturata, pesoMedio, totaleCatture: catture.length }
+    // Funzione - Import dati
+    const importaDati = (data) => {
+        if (data.catture) setCatture(data.catture)
+        if (data.sessioni) setSessioniCompletate(data.sessioni)
+        if (data.specie) setSpecieMemorizzate(data.specie)
+        if (data.esche) setEscheMemorizzate(data.esche)
+        if (data.localita) setLocalitaMemorizzate(data.localita)
+        if (data.attrezzature) {
+            if (data.attrezzature.canne) setCanneMemorizzate(data.attrezzature.canne)
+            if (data.attrezzature.travi) setTraviMemorizzate(data.attrezzature.travi)
+            if (data.attrezzature.ami) setAmiMemorizzati(data.attrezzature.ami)
+            if (data.attrezzature.piombi) setPiombiMemorizzati(data.attrezzature.piombi)
+        }
     }
-
-    const esportaDati = () => {
-        if (catture.length === 0) { alert('Nessuna cattura!'); return }
-        const data = JSON.stringify({
-            catture,
-            sessioni: sessioniCompletate,
-            attrezzature: { canne: canneMemorizzate, travi: traviMemorizzate, ami: amiMemorizzati, piombi: piombiMemorizzati },
-            localita: localitaMemorizzate,
-            specie: specieMemorizzate,
-            esche: escheMemorizzate
-        }, null, 2)
-        const blob = new Blob([data], {type: 'application/json'})
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `diario-pesca-${new Date().toISOString().split('T')[0]}.json`
-        a.click()
-        alert('Esportato!')
-    }
-
-    const stats = calcolaStatistiche()
 
     return (
         <>
@@ -512,54 +495,21 @@ function App() {
                     </Section>
 
                     {/* Sezione Analisi */}
-                    <Section
-                        icon={BarChart3}
-                        title="analizza dati"
-                        isActive={activeSection === 'analisi'}
-                        onToggle={() => setActiveSection(activeSection === 'analisi' ? null : 'analisi')}
-                    >
-                        {catture.length === 0 ? (
-                            <p className="text-gray-400 text-center py-8">nessuna cattura registrata</p>
-                        ) : (
-                            <>
-                                {stats && (
-                                    <div className="grid grid-cols-3 gap-4 mb-6">
-                                        <div className="bg-cyan-900 rounded-lg p-4 border border-cyan-600">
-                                            <p className="text-cyan-300 text-xs font-semibold">totale</p>
-                                            <p className="text-white text-2xl font-bold">{stats.totaleCatture}</p>
-                                        </div>
-                                        <div className="bg-blue-900 rounded-lg p-4 border border-blue-600">
-                                            <p className="text-blue-300 text-xs font-semibold">più catturata</p>
-                                            {stats.speciePiuCatturata && (
-                                                <>
-                                                    <p className="text-white text-lg font-bold">{stats.speciePiuCatturata[0]}</p>
-                                                    <p className="text-blue-300 text-xs">({stats.speciePiuCatturata[1]})</p>
-                                                </>
-                                            )}
-                                        </div>
-                                        <div className="bg-green-900 rounded-lg p-4 border border-green-600">
-                                            <p className="text-green-300 text-xs font-semibold">peso medio</p>
-                                            <p className="text-white text-2xl font-bold">{stats.pesoMedio} kg</p>
-                                        </div>
-                                    </div>
-                                )}
-
-                                <button
-                                    onClick={() => setMostraRegistro(!mostraRegistro)}
-                                    className="w-full bg-cyan-600 text-white py-3 rounded-lg font-bold mb-4"
-                                >
-                                    {mostraRegistro ? 'nascondi registro' : 'mostra registro'}
-                                </button>
-
-                                <button
-                                    onClick={esportaDati}
-                                    className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold"
-                                >
-                                    esporta dati ({catture.length} catture)
-                                </button>
-                            </>
-                        )}
-                    </Section>
+                    <AnalisiDati
+                        activeSection={activeSection}
+                        setActiveSection={setActiveSection}
+                        catture={catture}
+                        setCatture={setCatture}
+                        sessioniCompletate={sessioniCompletate}
+                        canneMemorizzate={canneMemorizzate}
+                        traviMemorizzate={traviMemorizzate}
+                        amiMemorizzati={amiMemorizzati}
+                        piombiMemorizzati={piombiMemorizzati}
+                        localitaMemorizzate={localitaMemorizzate}
+                        specieMemorizzate={specieMemorizzate}
+                        escheMemorizzate={escheMemorizzate}
+                        onImportaDati={importaDati}
+                    />
 
                     {/* Footer */}
                     <div className="text-center mt-8 pb-8">
@@ -567,6 +517,9 @@ function App() {
                     </div>
                 </div>
             </div>
+
+            {/* PWA Install Button */}
+            <PWAInstall />
         </>
     )
 }

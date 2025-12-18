@@ -25,3 +25,10 @@ npm-debug.log*
 
 # Cache
 .cache/
+
+# Capacitor native platforms (generated)
+ios/
+android/
+
+# Capacitor plugins cache
+.capacitor/
