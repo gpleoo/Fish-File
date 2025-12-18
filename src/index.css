@@ -46,6 +46,11 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     border: none;
 }
 
+.custom-marker-session {
+    background: transparent;
+    border: none;
+}
+
 /* Leaflet popup styles */
 .leaflet-popup-content-wrapper {
     background: #1f2937;
