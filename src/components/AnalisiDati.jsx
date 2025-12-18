@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useRef } from 'react'
 import { BarChart3 } from './Icons'
 import Section from './Section'
 import StatisticheBox from './StatisticheBox'
@@ -18,9 +18,11 @@ const AnalisiDati = ({
     piombiMemorizzati,
     localitaMemorizzate,
     specieMemorizzate,
-    escheMemorizzate
+    escheMemorizzate,
+    onImportaDati
 }) => {
     const toast = useToast()
+    const fileInputRef = useRef(null)
 
     // Filtri
     const [filtri, setFiltri] = useState({
@@ -93,6 +95,44 @@ const AnalisiDati = ({
         a.download = `diario-pesca-${new Date().toISOString().split('T')[0]}.json`
         a.click()
         toast.success('Dati esportati con successo!')
+    }
+
+    // Importa dati da file JSON
+    const handleImportFile = (event) => {
+        const file = event.target.files?.[0]
+        if (!file) return
+
+        const reader = new FileReader()
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result)
+
+                // Valida struttura base
+                if (!data.catture || !Array.isArray(data.catture)) {
+                    toast.error('File non valido: manca array catture')
+                    return
+                }
+
+                // Conferma import
+                const conferma = window.confirm(
+                    `Importare ${data.catture.length} catture?\n\n` +
+                    `Questo sostituira i dati esistenti.\n` +
+                    `Assicurati di aver esportato prima i dati attuali.`
+                )
+
+                if (conferma && onImportaDati) {
+                    onImportaDati(data)
+                    toast.success(`Importate ${data.catture.length} catture!`)
+                }
+            } catch (err) {
+                toast.error('Errore lettura file JSON')
+                console.error('Import error:', err)
+            }
+        }
+        reader.readAsText(file)
+
+        // Reset input per permettere reimport stesso file
+        event.target.value = ''
     }
 
     // Reset filtri
@@ -234,13 +274,31 @@ const AnalisiDati = ({
                         filtri={filtri}
                     />
 
-                    {/* Esporta */}
-                    <button
-                        onClick={esportaDati}
-                        className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold active:bg-purple-700"
-                    >
-                        📥 esporta dati ({catture.length} catture)
-                    </button>
+                    {/* Esporta / Importa */}
+                    <div className="flex gap-3">
+                        <button
+                            onClick={esportaDati}
+                            className="flex-1 bg-purple-600 text-white py-3 rounded-lg font-bold active:bg-purple-700"
+                            aria-label="Esporta dati"
+                        >
+                            📤 esporta
+                        </button>
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold active:bg-green-700"
+                            aria-label="Importa dati"
+                        >
+                            📥 importa
+                        </button>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept=".json"
+                            onChange={handleImportFile}
+                            className="hidden"
+                            aria-hidden="true"
+                        />
+                    </div>
                 </>
             )}
         </Section>

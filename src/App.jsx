@@ -164,9 +164,9 @@ function App() {
     useEffect(() => { localStorage.setItem('diarioPesca_sessioneCorrente', JSON.stringify(sessioneCorrente)) }, [sessioneCorrente])
     useEffect(() => { localStorage.setItem('diarioPesca_sessioniCompletate', JSON.stringify(sessioniCompletate)) }, [sessioniCompletate])
 
-    // Effect - Splash screen
+    // Effect - Splash screen (2s duration)
     useEffect(() => {
-        const timer = setTimeout(() => setMostraSplash(false), 3000)
+        const timer = setTimeout(() => setMostraSplash(false), 2000)
         return () => clearTimeout(timer)
     }, [])
 
@@ -319,6 +319,20 @@ function App() {
         setEditando(null)
     }
 
+    // Funzione - Import dati
+    const importaDati = (data) => {
+        if (data.catture) setCatture(data.catture)
+        if (data.sessioni) setSessioniCompletate(data.sessioni)
+        if (data.specie) setSpecieMemorizzate(data.specie)
+        if (data.esche) setEscheMemorizzate(data.esche)
+        if (data.localita) setLocalitaMemorizzate(data.localita)
+        if (data.attrezzature) {
+            if (data.attrezzature.canne) setCanneMemorizzate(data.attrezzature.canne)
+            if (data.attrezzature.travi) setTraviMemorizzate(data.attrezzature.travi)
+            if (data.attrezzature.ami) setAmiMemorizzati(data.attrezzature.ami)
+            if (data.attrezzature.piombi) setPiombiMemorizzati(data.attrezzature.piombi)
+        }
+    }
 
     return (
         <>
@@ -486,6 +500,7 @@ function App() {
                         localitaMemorizzate={localitaMemorizzate}
                         specieMemorizzate={specieMemorizzate}
                         escheMemorizzate={escheMemorizzate}
+                        onImportaDati={importaDati}
                     />
 
                     {/* Footer */}
