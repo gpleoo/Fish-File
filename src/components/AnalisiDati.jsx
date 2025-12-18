@@ -3,6 +3,7 @@ import { BarChart3 } from './Icons'
 import Section from './Section'
 import StatisticheBox from './StatisticheBox'
 import RegistroCatture from './RegistroCatture'
+import MapCatture from './MapCatture'
 import { ventiRosaDeiVenti, fasiLunari, condizioniMeteo } from './MeteoForm'
 import { useToast } from './Toast'
 
@@ -266,6 +267,9 @@ const AnalisiDati = ({
                             </select>
                         </div>
                     </div>
+
+                    {/* Mappa Catture */}
+                    <MapCatture catture={catture} filtri={filtri} />
 
                     {/* Registro Catture */}
                     <RegistroCatture
