@@ -342,6 +342,12 @@ function App() {
         }
     }
 
+    // Funzione - Elimina sessione
+    const eliminaSessione = (sessioneId) => {
+        setSessioniCompletate(prev => prev.filter(s => s.id !== sessioneId))
+        toast.success('Sessione eliminata')
+    }
+
     return (
         <>
             {/* Splash Screen */}
@@ -501,6 +507,7 @@ function App() {
                         catture={catture}
                         setCatture={setCatture}
                         sessioniCompletate={sessioniCompletate}
+                        onDeleteSessione={eliminaSessione}
                         canneMemorizzate={canneMemorizzate}
                         traviMemorizzate={traviMemorizzate}
                         amiMemorizzati={amiMemorizzati}

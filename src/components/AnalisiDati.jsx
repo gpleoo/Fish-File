@@ -3,6 +3,8 @@ import { BarChart3 } from './Icons'
 import Section from './Section'
 import StatisticheBox from './StatisticheBox'
 import RegistroCatture from './RegistroCatture'
+import MapCatture from './MapCatture'
+import SessioniRegistrate from './SessioniRegistrate'
 import { ventiRosaDeiVenti, fasiLunari, condizioniMeteo } from './MeteoForm'
 import { useToast } from './Toast'
 
@@ -12,6 +14,7 @@ const AnalisiDati = ({
     catture,
     setCatture,
     sessioniCompletate,
+    onDeleteSessione,
     canneMemorizzate,
     traviMemorizzate,
     amiMemorizzati,
@@ -266,6 +269,20 @@ const AnalisiDati = ({
                             </select>
                         </div>
                     </div>
+
+                    {/* Mappa Sessioni */}
+                    <MapCatture
+                        sessioni={sessioniCompletate}
+                        catture={catture}
+                        filtri={filtri}
+                    />
+
+                    {/* Sessioni Registrate */}
+                    <SessioniRegistrate
+                        sessioni={sessioniCompletate}
+                        catture={catture}
+                        onDeleteSessione={onDeleteSessione}
+                    />
 
                     {/* Registro Catture */}
                     <RegistroCatture
