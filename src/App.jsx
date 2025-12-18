@@ -18,6 +18,9 @@ import PWAInstall from './components/PWAInstall'
 import { useToast } from './components/Toast'
 import { Wrench } from './components/Icons'
 
+// Native utilities (Capacitor)
+import { initNativeFeatures, isNative } from './utils/native'
+
 // Default data
 const specieDefault = ['Cefalo', 'Gronco', 'Leccia stella', 'Marmora', 'Occhiata', 'Ombrina', 'Opa', 'Orata', 'Pesce serra', 'Sarago', 'Spigola', 'Sughero']
 const escheDefault = ['Americano', 'Arenicola', 'Bibi', 'Canolicchio', 'Cefalo', 'Coreano', 'Gambero', 'Granchio', 'Muriddu', 'Seppia']
@@ -168,6 +171,11 @@ function App() {
     useEffect(() => {
         const timer = setTimeout(() => setMostraSplash(false), 2000)
         return () => clearTimeout(timer)
+    }, [])
+
+    // Effect - Initialize native features (Capacitor)
+    useEffect(() => {
+        initNativeFeatures()
     }, [])
 
     // Funzioni - Sessione
