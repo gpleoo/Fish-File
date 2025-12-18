@@ -63,3 +63,37 @@ export const Mic = (props) => (
         <line x1="12" x2="12" y1="19" y2="22"/>
     </svg>
 )
+
+export const X = (props) => (
+    <svg {...props} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path d="M18 6 6 18M6 6l12 12"/>
+    </svg>
+)
+
+export const CheckCircle = (props) => (
+    <svg {...props} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <path d="m9 11 3 3L22 4"/>
+    </svg>
+)
+
+export const AlertTriangle = (props) => (
+    <svg {...props} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+        <path d="M12 9v4m0 4h.01"/>
+    </svg>
+)
+
+export const Info = (props) => (
+    <svg {...props} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 16v-4m0-4h.01"/>
+    </svg>
+)
+
+export const XCircle = (props) => (
+    <svg {...props} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="m15 9-6 6m0-6 6 6"/>
+    </svg>
+)

@@ -4,6 +4,7 @@ import Section from './Section'
 import StatisticheBox from './StatisticheBox'
 import RegistroCatture from './RegistroCatture'
 import { ventiRosaDeiVenti, fasiLunari, condizioniMeteo } from './MeteoForm'
+import { useToast } from './Toast'
 
 const AnalisiDati = ({
     activeSection,
@@ -19,6 +20,8 @@ const AnalisiDati = ({
     specieMemorizzate,
     escheMemorizzate
 }) => {
+    const toast = useToast()
+
     // Filtri
     const [filtri, setFiltri] = useState({
         anno: 'tutti',
@@ -67,7 +70,7 @@ const AnalisiDati = ({
     // Esporta dati
     const esportaDati = () => {
         if (catture.length === 0) {
-            alert('Nessuna cattura!')
+            toast.warning('Nessuna cattura da esportare!')
             return
         }
         const data = JSON.stringify({
@@ -89,7 +92,7 @@ const AnalisiDati = ({
         a.href = url
         a.download = `diario-pesca-${new Date().toISOString().split('T')[0]}.json`
         a.click()
-        alert('Esportato!')
+        toast.success('Dati esportati con successo!')
     }
 
     // Reset filtri

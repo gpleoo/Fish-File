@@ -49,7 +49,7 @@ const ListaGestione = ({
                     value={nuovoValore}
                     onChange={(e) => setNuovoValore(e.target.value)}
                     placeholder={placeholder}
-                    onKeyPress={(e) => {
+                    onKeyDown={(e) => {
                         if (e.key === 'Enter') onAggiungi()
                     }}
                     className="w-full mb-3 bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-2 text-white"
@@ -67,7 +67,7 @@ const ListaGestione = ({
                                 value={valoreEdit}
                                 onChange={(e) => setValoreEdit(e.target.value)}
                                 onBlur={() => onModifica(item, valoreEdit)}
-                                onKeyPress={(e) => {
+                                onKeyDown={(e) => {
                                     if (e.key === 'Enter') onModifica(item, valoreEdit)
                                 }}
                                 autoFocus
