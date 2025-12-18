@@ -14,6 +14,7 @@ import CatturaForm from './components/CatturaForm'
 import MeteoForm from './components/MeteoForm'
 import ListaGestione from './components/ListaGestione'
 import AnalisiDati from './components/AnalisiDati'
+import PWAInstall from './components/PWAInstall'
 import { useToast } from './components/Toast'
 import { Wrench } from './components/Icons'
 
@@ -493,6 +494,9 @@ function App() {
                     </div>
                 </div>
             </div>
+
+            {/* PWA Install Button */}
+            <PWAInstall />
         </>
     )
 }
