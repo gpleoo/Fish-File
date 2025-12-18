@@ -140,9 +140,15 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
                     const parsedData = parseVoiceInput(finalTranscript)
                     if (Object.keys(parsedData).length > 0) {
                         onResult(parsedData, finalTranscript)
-                        toast.success('Dati riconosciuti dal vocale!')
+                        // Mostra cosa è stato riconosciuto
+                        const campiRiconosciuti = []
+                        if (parsedData.specie) campiRiconosciuti.push(`specie: ${parsedData.specie}`)
+                        if (parsedData.peso) campiRiconosciuti.push(`peso: ${parsedData.peso}g`)
+                        if (parsedData.lunghezza) campiRiconosciuti.push(`lunghezza: ${parsedData.lunghezza}cm`)
+                        if (parsedData.esca) campiRiconosciuti.push(`esca: ${parsedData.esca}`)
+                        toast.success(campiRiconosciuti.join(', '), 'Compilato!')
                     } else {
-                        toast.warning('Nessun dato riconosciuto. Riprova con: specie, peso, lunghezza, esca')
+                        toast.warning('Nessun dato riconosciuto. Prova a dire il nome di una specie.')
                     }
                 }
             }
@@ -230,7 +236,7 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
                     )}
 
                     <p className="text-gray-500 text-xs mt-2">
-                        Prova: "Orata di 500 grammi, 35 centimetri, con coreano"
+                        Esempi: "Orata" oppure "Spigola 40 centimetri con coreano"
                     </p>
                 </div>
             )}
@@ -238,7 +244,7 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
             {/* Suggerimento */}
             {!isListening && (
                 <p className="text-gray-500 text-xs mt-2 text-center">
-                    Pronuncia specie, peso, lunghezza ed esca per compilare automaticamente
+                    Basta dire la specie! Peso, lunghezza ed esca sono opzionali
                 </p>
             )}
         </div>
