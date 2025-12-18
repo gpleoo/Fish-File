@@ -4,7 +4,7 @@
  * Tutti i diritti riservati.
  */
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 
@@ -14,10 +14,8 @@ import SessionePesca from './components/SessionePesca'
 import CatturaForm from './components/CatturaForm'
 import MeteoForm from './components/MeteoForm'
 import ListaGestione from './components/ListaGestione'
-import { Wrench, BarChart3 } from './components/Icons'
-
-// Constants
-const ITEMS_PER_PAGE = 10
+import AnalisiDati from './components/AnalisiDati'
+import { Wrench } from './components/Icons'
 
 // Default data
 const specieDefault = ['Cefalo', 'Gronco', 'Leccia stella', 'Marmora', 'Occhiata', 'Ombrina', 'Opa', 'Orata', 'Pesce serra', 'Sarago', 'Spigola', 'Sughero']
@@ -94,7 +92,6 @@ function App() {
     const [sessioniCompletate, setSessioniCompletate] = useState(() => loadFromStorage('diarioPesca_sessioniCompletate', []))
 
     // State - UI
-    const [mostraRegistro, setMostraRegistro] = useState(false)
     const [mostraSessionePesca, setMostraSessionePesca] = useState(false)
 
     // State - Gestione sezioni collassabili
@@ -318,46 +315,6 @@ function App() {
         setEditando(null)
     }
 
-    // Funzioni - Statistiche
-    const calcolaStatistiche = () => {
-        if (catture.length === 0) return null
-        const specieCount = {}
-        let pesoTotale = 0, numPesi = 0
-        catture.forEach(c => {
-            if (c.specie) specieCount[c.specie] = (specieCount[c.specie] || 0) + 1
-            if (c.peso) {
-                const pesoNum = parseFloat(c.peso)
-                if (!isNaN(pesoNum) && pesoNum > 0) {
-                    pesoTotale += pesoNum
-                    numPesi++
-                }
-            }
-        })
-        const speciePiuCatturata = Object.entries(specieCount).length > 0 ? Object.entries(specieCount).sort((a,b) => b[1] - a[1])[0] : null
-        const pesoMedio = numPesi > 0 ? ((pesoTotale / numPesi) / 1000).toFixed(2) : 0
-        return { speciePiuCatturata, pesoMedio, totaleCatture: catture.length }
-    }
-
-    const esportaDati = () => {
-        if (catture.length === 0) { alert('Nessuna cattura!'); return }
-        const data = JSON.stringify({
-            catture,
-            sessioni: sessioniCompletate,
-            attrezzature: { canne: canneMemorizzate, travi: traviMemorizzate, ami: amiMemorizzati, piombi: piombiMemorizzati },
-            localita: localitaMemorizzate,
-            specie: specieMemorizzate,
-            esche: escheMemorizzate
-        }, null, 2)
-        const blob = new Blob([data], {type: 'application/json'})
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `diario-pesca-${new Date().toISOString().split('T')[0]}.json`
-        a.click()
-        alert('Esportato!')
-    }
-
-    const stats = calcolaStatistiche()
 
     return (
         <>
@@ -512,54 +469,20 @@ function App() {
                     </Section>
 
                     {/* Sezione Analisi */}
-                    <Section
-                        icon={BarChart3}
-                        title="analizza dati"
-                        isActive={activeSection === 'analisi'}
-                        onToggle={() => setActiveSection(activeSection === 'analisi' ? null : 'analisi')}
-                    >
-                        {catture.length === 0 ? (
-                            <p className="text-gray-400 text-center py-8">nessuna cattura registrata</p>
-                        ) : (
-                            <>
-                                {stats && (
-                                    <div className="grid grid-cols-3 gap-4 mb-6">
-                                        <div className="bg-cyan-900 rounded-lg p-4 border border-cyan-600">
-                                            <p className="text-cyan-300 text-xs font-semibold">totale</p>
-                                            <p className="text-white text-2xl font-bold">{stats.totaleCatture}</p>
-                                        </div>
-                                        <div className="bg-blue-900 rounded-lg p-4 border border-blue-600">
-                                            <p className="text-blue-300 text-xs font-semibold">più catturata</p>
-                                            {stats.speciePiuCatturata && (
-                                                <>
-                                                    <p className="text-white text-lg font-bold">{stats.speciePiuCatturata[0]}</p>
-                                                    <p className="text-blue-300 text-xs">({stats.speciePiuCatturata[1]})</p>
-                                                </>
-                                            )}
-                                        </div>
-                                        <div className="bg-green-900 rounded-lg p-4 border border-green-600">
-                                            <p className="text-green-300 text-xs font-semibold">peso medio</p>
-                                            <p className="text-white text-2xl font-bold">{stats.pesoMedio} kg</p>
-                                        </div>
-                                    </div>
-                                )}
-
-                                <button
-                                    onClick={() => setMostraRegistro(!mostraRegistro)}
-                                    className="w-full bg-cyan-600 text-white py-3 rounded-lg font-bold mb-4"
-                                >
-                                    {mostraRegistro ? 'nascondi registro' : 'mostra registro'}
-                                </button>
-
-                                <button
-                                    onClick={esportaDati}
-                                    className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold"
-                                >
-                                    esporta dati ({catture.length} catture)
-                                </button>
-                            </>
-                        )}
-                    </Section>
+                    <AnalisiDati
+                        activeSection={activeSection}
+                        setActiveSection={setActiveSection}
+                        catture={catture}
+                        setCatture={setCatture}
+                        sessioniCompletate={sessioniCompletate}
+                        canneMemorizzate={canneMemorizzate}
+                        traviMemorizzate={traviMemorizzate}
+                        amiMemorizzati={amiMemorizzati}
+                        piombiMemorizzati={piombiMemorizzati}
+                        localitaMemorizzate={localitaMemorizzate}
+                        specieMemorizzate={specieMemorizzate}
+                        escheMemorizzate={escheMemorizzate}
+                    />
 
                     {/* Footer */}
                     <div className="text-center mt-8 pb-8">
