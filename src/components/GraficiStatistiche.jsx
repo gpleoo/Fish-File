@@ -20,7 +20,7 @@ const COLORI_BARRE = [
 
 const GraficiStatistiche = ({ catture, filtri }) => {
     const [mostraGrafici, setMostraGrafici] = useState(false)
-    const [graficoAttivo, setGraficoAttivo] = useState('mese') // 'mese' o 'specie'
+    const [graficoAttivo, setGraficoAttivo] = useState('mese') // 'mese', 'specie' o 'vento'
 
     // Filtra catture in base ai filtri attivi
     const cattureFiltrate = useMemo(() => {
@@ -77,10 +77,32 @@ const GraficiStatistiche = ({ catture, filtri }) => {
         return ordinato
     }, [cattureFiltrate])
 
+    // Calcola catture per direzione vento
+    const catturePerVento = useMemo(() => {
+        const conteggio = {}
+
+        cattureFiltrate.forEach(c => {
+            if (!c.meteo?.direzioneVento) return
+            // Estrai solo la sigla della direzione (es. "N", "NE", "S", etc.)
+            const direzione = c.meteo.direzioneVento.split(' ')[0]
+            conteggio[direzione] = (conteggio[direzione] || 0) + 1
+        })
+
+        // Ordina per numero catture
+        const ordinato = Object.entries(conteggio)
+            .map(([direzione, numero]) => ({ direzione, catture: numero }))
+            .sort((a, b) => b.catture - a.catture)
+
+        return ordinato
+    }, [cattureFiltrate])
+
     // Calcola il valore massimo per la scala
     const maxCattureMese = Math.max(...catturePerMese.map(m => m.catture), 1)
     const maxCattureSpecie = speciePiuCatturate.length > 0
         ? Math.max(...speciePiuCatturate.map(s => s.catture), 1)
+        : 1
+    const maxCattureVento = catturePerVento.length > 0
+        ? Math.max(...catturePerVento.map(v => v.catture), 1)
         : 1
 
     if (catture.length === 0) return null
@@ -107,7 +129,7 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                     <div className="flex gap-2 mb-3 sm:mb-4">
                         <button
                             onClick={() => setGraficoAttivo('mese')}
-                            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                            className={`flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                                 graficoAttivo === 'mese'
                                     ? 'bg-cyan-600 text-white'
                                     : 'bg-gray-700 text-gray-300 active:bg-gray-600'
@@ -117,13 +139,23 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                         </button>
                         <button
                             onClick={() => setGraficoAttivo('specie')}
-                            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                            className={`flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                                 graficoAttivo === 'specie'
                                     ? 'bg-cyan-600 text-white'
                                     : 'bg-gray-700 text-gray-300 active:bg-gray-600'
                             }`}
                         >
                             per specie
+                        </button>
+                        <button
+                            onClick={() => setGraficoAttivo('vento')}
+                            className={`flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                                graficoAttivo === 'vento'
+                                    ? 'bg-cyan-600 text-white'
+                                    : 'bg-gray-700 text-gray-300 active:bg-gray-600'
+                            }`}
+                        >
+                            per vento
                         </button>
                     </div>
 
@@ -247,6 +279,69 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                                                         style={{ backgroundColor: COLORI_BARRE[idx] }}
                                                     />
                                                     {s.specie}: {percentuale}%
+                                                </span>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Grafico catture per direzione vento */}
+                    {graficoAttivo === 'vento' && (
+                        <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
+                            <h5 className="text-gray-300 text-xs sm:text-sm mb-3 text-center">
+                                Catture per direzione vento
+                            </h5>
+
+                            {catturePerVento.length === 0 ? (
+                                <p className="text-gray-500 text-center py-4 text-sm">
+                                    Nessun dato vento registrato
+                                </p>
+                            ) : (
+                                <div className="space-y-2">
+                                    {catturePerVento.map((v, idx) => (
+                                        <div key={v.direzione} className="flex items-center gap-2">
+                                            <span className="text-gray-300 text-xs sm:text-sm w-12 sm:w-16 flex-shrink-0 font-medium">
+                                                {v.direzione}
+                                            </span>
+                                            <div className="flex-1 bg-gray-800 rounded h-6 sm:h-7 overflow-hidden">
+                                                <div
+                                                    className="h-full rounded transition-all duration-300 flex items-center justify-end pr-2"
+                                                    style={{
+                                                        width: `${(v.catture / maxCattureVento) * 100}%`,
+                                                        backgroundColor: COLORI_BARRE[idx % COLORI_BARRE.length],
+                                                        minWidth: '24px'
+                                                    }}
+                                                >
+                                                    <span className="text-white text-xs font-bold">
+                                                        {v.catture}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Legenda percentuali vento */}
+                            {catturePerVento.length > 0 && (
+                                <div className="mt-3 pt-3 border-t border-gray-700">
+                                    <div className="flex flex-wrap gap-2 justify-center">
+                                        {catturePerVento.slice(0, 4).map((v, idx) => {
+                                            const cattureTotaliConVento = catturePerVento.reduce((sum, x) => sum + x.catture, 0)
+                                            const percentuale = ((v.catture / cattureTotaliConVento) * 100).toFixed(0)
+                                            return (
+                                                <span
+                                                    key={v.direzione}
+                                                    className="inline-flex items-center gap-1 text-xs text-gray-400"
+                                                >
+                                                    <span
+                                                        className="w-2 h-2 rounded-full"
+                                                        style={{ backgroundColor: COLORI_BARRE[idx] }}
+                                                    />
+                                                    {v.direzione}: {percentuale}%
                                                 </span>
                                             )
                                         })}
