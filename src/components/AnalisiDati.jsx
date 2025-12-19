@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef } from 'react'
 import { BarChart3 } from './Icons'
 import Section from './Section'
 import StatisticheBox from './StatisticheBox'
+import GraficiStatistiche from './GraficiStatistiche'
 import RegistroCatture from './RegistroCatture'
 import MapCatture from './MapCatture'
 import SessioniRegistrate from './SessioniRegistrate'
@@ -167,6 +168,9 @@ const AnalisiDati = ({
                 <>
                     {/* Statistiche */}
                     <StatisticheBox stats={stats} />
+
+                    {/* Grafici */}
+                    <GraficiStatistiche catture={catture} filtri={filtri} />
 
                     {/* Filtri */}
                     <div className="bg-gray-800 rounded-lg border border-gray-700 p-3 sm:p-4 mb-3 sm:mb-4">
