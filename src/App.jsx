@@ -21,6 +21,9 @@ import { Wrench } from './components/Icons'
 // Native utilities (Capacitor)
 import { initNativeFeatures, isNative } from './utils/native'
 
+// Weather service
+import { fetchWeatherData } from './utils/weatherService'
+
 // Default data
 const specieDefault = ['Cefalo', 'Gronco', 'Leccia stella', 'Marmora', 'Occhiata', 'Ombrina', 'Opa', 'Orata', 'Pesce serra', 'Sarago', 'Spigola', 'Sughero']
 const escheDefault = ['Americano', 'Arenicola', 'Bibi', 'Canolicchio', 'Cefalo', 'Coreano', 'Gambero', 'Granchio', 'Muriddu', 'Seppia']
@@ -236,13 +239,19 @@ function App() {
         }
         toast.info('Richiesta posizione GPS in corso...')
         navigator.geolocation.getCurrentPosition(
-            (position) => {
+            async (position) => {
+                const lat = position.coords.latitude.toFixed(6)
+                const lng = position.coords.longitude.toFixed(6)
+
                 setDatiSessione(p => ({
                     ...p,
-                    latitudine: position.coords.latitude.toFixed(6),
-                    longitudine: position.coords.longitude.toFixed(6)
+                    latitudine: lat,
+                    longitudine: lng
                 }))
                 toast.success(`Precisione: ±${Math.round(position.coords.accuracy)}m`, 'Posizione GPS acquisita!')
+
+                // Ottieni dati meteo automaticamente
+                await aggiornaMeteo(parseFloat(lat), parseFloat(lng))
             },
             (error) => {
                 let msg = ''
@@ -254,6 +263,36 @@ function App() {
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         )
+    }
+
+    // Funzione per aggiornare meteo
+    const aggiornaMeteo = async (lat, lng) => {
+        if (!lat || !lng) {
+            // Usa coordinate dalla sessione se non passate
+            lat = parseFloat(datiSessione.latitudine)
+            lng = parseFloat(datiSessione.longitudine)
+        }
+
+        if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+            toast.warning('Inserisci prima le coordinate GPS')
+            return
+        }
+
+        toast.info('Recupero dati meteo...')
+
+        const result = await fetchWeatherData(lat, lng)
+
+        if (result.success && result.data) {
+            setMeteo(prev => ({
+                ...prev,
+                ...result.data,
+                data: getDataItalianaAttuale(),
+                localita: datiSessione.localita || prev.localita
+            }))
+            toast.success('Dati meteo aggiornati!')
+        } else {
+            toast.warning('Dati meteo non disponibili. Inseriscili manualmente.')
+        }
     }
 
     // Funzioni - Catture
@@ -404,6 +443,7 @@ function App() {
                         setActiveSection={setActiveSection}
                         meteo={meteo}
                         setMeteo={setMeteo}
+                        onRefreshMeteo={aggiornaMeteo}
                     />
 
                     {/* Sezione Gestione */}

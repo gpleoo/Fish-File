@@ -1,5 +1,5 @@
-import React from 'react'
-import { Cloud } from './Icons'
+import React, { useState } from 'react'
+import { Cloud, RefreshCw } from './Icons'
 import Section from './Section'
 import InputField from './InputField'
 
@@ -47,8 +47,19 @@ const MeteoForm = ({
     activeSection,
     setActiveSection,
     meteo,
-    setMeteo
+    setMeteo,
+    onRefreshMeteo
 }) => {
+    const [isLoading, setIsLoading] = useState(false)
+
+    const handleRefresh = async () => {
+        if (onRefreshMeteo) {
+            setIsLoading(true)
+            await onRefreshMeteo()
+            setIsLoading(false)
+        }
+    }
+
     return (
         <Section
             icon={Cloud}
@@ -56,9 +67,21 @@ const MeteoForm = ({
             isActive={activeSection === 'meteo'}
             onToggle={() => setActiveSection(activeSection === 'meteo' ? null : 'meteo')}
         >
-            <p className="text-yellow-400 text-sm mb-4 text-center">
-                dati opzionali ma utili per analisi
+            <p className="text-yellow-400 text-xs sm:text-sm mb-3 sm:mb-4 text-center">
+                dati opzionali ma utili per analisi - puoi modificarli in qualsiasi momento
             </p>
+
+            {/* Pulsante Aggiorna Meteo */}
+            {onRefreshMeteo && (
+                <button
+                    onClick={handleRefresh}
+                    disabled={isLoading}
+                    className="w-full mb-4 bg-blue-600 text-white py-2.5 sm:py-3 rounded-lg font-bold flex items-center justify-center gap-2 active:bg-blue-700 disabled:opacity-50 transition-colors text-sm sm:text-base"
+                >
+                    <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 ${isLoading ? 'animate-spin' : ''}`} />
+                    {isLoading ? 'Caricamento...' : 'Aggiorna Meteo da GPS'}
+                </button>
+            )}
 
             {/* Temperatura aria */}
             <InputField
