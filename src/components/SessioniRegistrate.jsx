@@ -1,9 +1,12 @@
 import React, { useState } from 'react'
 import { ChevronDown, ChevronUp, Trash2 } from './Icons'
 
+const ITEMS_PER_PAGE = 10
+
 const SessioniRegistrate = ({ sessioni, catture, onDeleteSessione }) => {
     const [espansa, setEspansa] = useState(false)
     const [sessioneEspansa, setSessioneEspansa] = useState(null)
+    const [pagina, setPagina] = useState(0)
 
     if (!sessioni || sessioni.length === 0) {
         return (
@@ -43,6 +46,13 @@ const SessioniRegistrate = ({ sessioni, catture, onDeleteSessione }) => {
         return dataB - dataA
     })
 
+    // Paginazione
+    const totalePagine = Math.max(1, Math.ceil(sessioniOrdinate.length / ITEMS_PER_PAGE))
+    const sessioniPaginate = sessioniOrdinate.slice(
+        pagina * ITEMS_PER_PAGE,
+        (pagina + 1) * ITEMS_PER_PAGE
+    )
+
     return (
         <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-4">
             <button
@@ -59,7 +69,7 @@ const SessioniRegistrate = ({ sessioni, catture, onDeleteSessione }) => {
 
             {espansa && (
                 <div className="mt-4 space-y-3">
-                    {sessioniOrdinate.map((sessione) => {
+                    {sessioniPaginate.map((sessione) => {
                         const cattureSessione = getCattureSessione(sessione.id)
                         const numCatture = cattureSessione.length
                         const isEspansa = sessioneEspansa === sessione.id
@@ -157,6 +167,29 @@ const SessioniRegistrate = ({ sessioni, catture, onDeleteSessione }) => {
                             </div>
                         )
                     })}
+
+                    {/* Paginazione */}
+                    {totalePagine > 1 && (
+                        <div className="flex items-center justify-center gap-3 mt-4 pt-3 border-t border-gray-700">
+                            <button
+                                onClick={() => setPagina(Math.max(0, pagina - 1))}
+                                disabled={pagina === 0}
+                                className="bg-cyan-600 text-white px-3 py-1 rounded text-sm font-bold disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                                Prec
+                            </button>
+                            <span className="text-gray-400 text-sm">
+                                {pagina + 1} / {totalePagine}
+                            </span>
+                            <button
+                                onClick={() => setPagina(Math.min(totalePagine - 1, pagina + 1))}
+                                disabled={pagina >= totalePagine - 1}
+                                className="bg-cyan-600 text-white px-3 py-1 rounded text-sm font-bold disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                                Succ
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
