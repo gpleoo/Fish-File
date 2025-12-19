@@ -1,13 +1,24 @@
 import React, { memo, useId } from 'react'
 
-const InputField = memo(({ label, value, onChange, type = "text", placeholder = "", min, max, step, required = false }) => {
+const InputField = memo(({
+    label,
+    value,
+    onChange,
+    type = "text",
+    placeholder = "",
+    min,
+    max,
+    step,
+    required = false,
+    className = ""
+}) => {
     const id = useId()
 
     return (
-        <div className="mb-4">
+        <div className={`mb-3 sm:mb-4 ${className}`}>
             <label
                 htmlFor={id}
-                className="block text-cyan-400 text-sm font-semibold mb-2"
+                className="block text-cyan-400 text-sm sm:text-base font-semibold mb-1.5 sm:mb-2"
             >
                 {label}
                 {required && <span className="text-red-400 ml-1">*</span>}
@@ -23,7 +34,8 @@ const InputField = memo(({ label, value, onChange, type = "text", placeholder = 
                 step={step}
                 required={required}
                 aria-label={label}
-                className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white text-lg focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+                autoComplete="off"
+                className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-3 sm:px-4 py-3 sm:py-3.5 text-white text-base sm:text-lg focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-colors"
                 style={{ colorScheme: 'dark' }}
             />
         </div>

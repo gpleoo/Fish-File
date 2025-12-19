@@ -39,45 +39,45 @@ const RegistroCatture = ({ catture, setCatture, filtri }) => {
     }
 
     return (
-        <div className="bg-gray-800 rounded-lg border-2 border-cyan-500 mb-6">
+        <div className="bg-gray-800 rounded-lg border-2 border-cyan-500 mb-4 sm:mb-6">
             <button
                 onClick={() => setMostraCatture(!mostraCatture)}
-                className="w-full flex items-center justify-between p-4 active:bg-gray-700"
+                className="w-full flex items-center justify-between p-3 sm:p-4 active:bg-gray-700 transition-colors"
             >
-                <h3 className="text-cyan-400 font-bold text-xl flex items-center gap-2">
-                    📊 registro catture ({cattureFiltrate.length})
+                <h3 className="text-cyan-400 font-bold text-base sm:text-xl flex items-center gap-2">
+                    registro catture ({cattureFiltrate.length})
                 </h3>
                 {mostraCatture ? (
-                    <ChevronUp className="text-cyan-400" width={24} height={24} />
+                    <ChevronUp className="text-cyan-400 flex-shrink-0" width={24} height={24} />
                 ) : (
-                    <ChevronDown className="text-cyan-400" width={24} height={24} />
+                    <ChevronDown className="text-cyan-400 flex-shrink-0" width={24} height={24} />
                 )}
             </button>
 
             {mostraCatture && (
-                <div className="p-4 pt-0">
-                    <div className="space-y-3">
+                <div className="p-3 sm:p-4 pt-0">
+                    <div className="space-y-2 sm:space-y-3">
                         {getCatturePaginate().map(c => {
                             const isEspansa = cattureEspanse[c.id]
                             return (
                                 <div key={c.id} className="bg-gray-900 rounded-lg border border-gray-700">
                                     <div
                                         onClick={() => toggleCatturaEspansa(c.id)}
-                                        className="flex justify-between items-start p-4 cursor-pointer active:bg-gray-800"
+                                        className="flex justify-between items-start p-3 sm:p-4 cursor-pointer active:bg-gray-800 transition-colors"
                                     >
-                                        <div className="flex-1">
+                                        <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <h4 className="text-white font-bold text-xl">{c.specie}</h4>
+                                                <h4 className="text-white font-bold text-lg sm:text-xl truncate">{c.specie}</h4>
                                                 {isEspansa ? (
-                                                    <ChevronUp className="text-cyan-400" width={20} height={20} />
+                                                    <ChevronUp className="text-cyan-400 flex-shrink-0" width={18} height={18} />
                                                 ) : (
-                                                    <ChevronDown className="text-cyan-400" width={20} height={20} />
+                                                    <ChevronDown className="text-cyan-400 flex-shrink-0" width={18} height={18} />
                                                 )}
                                             </div>
-                                            <p className="text-gray-400 text-sm">{c.data} - {c.ora}</p>
+                                            <p className="text-gray-400 text-xs sm:text-sm">{c.data} - {c.ora}</p>
                                             {c.meteo?.direzioneVento && (
-                                                <p className="text-cyan-300 text-sm mt-1">
-                                                    🌬️ {c.meteo.direzioneVento.split(' ')[0]}
+                                                <p className="text-cyan-300 text-xs sm:text-sm mt-1">
+                                                    {c.meteo.direzioneVento.split(' ')[0]}
                                                 </p>
                                             )}
 
@@ -91,7 +91,8 @@ const RegistroCatture = ({ catture, setCatture, filtri }) => {
                                                 e.stopPropagation()
                                                 eliminaCattura(c)
                                             }}
-                                            className="text-red-500 ml-3"
+                                            className="text-red-500 ml-2 sm:ml-3 p-1 min-h-[36px] min-w-[36px] flex items-center justify-center"
+                                            aria-label="Elimina cattura"
                                         >
                                             <Trash2 width={20} height={20} />
                                         </button>
@@ -103,23 +104,23 @@ const RegistroCatture = ({ catture, setCatture, filtri }) => {
 
                     {/* Paginazione */}
                     {totalePagine > 1 && (
-                        <div className="flex items-center justify-center gap-3 mt-4">
+                        <div className="flex items-center justify-center gap-2 sm:gap-3 mt-3 sm:mt-4">
                             <button
                                 onClick={() => setPaginaCatture(Math.max(0, paginaCatture - 1))}
                                 disabled={paginaCatture === 0}
-                                className="bg-cyan-600 text-white px-4 py-2 rounded-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed active:bg-cyan-700"
+                                className="pagination-btn bg-cyan-600 text-white rounded-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed active:bg-cyan-700 transition-colors"
                             >
-                                ← Precedente
+                                Prec
                             </button>
-                            <span className="text-gray-300 text-sm">
-                                Pagina {paginaCatture + 1} di {totalePagine}
+                            <span className="text-gray-300 text-xs sm:text-sm min-w-[80px] text-center">
+                                {paginaCatture + 1} / {totalePagine}
                             </span>
                             <button
                                 onClick={() => setPaginaCatture(Math.min(totalePagine - 1, paginaCatture + 1))}
                                 disabled={paginaCatture >= totalePagine - 1}
-                                className="bg-cyan-600 text-white px-4 py-2 rounded-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed active:bg-cyan-700"
+                                className="pagination-btn bg-cyan-600 text-white rounded-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed active:bg-cyan-700 transition-colors"
                             >
-                                Successiva →
+                                Succ
                             </button>
                         </div>
                     )}
@@ -132,9 +133,9 @@ const RegistroCatture = ({ catture, setCatture, filtri }) => {
 // Sub-component: Dettagli cattura espansa
 const DettagliCattura = ({ cattura: c }) => (
     <>
-        <div className="mt-3 pt-3 border-t border-gray-700">
-            <h5 className="text-cyan-400 font-semibold mb-2 text-sm">dati cattura</h5>
-            <div className="grid grid-cols-2 gap-2 text-sm">
+        <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-700">
+            <h5 className="text-cyan-400 font-semibold mb-1.5 sm:mb-2 text-xs sm:text-sm">dati cattura</h5>
+            <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-xs sm:text-sm">
                 {c.peso && (
                     <p className="text-gray-300">
                         <span className="text-cyan-400">peso:</span> {(parseFloat(c.peso) / 1000).toFixed(2)} kg
@@ -146,8 +147,8 @@ const DettagliCattura = ({ cattura: c }) => (
                     </p>
                 )}
                 {c.localita && (
-                    <p className="text-gray-300">
-                        <span className="text-cyan-400">località:</span> {c.localita}
+                    <p className="text-gray-300 truncate">
+                        <span className="text-cyan-400">localita:</span> {c.localita}
                     </p>
                 )}
                 {c.esca && (
@@ -156,7 +157,7 @@ const DettagliCattura = ({ cattura: c }) => (
                     </p>
                 )}
                 {c.canna && (
-                    <p className="text-gray-300">
+                    <p className="text-gray-300 truncate">
                         <span className="text-cyan-400">canna:</span> {c.canna}
                     </p>
                 )}
@@ -177,7 +178,7 @@ const DettagliCattura = ({ cattura: c }) => (
                 )}
             </div>
             {c.note && (
-                <p className="text-gray-400 text-sm mt-2 italic">
+                <p className="text-gray-400 text-xs sm:text-sm mt-2 italic">
                     <span className="text-cyan-400">note:</span> {c.note}
                 </p>
             )}
@@ -185,17 +186,17 @@ const DettagliCattura = ({ cattura: c }) => (
 
         {/* Dati meteo */}
         {c.meteo && Object.values(c.meteo).some(Boolean) && (
-            <div className="mt-3 pt-3 border-t border-gray-700">
-                <h5 className="text-cyan-400 font-semibold mb-2 text-sm">dati meteo</h5>
-                <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-700">
+                <h5 className="text-cyan-400 font-semibold mb-1.5 sm:mb-2 text-xs sm:text-sm">dati meteo</h5>
+                <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-xs sm:text-sm">
                     {c.meteo.temperatura && (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400">temp aria:</span> {c.meteo.temperatura}°C
+                            <span className="text-cyan-400">temp aria:</span> {c.meteo.temperatura}C
                         </p>
                     )}
                     {c.meteo.temperaturaAcqua && (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400">temp acqua:</span> {c.meteo.temperaturaAcqua}°C
+                            <span className="text-cyan-400">temp acqua:</span> {c.meteo.temperaturaAcqua}C
                         </p>
                     )}
                     {c.meteo.pressione && (
@@ -209,7 +210,7 @@ const DettagliCattura = ({ cattura: c }) => (
                         </p>
                     )}
                     {c.meteo.direzioneVento && (
-                        <p className="text-gray-300 col-span-2">
+                        <p className="text-gray-300 col-span-2 truncate">
                             <span className="text-cyan-400">direzione:</span> {c.meteo.direzioneVento}
                         </p>
                     )}

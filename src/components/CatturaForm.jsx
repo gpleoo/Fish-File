@@ -37,8 +37,8 @@ const CatturaForm = ({
             onToggle={() => setActiveSection(activeSection === 'cattura' ? null : 'cattura')}
         >
             {/* Avviso campi obbligatori */}
-            <div className="bg-yellow-900/30 border-2 border-yellow-500 rounded-lg p-3 mb-4">
-                <p className="text-yellow-400 text-sm font-semibold text-center">
+            <div className="bg-yellow-900/30 border-2 border-yellow-500 rounded-lg p-2.5 sm:p-3 mb-3 sm:mb-4">
+                <p className="text-yellow-400 text-xs sm:text-sm font-semibold text-center">
                     obbligatori: sessione + specie | resto opzionale
                 </p>
             </div>
@@ -109,11 +109,11 @@ const CatturaForm = ({
             />
 
             {/* Box Attrezzatura */}
-            <div className="bg-gray-800 rounded-lg p-4 border-2 border-cyan-500 mb-4">
-                <h3 className="text-cyan-400 font-bold mb-3 text-center">
+            <div className="bg-gray-800 rounded-lg p-3 sm:p-4 border-2 border-cyan-500 mb-3 sm:mb-4">
+                <h3 className="text-cyan-400 font-bold mb-2 sm:mb-3 text-center text-sm sm:text-base">
                     attrezzatura utilizzata
                 </h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 sm:gap-4">
                     <SelectField
                         label="canna"
                         value={nuovaCattura.canna}
@@ -156,15 +156,15 @@ const CatturaForm = ({
 
             {/* Messaggio errore */}
             {messaggioErrore && (
-                <div className="mt-4 p-4 bg-red-900/30 border-2 border-red-600 rounded-lg">
-                    <p className="text-red-400 font-semibold text-center">{messaggioErrore}</p>
+                <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-red-900/30 border-2 border-red-600 rounded-lg">
+                    <p className="text-red-400 font-semibold text-center text-sm sm:text-base">{messaggioErrore}</p>
                 </div>
             )}
 
             {/* Pulsante registra */}
             <button
                 onClick={aggiungiCattura}
-                className="w-full mt-4 bg-cyan-600 text-white py-4 rounded-lg font-bold text-xl"
+                className="w-full mt-3 sm:mt-4 bg-cyan-600 text-white py-3.5 sm:py-4 rounded-lg font-bold text-lg sm:text-xl active:bg-cyan-700 transition-colors"
             >
                 registra cattura
             </button>
