@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef } from 'react'
 import { BarChart3 } from './Icons'
 import Section from './Section'
 import StatisticheBox from './StatisticheBox'
+import GraficiStatistiche from './GraficiStatistiche'
 import RegistroCatture from './RegistroCatture'
 import MapCatture from './MapCatture'
 import SessioniRegistrate from './SessioniRegistrate'
@@ -168,25 +169,28 @@ const AnalisiDati = ({
                     {/* Statistiche */}
                     <StatisticheBox stats={stats} />
 
+                    {/* Grafici */}
+                    <GraficiStatistiche catture={catture} filtri={filtri} />
+
                     {/* Filtri */}
-                    <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-4">
-                        <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-cyan-400 font-bold">🔍 filtri</h4>
+                    <div className="bg-gray-800 rounded-lg border border-gray-700 p-3 sm:p-4 mb-3 sm:mb-4">
+                        <div className="flex items-center justify-between mb-2 sm:mb-3">
+                            <h4 className="text-cyan-400 font-bold text-sm sm:text-base">filtri</h4>
                             {hasFiltriAttivi && (
                                 <button
                                     onClick={resetFiltri}
-                                    className="text-red-400 text-sm underline"
+                                    className="text-red-400 text-xs sm:text-sm underline min-h-[36px] flex items-center"
                                 >
                                     reset filtri
                                 </button>
                             )}
                         </div>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                             {/* Anno */}
                             <select
                                 value={filtri.anno}
                                 onChange={(e) => setFiltri(p => ({ ...p, anno: e.target.value }))}
-                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
+                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
                             >
                                 <option value="tutti">tutti gli anni</option>
                                 {anniDisponibili.map(a => (
@@ -198,7 +202,7 @@ const AnalisiDati = ({
                             <select
                                 value={filtri.mese}
                                 onChange={(e) => setFiltri(p => ({ ...p, mese: e.target.value }))}
-                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
+                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
                             >
                                 <option value="tutti">tutti i mesi</option>
                                 {mesiDisponibili.map(m => (
@@ -212,7 +216,7 @@ const AnalisiDati = ({
                             <select
                                 value={filtri.specie}
                                 onChange={(e) => setFiltri(p => ({ ...p, specie: e.target.value }))}
-                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
+                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
                             >
                                 <option value="tutte">tutte le specie</option>
                                 {specieMemorizzate.map(s => (
@@ -224,9 +228,9 @@ const AnalisiDati = ({
                             <select
                                 value={filtri.localita}
                                 onChange={(e) => setFiltri(p => ({ ...p, localita: e.target.value }))}
-                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
+                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
                             >
-                                <option value="tutte">tutte le località</option>
+                                <option value="tutte">tutte le localita</option>
                                 {localitaMemorizzate.map(l => (
                                     <option key={l} value={l}>{l}</option>
                                 ))}
@@ -236,7 +240,7 @@ const AnalisiDati = ({
                             <select
                                 value={filtri.direzioneVento}
                                 onChange={(e) => setFiltri(p => ({ ...p, direzioneVento: e.target.value }))}
-                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm col-span-2"
+                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm sm:col-span-2"
                             >
                                 <option value="tutte">tutte le direzioni vento</option>
                                 {ventiRosaDeiVenti.map(v => (
@@ -248,7 +252,7 @@ const AnalisiDati = ({
                             <select
                                 value={filtri.condizioni}
                                 onChange={(e) => setFiltri(p => ({ ...p, condizioni: e.target.value }))}
-                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
+                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
                             >
                                 <option value="tutte">tutte le condizioni</option>
                                 {condizioniMeteo.map(c => (
@@ -260,7 +264,7 @@ const AnalisiDati = ({
                             <select
                                 value={filtri.faseLunare}
                                 onChange={(e) => setFiltri(p => ({ ...p, faseLunare: e.target.value }))}
-                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
+                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
                             >
                                 <option value="tutte">tutte le fasi lunari</option>
                                 {fasiLunari.map(f => (
@@ -292,20 +296,20 @@ const AnalisiDati = ({
                     />
 
                     {/* Esporta / Importa */}
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 sm:gap-3">
                         <button
                             onClick={esportaDati}
-                            className="flex-1 bg-purple-600 text-white py-3 rounded-lg font-bold active:bg-purple-700"
+                            className="flex-1 bg-purple-600 text-white py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base active:bg-purple-700 transition-colors"
                             aria-label="Esporta dati"
                         >
-                            📤 esporta
+                            esporta
                         </button>
                         <button
                             onClick={() => fileInputRef.current?.click()}
-                            className="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold active:bg-green-700"
+                            className="flex-1 bg-green-600 text-white py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base active:bg-green-700 transition-colors"
                             aria-label="Importa dati"
                         >
-                            📥 importa
+                            importa
                         </button>
                         <input
                             ref={fileInputRef}

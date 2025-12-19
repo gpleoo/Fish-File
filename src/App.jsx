@@ -358,13 +358,13 @@ function App() {
             )}
 
             {/* App Principale */}
-            <div className="min-h-screen bg-black p-4">
+            <div className="min-h-screen bg-black p-3 sm:p-4">
                 <div className="max-w-4xl mx-auto">
                     {/* Header */}
-                    <div className="text-center mb-8">
-                        <img src="/logoFishFile.png" alt="Fish File Logo" className="mx-auto mb-4" style={{maxWidth: '300px', width: '100%', height: 'auto'}} />
-                        <p className="text-gray-400">registra le tue battute di pesca</p>
-                        {catture.length > 0 && <p className="text-cyan-400 text-sm mt-2">{catture.length} catture salvate</p>}
+                    <div className="text-center mb-5 sm:mb-8">
+                        <img src="/logoFishFile.png" alt="Fish File Logo" className="mx-auto mb-3 sm:mb-4 header-logo" />
+                        <p className="text-gray-400 text-sm sm:text-base">registra le tue battute di pesca</p>
+                        {catture.length > 0 && <p className="text-cyan-400 text-xs sm:text-sm mt-1.5 sm:mt-2">{catture.length} catture salvate</p>}
                     </div>
 
                     {/* Sessione di Pesca */}
@@ -519,8 +519,8 @@ function App() {
                     />
 
                     {/* Footer */}
-                    <div className="text-center mt-8 pb-8">
-                        <p className="text-gray-600 text-xs">Fish File v1.0 © 2025 Giampietro Leonoro</p>
+                    <div className="text-center mt-6 sm:mt-8 pb-6 sm:pb-8 bottom-safe">
+                        <p className="text-gray-600 text-xs">Fish File v1.0 - 2025 Giampietro Leonoro</p>
                     </div>
                 </div>
             </div>

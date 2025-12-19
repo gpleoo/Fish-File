@@ -192,26 +192,26 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
     }
 
     return (
-        <div className="mb-4">
+        <div className="mb-3 sm:mb-4">
             {/* Pulsante microfono */}
             <button
                 type="button"
                 onClick={isListening ? stopListening : startListening}
-                className={`w-full py-4 rounded-lg font-bold text-lg flex items-center justify-center gap-3 transition-all ${
+                className={`w-full py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg flex items-center justify-center gap-2 sm:gap-3 transition-all ${
                     isListening
-                        ? 'bg-red-600 text-white animate-pulse'
-                        : 'bg-gray-700 text-cyan-400 border-2 border-cyan-500 hover:bg-gray-600'
+                        ? 'bg-red-600 text-white voice-recording'
+                        : 'bg-gray-700 text-cyan-400 border-2 border-cyan-500 active:bg-gray-600'
                 }`}
                 aria-label={isListening ? 'Ferma registrazione' : 'Avvia registrazione vocale'}
             >
                 {isListening ? (
                     <>
-                        <X className="w-6 h-6" />
+                        <X className="w-5 h-5 sm:w-6 sm:h-6" />
                         <span>ferma registrazione...</span>
                     </>
                 ) : (
                     <>
-                        <Mic className="w-6 h-6" />
+                        <Mic className="w-5 h-5 sm:w-6 sm:h-6" />
                         <span>registra con voce</span>
                     </>
                 )}
@@ -219,20 +219,20 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
 
             {/* Indicatore ascolto */}
             {isListening && (
-                <div className="mt-3 p-4 bg-gray-800 rounded-lg border border-cyan-500">
-                    <div className="flex items-center gap-3 mb-2">
+                <div className="mt-2 sm:mt-3 p-3 sm:p-4 bg-gray-800 rounded-lg border border-cyan-500">
+                    <div className="flex items-center gap-2 sm:gap-3 mb-2">
                         <div className="flex gap-1">
-                            <span className="w-2 h-4 bg-cyan-400 rounded animate-pulse" style={{ animationDelay: '0ms' }} />
-                            <span className="w-2 h-6 bg-cyan-400 rounded animate-pulse" style={{ animationDelay: '150ms' }} />
-                            <span className="w-2 h-5 bg-cyan-400 rounded animate-pulse" style={{ animationDelay: '300ms' }} />
-                            <span className="w-2 h-7 bg-cyan-400 rounded animate-pulse" style={{ animationDelay: '450ms' }} />
-                            <span className="w-2 h-4 bg-cyan-400 rounded animate-pulse" style={{ animationDelay: '600ms' }} />
+                            <span className="w-1.5 sm:w-2 h-3 sm:h-4 bg-cyan-400 rounded animate-pulse" style={{ animationDelay: '0ms' }} />
+                            <span className="w-1.5 sm:w-2 h-5 sm:h-6 bg-cyan-400 rounded animate-pulse" style={{ animationDelay: '150ms' }} />
+                            <span className="w-1.5 sm:w-2 h-4 sm:h-5 bg-cyan-400 rounded animate-pulse" style={{ animationDelay: '300ms' }} />
+                            <span className="w-1.5 sm:w-2 h-6 sm:h-7 bg-cyan-400 rounded animate-pulse" style={{ animationDelay: '450ms' }} />
+                            <span className="w-1.5 sm:w-2 h-3 sm:h-4 bg-cyan-400 rounded animate-pulse" style={{ animationDelay: '600ms' }} />
                         </div>
-                        <span className="text-cyan-400 text-sm">in ascolto...</span>
+                        <span className="text-cyan-400 text-xs sm:text-sm">in ascolto...</span>
                     </div>
 
                     {transcript && (
-                        <p className="text-gray-300 text-sm italic">"{transcript}"</p>
+                        <p className="text-gray-300 text-xs sm:text-sm italic">"{transcript}"</p>
                     )}
 
                     <p className="text-gray-500 text-xs mt-2">
@@ -243,7 +243,7 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
 
             {/* Suggerimento */}
             {!isListening && (
-                <p className="text-gray-500 text-xs mt-2 text-center">
+                <p className="text-gray-500 text-xs mt-1.5 sm:mt-2 text-center">
                     Basta dire la specie! Peso, lunghezza ed esca sono opzionali
                 </p>
             )}

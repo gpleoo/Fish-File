@@ -225,41 +225,40 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
     }, [sessioniConOffset])
 
     return (
-        <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-4">
-            <div className="flex items-center justify-between mb-3">
-                <h4 className="text-cyan-400 font-bold">mappa sessioni</h4>
-                <span className="text-gray-400 text-sm">
-                    {totali.sessioni} sessioni • {totali.catture} catture
+        <div className="bg-gray-800 rounded-lg border border-gray-700 p-3 sm:p-4 mb-3 sm:mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-0 mb-2 sm:mb-3">
+                <h4 className="text-cyan-400 font-bold text-sm sm:text-base">mappa sessioni</h4>
+                <span className="text-gray-400 text-xs sm:text-sm">
+                    {totali.sessioni} sessioni - {totali.catture} catture
                 </span>
             </div>
 
             {sessioniConOffset.length === 0 ? (
-                <div className="text-gray-500 text-center py-8">
-                    <p>Nessuna sessione con coordinate GPS</p>
-                    <p className="text-sm mt-2">Completa una sessione di pesca per vederla sulla mappa</p>
+                <div className="text-gray-500 text-center py-6 sm:py-8">
+                    <p className="text-sm sm:text-base">Nessuna sessione con coordinate GPS</p>
+                    <p className="text-xs sm:text-sm mt-2">Completa una sessione di pesca per vederla sulla mappa</p>
                 </div>
             ) : (
                 <div
                     ref={mapRef}
-                    className="rounded-lg overflow-hidden"
-                    style={{ height: '350px', width: '100%' }}
+                    className="rounded-lg overflow-hidden map-container"
                 />
             )}
 
-            {/* Legenda colori */}
+            {/* Legenda colori - responsive */}
             {sessioniConOffset.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-3 justify-center">
-                    <span className="inline-flex items-center gap-1 text-xs text-gray-400">
-                        <span className="w-3 h-3 rounded-full bg-red-500" /> 0 catture
+                <div className="mt-2 sm:mt-3 grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3 justify-center">
+                    <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
+                        <span className="w-3 h-3 rounded-full bg-red-500 flex-shrink-0" /> 0 catture
                     </span>
-                    <span className="inline-flex items-center gap-1 text-xs text-gray-400">
-                        <span className="w-3 h-3 rounded-full bg-pink-500" /> 1-4
+                    <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
+                        <span className="w-3 h-3 rounded-full bg-pink-500 flex-shrink-0" /> 1-4
                     </span>
-                    <span className="inline-flex items-center gap-1 text-xs text-gray-400">
-                        <span className="w-3 h-3 rounded-full bg-green-500" /> 5-8
+                    <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
+                        <span className="w-3 h-3 rounded-full bg-green-500 flex-shrink-0" /> 5-8
                     </span>
-                    <span className="inline-flex items-center gap-1 text-xs text-gray-400">
-                        <span className="w-3 h-3 rounded-full bg-blue-500" /> 9+
+                    <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
+                        <span className="w-3 h-3 rounded-full bg-blue-500 flex-shrink-0" /> 9+
                     </span>
                 </div>
             )}
