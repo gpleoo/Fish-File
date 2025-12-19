@@ -166,14 +166,21 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                                 Catture per mese ({cattureFiltrate.length} totali)
                             </h5>
 
+                            {/* Intestazione colonne mobile */}
+                            <div className="flex items-center gap-2 mb-2 sm:hidden text-gray-500 text-xs">
+                                <span className="w-8 flex-shrink-0">Mese</span>
+                                <span className="flex-1 text-center">Grafico</span>
+                                <span className="w-14 text-right">Catture</span>
+                            </div>
+
                             {/* Barre orizzontali per mobile, verticali per desktop */}
                             <div className="space-y-2 sm:hidden">
                                 {catturePerMese.map((m, idx) => (
                                     <div key={m.mese} className="flex items-center gap-2">
-                                        <span className="text-gray-400 text-xs w-8 flex-shrink-0">
+                                        <span className="text-gray-400 text-xs w-8 flex-shrink-0 font-medium">
                                             {m.mese}
                                         </span>
-                                        <div className="flex-1 bg-gray-800 rounded h-5 overflow-hidden">
+                                        <div className="flex-1 bg-gray-800 rounded h-6 overflow-hidden">
                                             <div
                                                 className="h-full rounded transition-all duration-300"
                                                 style={{
@@ -183,8 +190,8 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                                                 }}
                                             />
                                         </div>
-                                        <span className="text-white text-xs w-6 text-right font-medium">
-                                            {m.catture}
+                                        <span className="text-cyan-400 text-xs w-14 text-right font-bold">
+                                            {m.catture} <span className="text-gray-500 font-normal">cat.</span>
                                         </span>
                                     </div>
                                 ))}
@@ -238,29 +245,37 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                                     Nessuna cattura registrata
                                 </p>
                             ) : (
-                                <div className="space-y-2">
-                                    {speciePiuCatturate.map((s, idx) => (
-                                        <div key={s.specie} className="flex items-center gap-2">
-                                            <span className="text-gray-300 text-xs sm:text-sm w-20 sm:w-24 truncate flex-shrink-0">
-                                                {s.specie}
-                                            </span>
-                                            <div className="flex-1 bg-gray-800 rounded h-6 sm:h-7 overflow-hidden">
-                                                <div
-                                                    className="h-full rounded transition-all duration-300 flex items-center justify-end pr-2"
-                                                    style={{
-                                                        width: `${(s.catture / maxCattureSpecie) * 100}%`,
-                                                        backgroundColor: COLORI_BARRE[idx % COLORI_BARRE.length],
-                                                        minWidth: '24px'
-                                                    }}
-                                                >
-                                                    <span className="text-white text-xs font-bold">
-                                                        {s.catture}
-                                                    </span>
+                                <>
+                                    {/* Intestazione colonne */}
+                                    <div className="flex items-center gap-2 mb-2 text-gray-500 text-xs">
+                                        <span className="w-20 sm:w-24 flex-shrink-0">Specie</span>
+                                        <span className="flex-1 text-center">Grafico</span>
+                                        <span className="w-16 text-right">Catture</span>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        {speciePiuCatturate.map((s, idx) => (
+                                            <div key={s.specie} className="flex items-center gap-2">
+                                                <span className="text-gray-300 text-xs sm:text-sm w-20 sm:w-24 truncate flex-shrink-0 font-medium">
+                                                    {s.specie}
+                                                </span>
+                                                <div className="flex-1 bg-gray-800 rounded h-6 sm:h-7 overflow-hidden">
+                                                    <div
+                                                        className="h-full rounded transition-all duration-300"
+                                                        style={{
+                                                            width: `${(s.catture / maxCattureSpecie) * 100}%`,
+                                                            backgroundColor: COLORI_BARRE[idx % COLORI_BARRE.length],
+                                                            minWidth: '8px'
+                                                        }}
+                                                    />
                                                 </div>
+                                                <span className="text-cyan-400 text-xs w-16 text-right font-bold">
+                                                    {s.catture} <span className="text-gray-500 font-normal">cat.</span>
+                                                </span>
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                        ))}
+                                    </div>
+                                </>
                             )}
 
                             {/* Legenda percentuali */}
@@ -300,29 +315,37 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                                     Nessun dato vento registrato
                                 </p>
                             ) : (
-                                <div className="space-y-2">
-                                    {catturePerVento.map((v, idx) => (
-                                        <div key={v.direzione} className="flex items-center gap-2">
-                                            <span className="text-gray-300 text-xs sm:text-sm w-12 sm:w-16 flex-shrink-0 font-medium">
-                                                {v.direzione}
-                                            </span>
-                                            <div className="flex-1 bg-gray-800 rounded h-6 sm:h-7 overflow-hidden">
-                                                <div
-                                                    className="h-full rounded transition-all duration-300 flex items-center justify-end pr-2"
-                                                    style={{
-                                                        width: `${(v.catture / maxCattureVento) * 100}%`,
-                                                        backgroundColor: COLORI_BARRE[idx % COLORI_BARRE.length],
-                                                        minWidth: '24px'
-                                                    }}
-                                                >
-                                                    <span className="text-white text-xs font-bold">
-                                                        {v.catture}
-                                                    </span>
+                                <>
+                                    {/* Intestazione colonne */}
+                                    <div className="flex items-center gap-2 mb-2 text-gray-500 text-xs">
+                                        <span className="w-12 sm:w-16 flex-shrink-0">Vento</span>
+                                        <span className="flex-1 text-center">Grafico</span>
+                                        <span className="w-16 text-right">Catture</span>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        {catturePerVento.map((v, idx) => (
+                                            <div key={v.direzione} className="flex items-center gap-2">
+                                                <span className="text-gray-300 text-xs sm:text-sm w-12 sm:w-16 flex-shrink-0 font-medium">
+                                                    {v.direzione}
+                                                </span>
+                                                <div className="flex-1 bg-gray-800 rounded h-6 sm:h-7 overflow-hidden">
+                                                    <div
+                                                        className="h-full rounded transition-all duration-300"
+                                                        style={{
+                                                            width: `${(v.catture / maxCattureVento) * 100}%`,
+                                                            backgroundColor: COLORI_BARRE[idx % COLORI_BARRE.length],
+                                                            minWidth: '8px'
+                                                        }}
+                                                    />
                                                 </div>
+                                                <span className="text-cyan-400 text-xs w-16 text-right font-bold">
+                                                    {v.catture} <span className="text-gray-500 font-normal">cat.</span>
+                                                </span>
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                        ))}
+                                    </div>
+                                </>
                             )}
 
                             {/* Legenda percentuali vento */}
