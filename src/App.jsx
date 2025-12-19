@@ -182,7 +182,7 @@ function App() {
     }, [])
 
     // Funzioni - Sessione
-    const avviaSessione = () => {
+    const avviaSessione = async () => {
         if (!datiSessione.localita || !datiSessione.latitudine || !datiSessione.longitudine) {
             toast.warning('Compila tutti i campi!')
             return
@@ -214,6 +214,25 @@ function App() {
         setSessioneAttiva(true)
         setNuovaCattura(p => ({...p, localita: datiSessione.localita, latitudine: datiSessione.latitudine, longitudine: datiSessione.longitudine}))
         setMeteo(p => ({...p, localita: datiSessione.localita}))
+
+        // Aggiorna automaticamente i dati meteo all'avvio sessione
+        toast.info('Recupero dati meteo...')
+        const result = await fetchWeatherData(
+            parseFloat(datiSessione.latitudine),
+            parseFloat(datiSessione.longitudine)
+        )
+
+        if (result.success && result.data) {
+            setMeteo(prev => ({
+                ...prev,
+                ...result.data,
+                data: getDataItalianaAttuale(),
+                localita: datiSessione.localita
+            }))
+            toast.success('Sessione avviata con dati meteo!')
+        } else {
+            toast.warning('Sessione avviata. Dati meteo non disponibili, compilali manualmente nella sezione meteo.')
+        }
     }
 
     const terminaSessione = () => {
