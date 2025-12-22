@@ -286,6 +286,7 @@ const AnalisiDati = ({
                         sessioni={sessioniCompletate}
                         catture={catture}
                         onDeleteSessione={onDeleteSessione}
+                        filtri={filtri}
                     />
 
                     {/* Registro Catture */}

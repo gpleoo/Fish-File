@@ -3,23 +3,73 @@ import { ChevronDown, ChevronUp, Trash2 } from './Icons'
 
 const ITEMS_PER_PAGE = 10
 
-const SessioniRegistrate = ({ sessioni, catture, onDeleteSessione }) => {
+const SessioniRegistrate = ({ sessioni, catture, onDeleteSessione, filtri }) => {
     const [espansa, setEspansa] = useState(false)
     const [sessioneEspansa, setSessioneEspansa] = useState(null)
     const [pagina, setPagina] = useState(0)
 
-    if (!sessioni || sessioni.length === 0) {
+    // Funzione per filtrare catture
+    const filtraCatture = (cattureSessione) => {
+        if (!filtri) return cattureSessione
+
+        return cattureSessione.filter(c => {
+            // Filtro anno
+            if (filtri.anno !== 'tutti' && c.data && !c.data.startsWith(filtri.anno)) return false
+
+            // Filtro mese
+            if (filtri.mese !== 'tutti' && c.data) {
+                const mese = c.data.split('-')[1]
+                if (mese !== filtri.mese) return false
+            }
+
+            // Filtro specie
+            if (filtri.specie !== 'tutte' && c.specie !== filtri.specie) return false
+
+            // Filtro località
+            if (filtri.localita !== 'tutte' && c.localita !== filtri.localita) return false
+
+            // Filtro direzione vento
+            if (filtri.direzioneVento !== 'tutte' && c.meteo?.direzioneVento !== filtri.direzioneVento) return false
+
+            // Filtro condizioni meteo
+            if (filtri.condizioni !== 'tutte' && c.meteo?.condizioni !== filtri.condizioni) return false
+
+            // Filtro fase lunare
+            if (filtri.faseLunare !== 'tutte' && c.meteo?.faseLunare !== filtri.faseLunare) return false
+
+            return true
+        })
+    }
+
+    // Controlla se ci sono filtri attivi
+    const hasFiltriAttivi = filtri && Object.entries(filtri).some(([key, val]) =>
+        val !== 'tutti' && val !== 'tutte'
+    )
+
+    // Filtra sessioni che hanno catture matchanti
+    const sessioniFiltrate = (!sessioni || sessioni.length === 0) ? [] : sessioni.filter(sessione => {
+        if (!hasFiltriAttivi) return true // Mostra tutte se non ci sono filtri
+
+        const cattureSessione = catture.filter(c => c.sessioneId === sessione.id)
+        const cattureFiltrate = filtraCatture(cattureSessione)
+        return cattureFiltrate.length > 0
+    })
+
+    if (sessioniFiltrate.length === 0) {
         return (
             <div className="bg-gray-800 rounded-lg border border-gray-700 p-3 sm:p-4 mb-3 sm:mb-4">
                 <h4 className="text-cyan-400 font-bold mb-2 text-sm sm:text-base">sessioni registrate</h4>
-                <p className="text-gray-500 text-center py-3 sm:py-4 text-sm">Nessuna sessione completata</p>
+                <p className="text-gray-500 text-center py-3 sm:py-4 text-sm">
+                    {hasFiltriAttivi ? 'Nessuna sessione corrisponde ai filtri' : 'Nessuna sessione completata'}
+                </p>
             </div>
         )
     }
 
-    // Calcola catture per ogni sessione
+    // Calcola catture filtrate per ogni sessione
     const getCattureSessione = (sessioneId) => {
-        return catture.filter(c => c.sessioneId === sessioneId)
+        const cattureSessione = catture.filter(c => c.sessioneId === sessioneId)
+        return hasFiltriAttivi ? filtraCatture(cattureSessione) : cattureSessione
     }
 
     // Formatta durata
@@ -40,7 +90,7 @@ const SessioniRegistrate = ({ sessioni, catture, onDeleteSessione }) => {
     }
 
     // Ordina sessioni per data (più recenti prima)
-    const sessioniOrdinate = [...sessioni].sort((a, b) => {
+    const sessioniOrdinate = [...sessioniFiltrate].sort((a, b) => {
         const dataA = new Date(`${a.dataInizio}T${a.oraInizio || '00:00'}`)
         const dataB = new Date(`${b.dataInizio}T${b.oraInizio || '00:00'}`)
         return dataB - dataA
@@ -59,7 +109,9 @@ const SessioniRegistrate = ({ sessioni, catture, onDeleteSessione }) => {
                 onClick={() => setEspansa(!espansa)}
                 className="w-full flex items-center justify-between min-h-[44px]"
             >
-                <h4 className="text-cyan-400 font-bold text-sm sm:text-base">sessioni registrate ({sessioni.length})</h4>
+                <h4 className="text-cyan-400 font-bold text-sm sm:text-base">
+                    sessioni registrate ({sessioniFiltrate.length}{hasFiltriAttivi ? ` di ${sessioni.length}` : ''})
+                </h4>
                 {espansa ? (
                     <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" />
                 ) : (

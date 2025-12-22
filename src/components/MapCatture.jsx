@@ -71,19 +71,37 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
         })
 
         // Calcola catture per ogni sessione
-        return sessioniValide.map(sessione => {
+        const sessioniConCatture = sessioniValide.map(sessione => {
             const cattureSessione = catture.filter(c => c.sessioneId === sessione.id)
 
-            // Applica filtri alle catture
+            // Applica TUTTI i filtri alle catture
             const cattureFiltrate = cattureSessione.filter(c => {
                 if (!filtri) return true
+
+                // Filtro anno
                 if (filtri.anno !== 'tutti' && c.data && !c.data.startsWith(filtri.anno)) return false
+
+                // Filtro mese
                 if (filtri.mese !== 'tutti' && c.data) {
                     const mese = c.data.split('-')[1]
                     if (mese !== filtri.mese) return false
                 }
+
+                // Filtro specie
                 if (filtri.specie !== 'tutte' && c.specie !== filtri.specie) return false
+
+                // Filtro località
                 if (filtri.localita !== 'tutte' && c.localita !== filtri.localita) return false
+
+                // Filtro direzione vento
+                if (filtri.direzioneVento !== 'tutte' && c.meteo?.direzioneVento !== filtri.direzioneVento) return false
+
+                // Filtro condizioni meteo
+                if (filtri.condizioni !== 'tutte' && c.meteo?.condizioni !== filtri.condizioni) return false
+
+                // Filtro fase lunare
+                if (filtri.faseLunare !== 'tutte' && c.meteo?.faseLunare !== filtri.faseLunare) return false
+
                 return true
             })
 
@@ -94,6 +112,18 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
                 specieUniche: [...new Set(cattureFiltrate.map(c => c.specie).filter(Boolean))]
             }
         })
+
+        // Filtra: mostra solo sessioni con almeno 1 cattura che matcha i filtri
+        // Se non ci sono filtri attivi, mostra tutte le sessioni
+        const hasFiltriAttivi = filtri && Object.entries(filtri).some(([key, val]) =>
+            val !== 'tutti' && val !== 'tutte'
+        )
+
+        if (hasFiltriAttivi) {
+            return sessioniConCatture.filter(s => s.numeroCatture > 0)
+        }
+
+        return sessioniConCatture
     }, [sessioni, catture, filtri])
 
     // Raggruppa marker vicini per applicare offset
