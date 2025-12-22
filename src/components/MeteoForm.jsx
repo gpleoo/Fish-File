@@ -1,7 +1,8 @@
-import React from 'react'
-import { Cloud } from './Icons'
+import React, { useState } from 'react'
+import { Cloud, RefreshCw } from './Icons'
 import Section from './Section'
 import InputField from './InputField'
+import { useTranslation } from '../locales/LanguageContext'
 
 // Costanti meteo
 const ventiRosaDeiVenti = [
@@ -47,22 +48,46 @@ const MeteoForm = ({
     activeSection,
     setActiveSection,
     meteo,
-    setMeteo
+    setMeteo,
+    onRefreshMeteo
 }) => {
+    const { t } = useTranslation()
+    const [isLoading, setIsLoading] = useState(false)
+
+    const handleRefresh = async () => {
+        if (onRefreshMeteo) {
+            setIsLoading(true)
+            await onRefreshMeteo()
+            setIsLoading(false)
+        }
+    }
+
     return (
         <Section
             icon={Cloud}
-            title="dati meteo"
+            title={t('weather.title')}
             isActive={activeSection === 'meteo'}
             onToggle={() => setActiveSection(activeSection === 'meteo' ? null : 'meteo')}
         >
-            <p className="text-yellow-400 text-sm mb-4 text-center">
-                dati opzionali ma utili per analisi
+            <p className="text-yellow-400 text-xs sm:text-sm mb-3 sm:mb-4 text-center">
+                {t('weather.optional')}
             </p>
+
+            {/* Pulsante Aggiorna Meteo */}
+            {onRefreshMeteo && (
+                <button
+                    onClick={handleRefresh}
+                    disabled={isLoading}
+                    className="w-full mb-4 bg-blue-600 text-white py-2.5 sm:py-3 rounded-lg font-bold flex items-center justify-center gap-2 active:bg-blue-700 disabled:opacity-50 transition-colors text-sm sm:text-base"
+                >
+                    <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 ${isLoading ? 'animate-spin' : ''}`} />
+                    {isLoading ? t('common.loading') : t('weather.refreshFromGPS')}
+                </button>
+            )}
 
             {/* Temperatura aria */}
             <InputField
-                label="temperatura (°C)"
+                label={t('weather.temperature')}
                 type="number"
                 value={meteo.temperatura}
                 onChange={(e) => setMeteo(p => ({ ...p, temperatura: e.target.value }))}
@@ -71,7 +96,7 @@ const MeteoForm = ({
 
             {/* Temperatura acqua */}
             <InputField
-                label="temp. acqua (°C)"
+                label={t('weather.waterTemp')}
                 type="number"
                 value={meteo.temperaturaAcqua}
                 onChange={(e) => setMeteo(p => ({ ...p, temperaturaAcqua: e.target.value }))}
@@ -80,7 +105,7 @@ const MeteoForm = ({
 
             {/* Pressione */}
             <InputField
-                label="pressione (hPa)"
+                label={t('weather.pressure')}
                 type="number"
                 value={meteo.pressione}
                 onChange={(e) => setMeteo(p => ({ ...p, pressione: e.target.value }))}
@@ -90,7 +115,7 @@ const MeteoForm = ({
 
             {/* Vento intensità */}
             <InputField
-                label="vento (nodi)"
+                label={t('weather.wind')}
                 type="number"
                 value={meteo.vento}
                 onChange={(e) => setMeteo(p => ({ ...p, vento: e.target.value }))}
@@ -101,14 +126,14 @@ const MeteoForm = ({
             {/* Direzione vento */}
             <div className="mb-4">
                 <label className="block text-cyan-400 text-sm font-semibold mb-2">
-                    direzione vento
+                    {t('weather.windDirection')}
                 </label>
                 <select
                     value={meteo.direzioneVento}
                     onChange={(e) => setMeteo(p => ({ ...p, direzioneVento: e.target.value }))}
                     className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white"
                 >
-                    <option value="">seleziona...</option>
+                    <option value="">{t('weather.select')}</option>
                     {ventiRosaDeiVenti.map(v => (
                         <option key={v} value={v}>{v}</option>
                     ))}
@@ -118,14 +143,14 @@ const MeteoForm = ({
             {/* Condizioni meteo */}
             <div className="mb-4">
                 <label className="block text-cyan-400 text-sm font-semibold mb-2">
-                    condizioni
+                    {t('weather.conditions')}
                 </label>
                 <select
                     value={meteo.condizioni}
                     onChange={(e) => setMeteo(p => ({ ...p, condizioni: e.target.value }))}
                     className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white"
                 >
-                    <option value="">seleziona...</option>
+                    <option value="">{t('weather.select')}</option>
                     {condizioniMeteo.map(c => (
                         <option key={c} value={c}>{c}</option>
                     ))}
@@ -135,14 +160,14 @@ const MeteoForm = ({
             {/* Fase lunare */}
             <div className="mb-4">
                 <label className="block text-cyan-400 text-sm font-semibold mb-2">
-                    fase lunare
+                    {t('weather.moonPhase')}
                 </label>
                 <select
                     value={meteo.faseLunare}
                     onChange={(e) => setMeteo(p => ({ ...p, faseLunare: e.target.value }))}
                     className="w-full bg-gray-900 border-2 border-gray-700 rounded-lg px-4 py-3 text-white"
                 >
-                    <option value="">seleziona...</option>
+                    <option value="">{t('weather.select')}</option>
                     {fasiLunari.map(f => (
                         <option key={f} value={f}>{f}</option>
                     ))}
@@ -151,13 +176,13 @@ const MeteoForm = ({
 
             {/* Maree */}
             <InputField
-                label="alta marea"
+                label={t('weather.highTide')}
                 type="time"
                 value={meteo.altaMareaOra}
                 onChange={(e) => setMeteo(p => ({ ...p, altaMareaOra: e.target.value }))}
             />
             <InputField
-                label="bassa marea"
+                label={t('weather.lowTide')}
                 type="time"
                 value={meteo.bassaMareaOra}
                 onChange={(e) => setMeteo(p => ({ ...p, bassaMareaOra: e.target.value }))}
@@ -165,7 +190,7 @@ const MeteoForm = ({
 
             {/* Onde */}
             <InputField
-                label="altezza onde (cm)"
+                label={t('weather.waveHeight')}
                 type="number"
                 value={meteo.altezzaOnde}
                 onChange={(e) => setMeteo(p => ({ ...p, altezzaOnde: e.target.value }))}
@@ -173,7 +198,7 @@ const MeteoForm = ({
                 step="1"
             />
             <InputField
-                label="frequenza onde (sec)"
+                label={t('weather.waveFrequency')}
                 type="number"
                 value={meteo.frequenzaOnde}
                 onChange={(e) => setMeteo(p => ({ ...p, frequenzaOnde: e.target.value }))}

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useMemo } from 'react'
 import L from 'leaflet'
+import { useTranslation } from '../locales/LanguageContext'
 
 // Colori in base al numero di catture
 const getColorByCount = (count) => {
@@ -55,6 +56,7 @@ const calculateOffset = (index, total) => {
 }
 
 const MapCatture = ({ sessioni, catture, filtri }) => {
+    const { t } = useTranslation()
     const mapRef = useRef(null)
     const mapInstanceRef = useRef(null)
     const markersLayerRef = useRef(null)
@@ -71,19 +73,37 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
         })
 
         // Calcola catture per ogni sessione
-        return sessioniValide.map(sessione => {
+        const sessioniConCatture = sessioniValide.map(sessione => {
             const cattureSessione = catture.filter(c => c.sessioneId === sessione.id)
 
-            // Applica filtri alle catture
+            // Applica TUTTI i filtri alle catture
             const cattureFiltrate = cattureSessione.filter(c => {
                 if (!filtri) return true
+
+                // Filtro anno
                 if (filtri.anno !== 'tutti' && c.data && !c.data.startsWith(filtri.anno)) return false
+
+                // Filtro mese
                 if (filtri.mese !== 'tutti' && c.data) {
                     const mese = c.data.split('-')[1]
                     if (mese !== filtri.mese) return false
                 }
+
+                // Filtro specie
                 if (filtri.specie !== 'tutte' && c.specie !== filtri.specie) return false
+
+                // Filtro località
                 if (filtri.localita !== 'tutte' && c.localita !== filtri.localita) return false
+
+                // Filtro direzione vento
+                if (filtri.direzioneVento !== 'tutte' && c.meteo?.direzioneVento !== filtri.direzioneVento) return false
+
+                // Filtro condizioni meteo
+                if (filtri.condizioni !== 'tutte' && c.meteo?.condizioni !== filtri.condizioni) return false
+
+                // Filtro fase lunare
+                if (filtri.faseLunare !== 'tutte' && c.meteo?.faseLunare !== filtri.faseLunare) return false
+
                 return true
             })
 
@@ -94,6 +114,18 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
                 specieUniche: [...new Set(cattureFiltrate.map(c => c.specie).filter(Boolean))]
             }
         })
+
+        // Filtra: mostra solo sessioni con almeno 1 cattura che matcha i filtri
+        // Se non ci sono filtri attivi, mostra tutte le sessioni
+        const hasFiltriAttivi = filtri && Object.entries(filtri).some(([key, val]) =>
+            val !== 'tutti' && val !== 'tutte'
+        )
+
+        if (hasFiltriAttivi) {
+            return sessioniConCatture.filter(s => s.numeroCatture > 0)
+        }
+
+        return sessioniConCatture
     }, [sessioni, catture, filtri])
 
     // Raggruppa marker vicini per applicare offset
@@ -180,18 +212,18 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
             // Crea popup con dettagli sessione
             const specieList = sessione.specieUniche.length > 0
                 ? sessione.specieUniche.slice(0, 5).join(', ') + (sessione.specieUniche.length > 5 ? '...' : '')
-                : 'Nessuna cattura'
+                : t('map.noCatches')
 
             const popupContent = `
                 <div style="min-width: 200px; font-family: system-ui, sans-serif;">
                     <div style="font-weight: bold; font-size: 16px; color: ${color}; margin-bottom: 8px;">
-                        ${sessione.localita || 'Località sconosciuta'}
+                        ${sessione.localita || t('map.unknownLocation')}
                     </div>
                     <div style="font-size: 13px; color: #e5e7eb; line-height: 1.8;">
-                        <div><strong>Catture:</strong> ${count}</div>
-                        <div><strong>Data:</strong> ${sessione.dataInizio || 'N/D'}</div>
-                        <div><strong>Orario:</strong> ${sessione.oraInizio || 'N/D'} - ${sessione.oraFine || 'N/D'}</div>
-                        ${sessione.specieUniche.length > 0 ? `<div><strong>Specie:</strong> ${specieList}</div>` : ''}
+                        <div><strong>${t('map.catches')}:</strong> ${count}</div>
+                        <div><strong>${t('catch.date')}:</strong> ${sessione.dataInizio || 'N/D'}</div>
+                        <div><strong>${t('sessions.time')}:</strong> ${sessione.oraInizio || 'N/D'} - ${sessione.oraFine || 'N/D'}</div>
+                        ${sessione.specieUniche.length > 0 ? `<div><strong>${t('catch.species')}:</strong> ${specieList}</div>` : ''}
                     </div>
                 </div>
             `
@@ -213,7 +245,7 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
                 mapInstanceRef.current.fitBounds(bounds, { padding: [50, 50] })
             }
         }
-    }, [sessioniConOffset])
+    }, [sessioniConOffset, t])
 
     // Statistiche totali
     const totali = useMemo(() => {
@@ -227,16 +259,16 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
     return (
         <div className="bg-gray-800 rounded-lg border border-gray-700 p-3 sm:p-4 mb-3 sm:mb-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-0 mb-2 sm:mb-3">
-                <h4 className="text-cyan-400 font-bold text-sm sm:text-base">mappa sessioni</h4>
+                <h4 className="text-cyan-400 font-bold text-sm sm:text-base">{t('map.title')}</h4>
                 <span className="text-gray-400 text-xs sm:text-sm">
-                    {totali.sessioni} sessioni - {totali.catture} catture
+                    {totali.sessioni} {t('sessions.title')} - {totali.catture} {t('map.catches')}
                 </span>
             </div>
 
             {sessioniConOffset.length === 0 ? (
                 <div className="text-gray-500 text-center py-6 sm:py-8">
-                    <p className="text-sm sm:text-base">Nessuna sessione con coordinate GPS</p>
-                    <p className="text-xs sm:text-sm mt-2">Completa una sessione di pesca per vederla sulla mappa</p>
+                    <p className="text-sm sm:text-base">{t('map.noSessions')}</p>
+                    <p className="text-xs sm:text-sm mt-2">{t('map.completeSession')}</p>
                 </div>
             ) : (
                 <div
@@ -249,7 +281,7 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
             {sessioniConOffset.length > 0 && (
                 <div className="mt-2 sm:mt-3 grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3 justify-center">
                     <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
-                        <span className="w-3 h-3 rounded-full bg-red-500 flex-shrink-0" /> 0 catture
+                        <span className="w-3 h-3 rounded-full bg-red-500 flex-shrink-0" /> 0 {t('map.catches')}
                     </span>
                     <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
                         <span className="w-3 h-3 rounded-full bg-pink-500 flex-shrink-0" /> 1-4

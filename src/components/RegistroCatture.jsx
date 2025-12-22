@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { ChevronDown, ChevronUp, Trash2 } from './Icons'
+import { useTranslation } from '../locales/LanguageContext'
 
 const ITEMS_PER_PAGE = 10
 
 const RegistroCatture = ({ catture, setCatture, filtri }) => {
+    const { t } = useTranslation()
     const [paginaCatture, setPaginaCatture] = useState(0)
     const [cattureEspanse, setCattureEspanse] = useState({})
     const [mostraCatture, setMostraCatture] = useState(false)
@@ -33,7 +35,7 @@ const RegistroCatture = ({ catture, setCatture, filtri }) => {
     }
 
     const eliminaCattura = (cattura) => {
-        if (window.confirm(`Cancellare la cattura di ${cattura.specie}?`)) {
+        if (window.confirm(t('registry.deleteConfirm', { species: cattura.specie }))) {
             setCatture(prev => prev.filter(x => x.id !== cattura.id))
         }
     }
@@ -45,7 +47,7 @@ const RegistroCatture = ({ catture, setCatture, filtri }) => {
                 className="w-full flex items-center justify-between p-3 sm:p-4 active:bg-gray-700 transition-colors"
             >
                 <h3 className="text-cyan-400 font-bold text-base sm:text-xl flex items-center gap-2">
-                    registro catture ({cattureFiltrate.length})
+                    {t('registry.title')} ({cattureFiltrate.length})
                 </h3>
                 {mostraCatture ? (
                     <ChevronUp className="text-cyan-400 flex-shrink-0" width={24} height={24} />
@@ -83,7 +85,7 @@ const RegistroCatture = ({ catture, setCatture, filtri }) => {
 
                                             {/* Dettagli espansi */}
                                             {isEspansa && (
-                                                <DettagliCattura cattura={c} />
+                                                <DettagliCattura cattura={c} t={t} />
                                             )}
                                         </div>
                                         <button
@@ -92,7 +94,7 @@ const RegistroCatture = ({ catture, setCatture, filtri }) => {
                                                 eliminaCattura(c)
                                             }}
                                             className="text-red-500 ml-2 sm:ml-3 p-1 min-h-[36px] min-w-[36px] flex items-center justify-center"
-                                            aria-label="Elimina cattura"
+                                            aria-label={t('common.delete')}
                                         >
                                             <Trash2 width={20} height={20} />
                                         </button>
@@ -110,7 +112,7 @@ const RegistroCatture = ({ catture, setCatture, filtri }) => {
                                 disabled={paginaCatture === 0}
                                 className="pagination-btn bg-cyan-600 text-white rounded-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed active:bg-cyan-700 transition-colors"
                             >
-                                Prec
+                                {t('common.prev')}
                             </button>
                             <span className="text-gray-300 text-xs sm:text-sm min-w-[80px] text-center">
                                 {paginaCatture + 1} / {totalePagine}
@@ -120,7 +122,7 @@ const RegistroCatture = ({ catture, setCatture, filtri }) => {
                                 disabled={paginaCatture >= totalePagine - 1}
                                 className="pagination-btn bg-cyan-600 text-white rounded-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed active:bg-cyan-700 transition-colors"
                             >
-                                Succ
+                                {t('common.next')}
                             </button>
                         </div>
                     )}
@@ -131,55 +133,55 @@ const RegistroCatture = ({ catture, setCatture, filtri }) => {
 }
 
 // Sub-component: Dettagli cattura espansa
-const DettagliCattura = ({ cattura: c }) => (
+const DettagliCattura = ({ cattura: c, t }) => (
     <>
         <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-700">
-            <h5 className="text-cyan-400 font-semibold mb-1.5 sm:mb-2 text-xs sm:text-sm">dati cattura</h5>
+            <h5 className="text-cyan-400 font-semibold mb-1.5 sm:mb-2 text-xs sm:text-sm">{t('registry.catchData')}</h5>
             <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-xs sm:text-sm">
                 {c.peso && (
                     <p className="text-gray-300">
-                        <span className="text-cyan-400">peso:</span> {(parseFloat(c.peso) / 1000).toFixed(2)} kg
+                        <span className="text-cyan-400">{t('catch.weight')}:</span> {(parseFloat(c.peso) / 1000).toFixed(2)} kg
                     </p>
                 )}
                 {c.lunghezza && (
                     <p className="text-gray-300">
-                        <span className="text-cyan-400">lunghezza:</span> {c.lunghezza} cm
+                        <span className="text-cyan-400">{t('catch.length')}:</span> {c.lunghezza} cm
                     </p>
                 )}
                 {c.localita && (
                     <p className="text-gray-300 truncate">
-                        <span className="text-cyan-400">localita:</span> {c.localita}
+                        <span className="text-cyan-400">{t('session.location')}:</span> {c.localita}
                     </p>
                 )}
                 {c.esca && (
                     <p className="text-gray-300">
-                        <span className="text-cyan-400">esca:</span> {c.esca}
+                        <span className="text-cyan-400">{t('catch.bait')}:</span> {c.esca}
                     </p>
                 )}
                 {c.canna && (
                     <p className="text-gray-300 truncate">
-                        <span className="text-cyan-400">canna:</span> {c.canna}
+                        <span className="text-cyan-400">{t('catch.rod')}:</span> {c.canna}
                     </p>
                 )}
                 {c.trave && (
                     <p className="text-gray-300">
-                        <span className="text-cyan-400">trave:</span> {c.trave}
+                        <span className="text-cyan-400">{t('catch.leader')}:</span> {c.trave}
                     </p>
                 )}
                 {c.amo && (
                     <p className="text-gray-300">
-                        <span className="text-cyan-400">amo:</span> {c.amo}
+                        <span className="text-cyan-400">{t('catch.hook')}:</span> {c.amo}
                     </p>
                 )}
                 {c.piombo && (
                     <p className="text-gray-300">
-                        <span className="text-cyan-400">piombo:</span> {c.piombo}
+                        <span className="text-cyan-400">{t('catch.sinker')}:</span> {c.piombo}
                     </p>
                 )}
             </div>
             {c.note && (
                 <p className="text-gray-400 text-xs sm:text-sm mt-2 italic">
-                    <span className="text-cyan-400">note:</span> {c.note}
+                    <span className="text-cyan-400">{t('catch.notes')}:</span> {c.note}
                 </p>
             )}
         </div>
@@ -187,41 +189,41 @@ const DettagliCattura = ({ cattura: c }) => (
         {/* Dati meteo */}
         {c.meteo && Object.values(c.meteo).some(Boolean) && (
             <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-700">
-                <h5 className="text-cyan-400 font-semibold mb-1.5 sm:mb-2 text-xs sm:text-sm">dati meteo</h5>
+                <h5 className="text-cyan-400 font-semibold mb-1.5 sm:mb-2 text-xs sm:text-sm">{t('registry.weatherData')}</h5>
                 <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-xs sm:text-sm">
                     {c.meteo.temperatura && (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400">temp aria:</span> {c.meteo.temperatura}C
+                            <span className="text-cyan-400">{t('weather.temperature')}:</span> {c.meteo.temperatura}C
                         </p>
                     )}
                     {c.meteo.temperaturaAcqua && (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400">temp acqua:</span> {c.meteo.temperaturaAcqua}C
+                            <span className="text-cyan-400">{t('weather.waterTemp')}:</span> {c.meteo.temperaturaAcqua}C
                         </p>
                     )}
                     {c.meteo.pressione && (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400">pressione:</span> {c.meteo.pressione} hPa
+                            <span className="text-cyan-400">{t('weather.pressure')}:</span> {c.meteo.pressione} hPa
                         </p>
                     )}
                     {c.meteo.vento && (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400">vento:</span> {c.meteo.vento} nodi
+                            <span className="text-cyan-400">{t('weather.wind')}:</span> {c.meteo.vento} nodi
                         </p>
                     )}
                     {c.meteo.direzioneVento && (
                         <p className="text-gray-300 col-span-2 truncate">
-                            <span className="text-cyan-400">direzione:</span> {c.meteo.direzioneVento}
+                            <span className="text-cyan-400">{t('weather.windDirection')}:</span> {c.meteo.direzioneVento}
                         </p>
                     )}
                     {c.meteo.condizioni && (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400">condizioni:</span> {c.meteo.condizioni}
+                            <span className="text-cyan-400">{t('weather.conditions')}:</span> {c.meteo.condizioni}
                         </p>
                     )}
                     {c.meteo.faseLunare && (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400">luna:</span> {c.meteo.faseLunare}
+                            <span className="text-cyan-400">{t('weather.moonPhase')}:</span> {c.meteo.faseLunare}
                         </p>
                     )}
                 </div>

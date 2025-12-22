@@ -8,6 +8,7 @@ import MapCatture from './MapCatture'
 import SessioniRegistrate from './SessioniRegistrate'
 import { ventiRosaDeiVenti, fasiLunari, condizioniMeteo } from './MeteoForm'
 import { useToast } from './Toast'
+import { useTranslation } from '../locales/LanguageContext'
 
 const AnalisiDati = ({
     activeSection,
@@ -25,6 +26,7 @@ const AnalisiDati = ({
     escheMemorizzate,
     onImportaDati
 }) => {
+    const { t, language } = useTranslation()
     const toast = useToast()
     const fileInputRef = useRef(null)
 
@@ -76,7 +78,7 @@ const AnalisiDati = ({
     // Esporta dati
     const esportaDati = () => {
         if (catture.length === 0) {
-            toast.warning('Nessuna cattura da esportare!')
+            toast.warning(t('analysis.noCatches'))
             return
         }
         const data = JSON.stringify({
@@ -98,7 +100,7 @@ const AnalisiDati = ({
         a.href = url
         a.download = `diario-pesca-${new Date().toISOString().split('T')[0]}.json`
         a.click()
-        toast.success('Dati esportati con successo!')
+        toast.success(t('analysis.exportSuccess'))
     }
 
     // Importa dati da file JSON
@@ -113,23 +115,21 @@ const AnalisiDati = ({
 
                 // Valida struttura base
                 if (!data.catture || !Array.isArray(data.catture)) {
-                    toast.error('File non valido: manca array catture')
+                    toast.error(t('analysis.invalidFile'))
                     return
                 }
 
                 // Conferma import
                 const conferma = window.confirm(
-                    `Importare ${data.catture.length} catture?\n\n` +
-                    `Questo sostituira i dati esistenti.\n` +
-                    `Assicurati di aver esportato prima i dati attuali.`
+                    `${t('analysis.importConfirm', { count: data.catture.length })}`
                 )
 
                 if (conferma && onImportaDati) {
                     onImportaDati(data)
-                    toast.success(`Importate ${data.catture.length} catture!`)
+                    toast.success(t('analysis.importSuccess', { count: data.catture.length }))
                 }
             } catch (err) {
-                toast.error('Errore lettura file JSON')
+                toast.error(t('analysis.importError'))
                 console.error('Import error:', err)
             }
         }
@@ -158,12 +158,12 @@ const AnalisiDati = ({
     return (
         <Section
             icon={BarChart3}
-            title="analizza dati"
+            title={t('analysis.title')}
             isActive={activeSection === 'analisi'}
             onToggle={() => setActiveSection(activeSection === 'analisi' ? null : 'analisi')}
         >
             {catture.length === 0 ? (
-                <p className="text-gray-400 text-center py-8">nessuna cattura registrata</p>
+                <p className="text-gray-400 text-center py-8">{t('analysis.noCatches')}</p>
             ) : (
                 <>
                     {/* Statistiche */}
@@ -175,13 +175,13 @@ const AnalisiDati = ({
                     {/* Filtri */}
                     <div className="bg-gray-800 rounded-lg border border-gray-700 p-3 sm:p-4 mb-3 sm:mb-4">
                         <div className="flex items-center justify-between mb-2 sm:mb-3">
-                            <h4 className="text-cyan-400 font-bold text-sm sm:text-base">filtri</h4>
+                            <h4 className="text-cyan-400 font-bold text-sm sm:text-base">{t('analysis.filters')}</h4>
                             {hasFiltriAttivi && (
                                 <button
                                     onClick={resetFiltri}
                                     className="text-red-400 text-xs sm:text-sm underline min-h-[36px] flex items-center"
                                 >
-                                    reset filtri
+                                    {t('analysis.resetFilters')}
                                 </button>
                             )}
                         </div>
@@ -192,7 +192,7 @@ const AnalisiDati = ({
                                 onChange={(e) => setFiltri(p => ({ ...p, anno: e.target.value }))}
                                 className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
                             >
-                                <option value="tutti">tutti gli anni</option>
+                                <option value="tutti">{t('analysis.allYears')}</option>
                                 {anniDisponibili.map(a => (
                                     <option key={a} value={a}>{a}</option>
                                 ))}
@@ -204,10 +204,10 @@ const AnalisiDati = ({
                                 onChange={(e) => setFiltri(p => ({ ...p, mese: e.target.value }))}
                                 className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
                             >
-                                <option value="tutti">tutti i mesi</option>
+                                <option value="tutti">{t('analysis.allMonths')}</option>
                                 {mesiDisponibili.map(m => (
                                     <option key={m} value={m}>
-                                        {new Date(2000, parseInt(m) - 1).toLocaleString('it-IT', { month: 'long' })}
+                                        {new Date(2000, parseInt(m) - 1).toLocaleString(language === 'it' ? 'it-IT' : 'en-US', { month: 'long' })}
                                     </option>
                                 ))}
                             </select>
@@ -218,7 +218,7 @@ const AnalisiDati = ({
                                 onChange={(e) => setFiltri(p => ({ ...p, specie: e.target.value }))}
                                 className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
                             >
-                                <option value="tutte">tutte le specie</option>
+                                <option value="tutte">{t('analysis.allSpecies')}</option>
                                 {specieMemorizzate.map(s => (
                                     <option key={s} value={s}>{s}</option>
                                 ))}
@@ -230,7 +230,7 @@ const AnalisiDati = ({
                                 onChange={(e) => setFiltri(p => ({ ...p, localita: e.target.value }))}
                                 className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
                             >
-                                <option value="tutte">tutte le localita</option>
+                                <option value="tutte">{t('analysis.allLocations')}</option>
                                 {localitaMemorizzate.map(l => (
                                     <option key={l} value={l}>{l}</option>
                                 ))}
@@ -242,7 +242,7 @@ const AnalisiDati = ({
                                 onChange={(e) => setFiltri(p => ({ ...p, direzioneVento: e.target.value }))}
                                 className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm sm:col-span-2"
                             >
-                                <option value="tutte">tutte le direzioni vento</option>
+                                <option value="tutte">{t('analysis.allWindDirections')}</option>
                                 {ventiRosaDeiVenti.map(v => (
                                     <option key={v} value={v}>{v.split(' ')[0]}</option>
                                 ))}
@@ -254,7 +254,7 @@ const AnalisiDati = ({
                                 onChange={(e) => setFiltri(p => ({ ...p, condizioni: e.target.value }))}
                                 className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
                             >
-                                <option value="tutte">tutte le condizioni</option>
+                                <option value="tutte">{t('analysis.allConditions')}</option>
                                 {condizioniMeteo.map(c => (
                                     <option key={c} value={c}>{c}</option>
                                 ))}
@@ -266,7 +266,7 @@ const AnalisiDati = ({
                                 onChange={(e) => setFiltri(p => ({ ...p, faseLunare: e.target.value }))}
                                 className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
                             >
-                                <option value="tutte">tutte le fasi lunari</option>
+                                <option value="tutte">{t('analysis.allMoonPhases')}</option>
                                 {fasiLunari.map(f => (
                                     <option key={f} value={f}>{f}</option>
                                 ))}
@@ -286,6 +286,7 @@ const AnalisiDati = ({
                         sessioni={sessioniCompletate}
                         catture={catture}
                         onDeleteSessione={onDeleteSessione}
+                        filtri={filtri}
                     />
 
                     {/* Registro Catture */}
@@ -300,16 +301,16 @@ const AnalisiDati = ({
                         <button
                             onClick={esportaDati}
                             className="flex-1 bg-purple-600 text-white py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base active:bg-purple-700 transition-colors"
-                            aria-label="Esporta dati"
+                            aria-label={t('analysis.export')}
                         >
-                            esporta
+                            {t('analysis.export')}
                         </button>
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             className="flex-1 bg-green-600 text-white py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base active:bg-green-700 transition-colors"
-                            aria-label="Importa dati"
+                            aria-label={t('analysis.import')}
                         >
-                            importa
+                            {t('analysis.import')}
                         </button>
                         <input
                             ref={fileInputRef}

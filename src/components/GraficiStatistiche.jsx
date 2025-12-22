@@ -1,10 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { ChevronDown, ChevronUp } from './Icons'
-
-const MESI_ITALIANI = [
-    'Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu',
-    'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'
-]
+import { useTranslation } from '../locales/LanguageContext'
 
 // Colori per le barre dei grafici
 const COLORI_BARRE = [
@@ -19,8 +15,17 @@ const COLORI_BARRE = [
 ]
 
 const GraficiStatistiche = ({ catture, filtri }) => {
+    const { t, language } = useTranslation()
     const [mostraGrafici, setMostraGrafici] = useState(false)
-    const [graficoAttivo, setGraficoAttivo] = useState('mese') // 'mese' o 'specie'
+    const [graficoAttivo, setGraficoAttivo] = useState('mese') // 'mese', 'specie' o 'vento'
+
+    // Mesi abbreviati basati sulla lingua
+    const mesiAbbreviati = useMemo(() => {
+        return Array.from({ length: 12 }, (_, i) => {
+            const date = new Date(2000, i, 1)
+            return date.toLocaleString(language === 'it' ? 'it-IT' : 'en-US', { month: 'short' })
+        })
+    }, [language])
 
     // Filtra catture in base ai filtri attivi
     const cattureFiltrate = useMemo(() => {
@@ -50,14 +55,14 @@ const GraficiStatistiche = ({ catture, filtri }) => {
         })
 
         // Crea array con tutti i mesi
-        const risultato = MESI_ITALIANI.map((nome, idx) => ({
+        const risultato = mesiAbbreviati.map((nome, idx) => ({
             mese: nome,
             indice: idx,
             catture: conteggio[idx] || 0
         }))
 
         return risultato
-    }, [cattureFiltrate])
+    }, [cattureFiltrate, mesiAbbreviati])
 
     // Calcola specie piu catturate (top 8)
     const speciePiuCatturate = useMemo(() => {
@@ -77,10 +82,32 @@ const GraficiStatistiche = ({ catture, filtri }) => {
         return ordinato
     }, [cattureFiltrate])
 
+    // Calcola catture per direzione vento
+    const catturePerVento = useMemo(() => {
+        const conteggio = {}
+
+        cattureFiltrate.forEach(c => {
+            if (!c.meteo?.direzioneVento) return
+            // Estrai solo la sigla della direzione (es. "N", "NE", "S", etc.)
+            const direzione = c.meteo.direzioneVento.split(' ')[0]
+            conteggio[direzione] = (conteggio[direzione] || 0) + 1
+        })
+
+        // Ordina per numero catture
+        const ordinato = Object.entries(conteggio)
+            .map(([direzione, numero]) => ({ direzione, catture: numero }))
+            .sort((a, b) => b.catture - a.catture)
+
+        return ordinato
+    }, [cattureFiltrate])
+
     // Calcola il valore massimo per la scala
     const maxCattureMese = Math.max(...catturePerMese.map(m => m.catture), 1)
     const maxCattureSpecie = speciePiuCatturate.length > 0
         ? Math.max(...speciePiuCatturate.map(s => s.catture), 1)
+        : 1
+    const maxCattureVento = catturePerVento.length > 0
+        ? Math.max(...catturePerVento.map(v => v.catture), 1)
         : 1
 
     if (catture.length === 0) return null
@@ -92,7 +119,7 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                 className="w-full flex items-center justify-between min-h-[44px]"
             >
                 <h4 className="text-cyan-400 font-bold text-sm sm:text-base">
-                    grafici statistiche
+                    {t('charts.title')}
                 </h4>
                 {mostraGrafici ? (
                     <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" />
@@ -107,23 +134,33 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                     <div className="flex gap-2 mb-3 sm:mb-4">
                         <button
                             onClick={() => setGraficoAttivo('mese')}
-                            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                            className={`flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                                 graficoAttivo === 'mese'
                                     ? 'bg-cyan-600 text-white'
                                     : 'bg-gray-700 text-gray-300 active:bg-gray-600'
                             }`}
                         >
-                            per mese
+                            {t('charts.byMonth')}
                         </button>
                         <button
                             onClick={() => setGraficoAttivo('specie')}
-                            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                            className={`flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                                 graficoAttivo === 'specie'
                                     ? 'bg-cyan-600 text-white'
                                     : 'bg-gray-700 text-gray-300 active:bg-gray-600'
                             }`}
                         >
-                            per specie
+                            {t('charts.bySpecies')}
+                        </button>
+                        <button
+                            onClick={() => setGraficoAttivo('vento')}
+                            className={`flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                                graficoAttivo === 'vento'
+                                    ? 'bg-cyan-600 text-white'
+                                    : 'bg-gray-700 text-gray-300 active:bg-gray-600'
+                            }`}
+                        >
+                            {t('charts.byWind')}
                         </button>
                     </div>
 
@@ -131,17 +168,24 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                     {graficoAttivo === 'mese' && (
                         <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
                             <h5 className="text-gray-300 text-xs sm:text-sm mb-3 text-center">
-                                Catture per mese ({cattureFiltrate.length} totali)
+                                {t('charts.catchesByMonth', { count: cattureFiltrate.length })}
                             </h5>
+
+                            {/* Intestazione colonne mobile */}
+                            <div className="flex items-center gap-2 mb-2 sm:hidden text-gray-500 text-xs">
+                                <span className="w-8 flex-shrink-0">{t('charts.month')}</span>
+                                <span className="flex-1 text-center">{t('charts.chart')}</span>
+                                <span className="w-14 text-right">{t('map.catches')}</span>
+                            </div>
 
                             {/* Barre orizzontali per mobile, verticali per desktop */}
                             <div className="space-y-2 sm:hidden">
                                 {catturePerMese.map((m, idx) => (
                                     <div key={m.mese} className="flex items-center gap-2">
-                                        <span className="text-gray-400 text-xs w-8 flex-shrink-0">
+                                        <span className="text-gray-400 text-xs w-8 flex-shrink-0 font-medium">
                                             {m.mese}
                                         </span>
-                                        <div className="flex-1 bg-gray-800 rounded h-5 overflow-hidden">
+                                        <div className="flex-1 bg-gray-800 rounded h-6 overflow-hidden">
                                             <div
                                                 className="h-full rounded transition-all duration-300"
                                                 style={{
@@ -151,8 +195,8 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                                                 }}
                                             />
                                         </div>
-                                        <span className="text-white text-xs w-6 text-right font-medium">
-                                            {m.catture}
+                                        <span className="text-cyan-400 text-xs w-14 text-right font-bold">
+                                            {m.catture} <span className="text-gray-500 font-normal">{t('charts.cat')}</span>
                                         </span>
                                     </div>
                                 ))}
@@ -198,37 +242,45 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                     {graficoAttivo === 'specie' && (
                         <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
                             <h5 className="text-gray-300 text-xs sm:text-sm mb-3 text-center">
-                                Specie piu catturate (top 8)
+                                {t('charts.topSpecies')}
                             </h5>
 
                             {speciePiuCatturate.length === 0 ? (
                                 <p className="text-gray-500 text-center py-4 text-sm">
-                                    Nessuna cattura registrata
+                                    {t('analysis.noCatches')}
                                 </p>
                             ) : (
-                                <div className="space-y-2">
-                                    {speciePiuCatturate.map((s, idx) => (
-                                        <div key={s.specie} className="flex items-center gap-2">
-                                            <span className="text-gray-300 text-xs sm:text-sm w-20 sm:w-24 truncate flex-shrink-0">
-                                                {s.specie}
-                                            </span>
-                                            <div className="flex-1 bg-gray-800 rounded h-6 sm:h-7 overflow-hidden">
-                                                <div
-                                                    className="h-full rounded transition-all duration-300 flex items-center justify-end pr-2"
-                                                    style={{
-                                                        width: `${(s.catture / maxCattureSpecie) * 100}%`,
-                                                        backgroundColor: COLORI_BARRE[idx % COLORI_BARRE.length],
-                                                        minWidth: '24px'
-                                                    }}
-                                                >
-                                                    <span className="text-white text-xs font-bold">
-                                                        {s.catture}
-                                                    </span>
+                                <>
+                                    {/* Intestazione colonne */}
+                                    <div className="flex items-center gap-2 mb-2 text-gray-500 text-xs">
+                                        <span className="w-20 sm:w-24 flex-shrink-0">{t('catch.species')}</span>
+                                        <span className="flex-1 text-center">{t('charts.chart')}</span>
+                                        <span className="w-16 text-right">{t('map.catches')}</span>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        {speciePiuCatturate.map((s, idx) => (
+                                            <div key={s.specie} className="flex items-center gap-2">
+                                                <span className="text-gray-300 text-xs sm:text-sm w-20 sm:w-24 truncate flex-shrink-0 font-medium">
+                                                    {s.specie}
+                                                </span>
+                                                <div className="flex-1 bg-gray-800 rounded h-6 sm:h-7 overflow-hidden">
+                                                    <div
+                                                        className="h-full rounded transition-all duration-300"
+                                                        style={{
+                                                            width: `${(s.catture / maxCattureSpecie) * 100}%`,
+                                                            backgroundColor: COLORI_BARRE[idx % COLORI_BARRE.length],
+                                                            minWidth: '8px'
+                                                        }}
+                                                    />
                                                 </div>
+                                                <span className="text-cyan-400 text-xs w-16 text-right font-bold">
+                                                    {s.catture} <span className="text-gray-500 font-normal">{t('charts.cat')}</span>
+                                                </span>
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                        ))}
+                                    </div>
+                                </>
                             )}
 
                             {/* Legenda percentuali */}
@@ -247,6 +299,77 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                                                         style={{ backgroundColor: COLORI_BARRE[idx] }}
                                                     />
                                                     {s.specie}: {percentuale}%
+                                                </span>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Grafico catture per direzione vento */}
+                    {graficoAttivo === 'vento' && (
+                        <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
+                            <h5 className="text-gray-300 text-xs sm:text-sm mb-3 text-center">
+                                {t('charts.catchesByWind')}
+                            </h5>
+
+                            {catturePerVento.length === 0 ? (
+                                <p className="text-gray-500 text-center py-4 text-sm">
+                                    {t('charts.noWindData')}
+                                </p>
+                            ) : (
+                                <>
+                                    {/* Intestazione colonne */}
+                                    <div className="flex items-center gap-2 mb-2 text-gray-500 text-xs">
+                                        <span className="w-12 sm:w-16 flex-shrink-0">{t('weather.wind')}</span>
+                                        <span className="flex-1 text-center">{t('charts.chart')}</span>
+                                        <span className="w-16 text-right">{t('map.catches')}</span>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        {catturePerVento.map((v, idx) => (
+                                            <div key={v.direzione} className="flex items-center gap-2">
+                                                <span className="text-gray-300 text-xs sm:text-sm w-12 sm:w-16 flex-shrink-0 font-medium">
+                                                    {v.direzione}
+                                                </span>
+                                                <div className="flex-1 bg-gray-800 rounded h-6 sm:h-7 overflow-hidden">
+                                                    <div
+                                                        className="h-full rounded transition-all duration-300"
+                                                        style={{
+                                                            width: `${(v.catture / maxCattureVento) * 100}%`,
+                                                            backgroundColor: COLORI_BARRE[idx % COLORI_BARRE.length],
+                                                            minWidth: '8px'
+                                                        }}
+                                                    />
+                                                </div>
+                                                <span className="text-cyan-400 text-xs w-16 text-right font-bold">
+                                                    {v.catture} <span className="text-gray-500 font-normal">{t('charts.cat')}</span>
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+
+                            {/* Legenda percentuali vento */}
+                            {catturePerVento.length > 0 && (
+                                <div className="mt-3 pt-3 border-t border-gray-700">
+                                    <div className="flex flex-wrap gap-2 justify-center">
+                                        {catturePerVento.slice(0, 4).map((v, idx) => {
+                                            const cattureTotaliConVento = catturePerVento.reduce((sum, x) => sum + x.catture, 0)
+                                            const percentuale = ((v.catture / cattureTotaliConVento) * 100).toFixed(0)
+                                            return (
+                                                <span
+                                                    key={v.direzione}
+                                                    className="inline-flex items-center gap-1 text-xs text-gray-400"
+                                                >
+                                                    <span
+                                                        className="w-2 h-2 rounded-full"
+                                                        style={{ backgroundColor: COLORI_BARRE[idx] }}
+                                                    />
+                                                    {v.direzione}: {percentuale}%
                                                 </span>
                                             )
                                         })}

@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Mic, X } from './Icons'
 import { useToast } from './Toast'
+import { useTranslation } from '../locales/LanguageContext'
 
 // Verifica supporto Web Speech API
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 
 const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
+    const { t, language } = useTranslation()
     const toast = useToast()
     const [isListening, setIsListening] = useState(false)
     const [transcript, setTranscript] = useState('')
@@ -36,10 +38,10 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
 
         // Cerca peso (pattern: "XXX grammi" o "X chili" o "peso XXX")
         const pesoPatterns = [
-            /(\d+(?:[.,]\d+)?)\s*(?:grammi|gr|g\b)/i,
-            /(\d+(?:[.,]\d+)?)\s*(?:chili|kg|chilogrammi)/i,
+            /(\d+(?:[.,]\d+)?)\s*(?:grammi|gr|g\b|grams)/i,
+            /(\d+(?:[.,]\d+)?)\s*(?:chili|kg|chilogrammi|kilograms|kilos)/i,
             /peso\s*(?:di\s*)?(\d+(?:[.,]\d+)?)/i,
-            /(?:pesa|pesava)\s*(\d+(?:[.,]\d+)?)/i
+            /(?:pesa|pesava|weighs|weighed)\s*(\d+(?:[.,]\d+)?)/i
         ]
 
         for (const pattern of pesoPatterns) {
@@ -47,7 +49,7 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
             if (match) {
                 let peso = parseFloat(match[1].replace(',', '.'))
                 // Se è in chili, converti in grammi
-                if (pattern.toString().includes('chili') || pattern.toString().includes('kg')) {
+                if (pattern.toString().includes('chili') || pattern.toString().includes('kg') || pattern.toString().includes('kilo')) {
                     peso = peso * 1000
                 }
                 result.peso = Math.round(peso).toString()
@@ -57,9 +59,9 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
 
         // Cerca lunghezza (pattern: "XX centimetri" o "XX cm" o "lungo XX")
         const lunghezzaPatterns = [
-            /(\d+(?:[.,]\d+)?)\s*(?:centimetri|cm)/i,
-            /(?:lungo|lunga|lunghezza)\s*(?:di\s*)?(\d+(?:[.,]\d+)?)/i,
-            /(\d+(?:[.,]\d+)?)\s*(?:metri|m\b)/i
+            /(\d+(?:[.,]\d+)?)\s*(?:centimetri|cm|centimeters)/i,
+            /(?:lungo|lunga|lunghezza|long|length)\s*(?:di\s*)?(\d+(?:[.,]\d+)?)/i,
+            /(\d+(?:[.,]\d+)?)\s*(?:metri|m\b|meters)/i
         ]
 
         for (const pattern of lunghezzaPatterns) {
@@ -67,7 +69,7 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
             if (match) {
                 let lunghezza = parseFloat(match[1].replace(',', '.'))
                 // Se è in metri, converti in cm
-                if (pattern.toString().includes('metri')) {
+                if (pattern.toString().includes('metri') || pattern.toString().includes('meters')) {
                     lunghezza = lunghezza * 100
                 }
                 result.lunghezza = lunghezza.toString()
@@ -86,7 +88,8 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
         }
 
         // Cerca parole chiave per esca comune non in lista
-        const escheComuni = ['verme', 'gambero', 'cozza', 'granchio', 'sardina', 'calamaro', 'seppia', 'bigattino']
+        const escheComuni = ['verme', 'gambero', 'cozza', 'granchio', 'sardina', 'calamaro', 'seppia', 'bigattino',
+                            'worm', 'shrimp', 'mussel', 'crab', 'sardine', 'squid', 'cuttlefish', 'maggot']
         if (!result.esca) {
             for (const esca of escheComuni) {
                 if (textLower.includes(esca)) {
@@ -102,7 +105,7 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
     // Inizia registrazione vocale
     const startListening = useCallback(() => {
         if (!SpeechRecognition) {
-            toast.error('Il tuo browser non supporta il riconoscimento vocale')
+            toast.error(t('voice.notSupported'))
             return
         }
 
@@ -110,7 +113,7 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
             const recognition = new SpeechRecognition()
             recognitionRef.current = recognition
 
-            recognition.lang = 'it-IT'
+            recognition.lang = language === 'it' ? 'it-IT' : 'en-US'
             recognition.continuous = false
             recognition.interimResults = true
             recognition.maxAlternatives = 1
@@ -142,13 +145,13 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
                         onResult(parsedData, finalTranscript)
                         // Mostra cosa è stato riconosciuto
                         const campiRiconosciuti = []
-                        if (parsedData.specie) campiRiconosciuti.push(`specie: ${parsedData.specie}`)
-                        if (parsedData.peso) campiRiconosciuti.push(`peso: ${parsedData.peso}g`)
-                        if (parsedData.lunghezza) campiRiconosciuti.push(`lunghezza: ${parsedData.lunghezza}cm`)
-                        if (parsedData.esca) campiRiconosciuti.push(`esca: ${parsedData.esca}`)
-                        toast.success(campiRiconosciuti.join(', '), 'Compilato!')
+                        if (parsedData.specie) campiRiconosciuti.push(`${t('catch.species')}: ${parsedData.specie}`)
+                        if (parsedData.peso) campiRiconosciuti.push(`${t('catch.weight')}: ${parsedData.peso}g`)
+                        if (parsedData.lunghezza) campiRiconosciuti.push(`${t('catch.length')}: ${parsedData.lunghezza}cm`)
+                        if (parsedData.esca) campiRiconosciuti.push(`${t('catch.bait')}: ${parsedData.esca}`)
+                        toast.success(campiRiconosciuti.join(', '), t('voice.filled'))
                     } else {
-                        toast.warning('Nessun dato riconosciuto. Prova a dire il nome di una specie.')
+                        toast.warning(t('voice.noDataRecognized'))
                     }
                 }
             }
@@ -158,11 +161,11 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
                 setIsListening(false)
 
                 if (event.error === 'not-allowed') {
-                    toast.error('Permesso microfono negato. Abilita il microfono nelle impostazioni del browser.')
+                    toast.error(t('voice.micDenied'))
                 } else if (event.error === 'no-speech') {
-                    toast.warning('Nessun audio rilevato. Riprova.')
+                    toast.warning(t('voice.noAudio'))
                 } else {
-                    toast.error(`Errore riconoscimento: ${event.error}`)
+                    toast.error(`${t('voice.error')}: ${event.error}`)
                 }
             }
 
@@ -173,10 +176,10 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
             recognition.start()
         } catch (error) {
             console.error('Error starting recognition:', error)
-            toast.error('Errore avvio riconoscimento vocale')
+            toast.error(t('voice.startError'))
             setIsListening(false)
         }
-    }, [parseVoiceInput, onResult, toast])
+    }, [parseVoiceInput, onResult, toast, t, language])
 
     // Ferma registrazione
     const stopListening = useCallback(() => {
@@ -202,17 +205,17 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
                         ? 'bg-red-600 text-white voice-recording'
                         : 'bg-gray-700 text-cyan-400 border-2 border-cyan-500 active:bg-gray-600'
                 }`}
-                aria-label={isListening ? 'Ferma registrazione' : 'Avvia registrazione vocale'}
+                aria-label={isListening ? t('voice.stopRecording') : t('voice.startRecording')}
             >
                 {isListening ? (
                     <>
                         <X className="w-5 h-5 sm:w-6 sm:h-6" />
-                        <span>ferma registrazione...</span>
+                        <span>{t('voice.stopRecording')}...</span>
                     </>
                 ) : (
                     <>
                         <Mic className="w-5 h-5 sm:w-6 sm:h-6" />
-                        <span>registra con voce</span>
+                        <span>{t('voice.recordWithVoice')}</span>
                     </>
                 )}
             </button>
@@ -228,7 +231,7 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
                             <span className="w-1.5 sm:w-2 h-6 sm:h-7 bg-cyan-400 rounded animate-pulse" style={{ animationDelay: '450ms' }} />
                             <span className="w-1.5 sm:w-2 h-3 sm:h-4 bg-cyan-400 rounded animate-pulse" style={{ animationDelay: '600ms' }} />
                         </div>
-                        <span className="text-cyan-400 text-xs sm:text-sm">in ascolto...</span>
+                        <span className="text-cyan-400 text-xs sm:text-sm">{t('voice.listening')}...</span>
                     </div>
 
                     {transcript && (
@@ -236,7 +239,7 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
                     )}
 
                     <p className="text-gray-500 text-xs mt-2">
-                        Esempi: "Orata" oppure "Spigola 40 centimetri con coreano"
+                        {t('voice.examples')}
                     </p>
                 </div>
             )}
@@ -244,7 +247,7 @@ const VoiceInput = ({ onResult, specieDisponibili, escheDisponibili }) => {
             {/* Suggerimento */}
             {!isListening && (
                 <p className="text-gray-500 text-xs mt-1.5 sm:mt-2 text-center">
-                    Basta dire la specie! Peso, lunghezza ed esca sono opzionali
+                    {t('voice.hint')}
                 </p>
             )}
         </div>

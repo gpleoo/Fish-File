@@ -4,7 +4,7 @@
  * Tutti i diritti riservati.
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import 'leaflet/dist/leaflet.css'
 
 // Components
@@ -14,12 +14,18 @@ import CatturaForm from './components/CatturaForm'
 import MeteoForm from './components/MeteoForm'
 import ListaGestione from './components/ListaGestione'
 import AnalisiDati from './components/AnalisiDati'
+import BackupManager from './components/BackupManager'
 import PWAInstall from './components/PWAInstall'
+import LanguageSelector from './components/LanguageSelector'
 import { useToast } from './components/Toast'
 import { Wrench } from './components/Icons'
+import { useTranslation } from './locales/LanguageContext'
 
 // Native utilities (Capacitor)
 import { initNativeFeatures, isNative } from './utils/native'
+
+// Weather service
+import { fetchWeatherData } from './utils/weatherService'
 
 // Default data
 const specieDefault = ['Cefalo', 'Gronco', 'Leccia stella', 'Marmora', 'Occhiata', 'Ombrina', 'Opa', 'Orata', 'Pesce serra', 'Sarago', 'Spigola', 'Sughero']
@@ -76,6 +82,9 @@ const loadFromStorage = (key, defaultValue) => {
 function App() {
     // Toast notifications
     const toast = useToast()
+
+    // Translations
+    const { t } = useTranslation()
 
     // State - Sezioni attive
     const [activeSection, setActiveSection] = useState(null)
@@ -179,7 +188,7 @@ function App() {
     }, [])
 
     // Funzioni - Sessione
-    const avviaSessione = () => {
+    const avviaSessione = async () => {
         if (!datiSessione.localita || !datiSessione.latitudine || !datiSessione.longitudine) {
             toast.warning('Compila tutti i campi!')
             return
@@ -211,6 +220,25 @@ function App() {
         setSessioneAttiva(true)
         setNuovaCattura(p => ({...p, localita: datiSessione.localita, latitudine: datiSessione.latitudine, longitudine: datiSessione.longitudine}))
         setMeteo(p => ({...p, localita: datiSessione.localita}))
+
+        // Aggiorna automaticamente i dati meteo all'avvio sessione
+        toast.info('Recupero dati meteo...')
+        const result = await fetchWeatherData(
+            parseFloat(datiSessione.latitudine),
+            parseFloat(datiSessione.longitudine)
+        )
+
+        if (result.success && result.data) {
+            setMeteo(prev => ({
+                ...prev,
+                ...result.data,
+                data: getDataItalianaAttuale(),
+                localita: datiSessione.localita
+            }))
+            toast.success('Sessione avviata con dati meteo!')
+        } else {
+            toast.warning('Sessione avviata. Dati meteo non disponibili, compilali manualmente nella sezione meteo.')
+        }
     }
 
     const terminaSessione = () => {
@@ -236,13 +264,19 @@ function App() {
         }
         toast.info('Richiesta posizione GPS in corso...')
         navigator.geolocation.getCurrentPosition(
-            (position) => {
+            async (position) => {
+                const lat = position.coords.latitude.toFixed(6)
+                const lng = position.coords.longitude.toFixed(6)
+
                 setDatiSessione(p => ({
                     ...p,
-                    latitudine: position.coords.latitude.toFixed(6),
-                    longitudine: position.coords.longitude.toFixed(6)
+                    latitudine: lat,
+                    longitudine: lng
                 }))
                 toast.success(`Precisione: ±${Math.round(position.coords.accuracy)}m`, 'Posizione GPS acquisita!')
+
+                // Ottieni dati meteo automaticamente
+                await aggiornaMeteo(parseFloat(lat), parseFloat(lng))
             },
             (error) => {
                 let msg = ''
@@ -254,6 +288,36 @@ function App() {
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         )
+    }
+
+    // Funzione per aggiornare meteo
+    const aggiornaMeteo = async (lat, lng) => {
+        if (!lat || !lng) {
+            // Usa coordinate dalla sessione se non passate
+            lat = parseFloat(datiSessione.latitudine)
+            lng = parseFloat(datiSessione.longitudine)
+        }
+
+        if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+            toast.warning('Inserisci prima le coordinate GPS')
+            return
+        }
+
+        toast.info('Recupero dati meteo...')
+
+        const result = await fetchWeatherData(lat, lng)
+
+        if (result.success && result.data) {
+            setMeteo(prev => ({
+                ...prev,
+                ...result.data,
+                data: getDataItalianaAttuale(),
+                localita: datiSessione.localita || prev.localita
+            }))
+            toast.success('Dati meteo aggiornati!')
+        } else {
+            toast.warning('Dati meteo non disponibili. Inseriscili manualmente.')
+        }
     }
 
     // Funzioni - Catture
@@ -342,6 +406,20 @@ function App() {
         }
     }
 
+    // Funzione - Ricarica dati dopo ripristino backup
+    const ricaricaDatiDaStorage = useCallback(() => {
+        setCatture(loadFromStorage('catture', []))
+        setSessioniCompletate(loadFromStorage('sessioni_completate', []))
+        setSpecieMemorizzate(loadFromStorage('specie_memorizzate', specieDefault))
+        setEscheMemorizzate(loadFromStorage('esche_memorizzate', escheDefault))
+        setLocalitaMemorizzate(loadFromStorage('localita_memorizzate', []))
+        setCanneMemorizzate(loadFromStorage('canne_memorizzate', []))
+        setTraviMemorizzate(loadFromStorage('travi_memorizzate', []))
+        setAmiMemorizzati(loadFromStorage('ami_memorizzati', amiDefault))
+        setPiombiMemorizzati(loadFromStorage('piombi_memorizzati', piombiDefault))
+        setNoteMemorizzate(loadFromStorage('note_memorizzate', []))
+    }, [])
+
     // Funzione - Elimina sessione
     const eliminaSessione = (sessioneId) => {
         setSessioniCompletate(prev => prev.filter(s => s.id !== sessioneId))
@@ -363,8 +441,8 @@ function App() {
                     {/* Header */}
                     <div className="text-center mb-5 sm:mb-8">
                         <img src="/logoFishFile.png" alt="Fish File Logo" className="mx-auto mb-3 sm:mb-4 header-logo" />
-                        <p className="text-gray-400 text-sm sm:text-base">registra le tue battute di pesca</p>
-                        {catture.length > 0 && <p className="text-cyan-400 text-xs sm:text-sm mt-1.5 sm:mt-2">{catture.length} catture salvate</p>}
+                        <p className="text-gray-400 text-sm sm:text-base">{t('app.subtitle')}</p>
+                        {catture.length > 0 && <p className="text-cyan-400 text-xs sm:text-sm mt-1.5 sm:mt-2">{t('app.catchesSaved', { count: catture.length })}</p>}
                     </div>
 
                     {/* Sessione di Pesca */}
@@ -404,12 +482,13 @@ function App() {
                         setActiveSection={setActiveSection}
                         meteo={meteo}
                         setMeteo={setMeteo}
+                        onRefreshMeteo={aggiornaMeteo}
                     />
 
                     {/* Sezione Gestione */}
                     <Section
                         icon={Wrench}
-                        title="gestione"
+                        title={t('management.title')}
                         isActive={activeSection === 'attrezzature'}
                         onToggle={() => setActiveSection(activeSection === 'attrezzature' ? null : 'attrezzature')}
                     >
@@ -500,6 +579,13 @@ function App() {
                         </div>
                     </Section>
 
+                    {/* Sezione Backup & Cloud */}
+                    <BackupManager
+                        activeSection={activeSection}
+                        setActiveSection={setActiveSection}
+                        onDataRestored={ricaricaDatiDaStorage}
+                    />
+
                     {/* Sezione Analisi */}
                     <AnalisiDati
                         activeSection={activeSection}
@@ -527,6 +613,9 @@ function App() {
 
             {/* PWA Install Button */}
             <PWAInstall />
+
+            {/* Language Selector */}
+            <LanguageSelector />
         </>
     )
 }
