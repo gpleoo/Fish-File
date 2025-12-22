@@ -1,10 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { ChevronDown, ChevronUp } from './Icons'
-
-const MESI_ITALIANI = [
-    'Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu',
-    'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'
-]
+import { useTranslation } from '../locales/LanguageContext'
 
 // Colori per le barre dei grafici
 const COLORI_BARRE = [
@@ -19,8 +15,17 @@ const COLORI_BARRE = [
 ]
 
 const GraficiStatistiche = ({ catture, filtri }) => {
+    const { t, language } = useTranslation()
     const [mostraGrafici, setMostraGrafici] = useState(false)
     const [graficoAttivo, setGraficoAttivo] = useState('mese') // 'mese', 'specie' o 'vento'
+
+    // Mesi abbreviati basati sulla lingua
+    const mesiAbbreviati = useMemo(() => {
+        return Array.from({ length: 12 }, (_, i) => {
+            const date = new Date(2000, i, 1)
+            return date.toLocaleString(language === 'it' ? 'it-IT' : 'en-US', { month: 'short' })
+        })
+    }, [language])
 
     // Filtra catture in base ai filtri attivi
     const cattureFiltrate = useMemo(() => {
@@ -50,14 +55,14 @@ const GraficiStatistiche = ({ catture, filtri }) => {
         })
 
         // Crea array con tutti i mesi
-        const risultato = MESI_ITALIANI.map((nome, idx) => ({
+        const risultato = mesiAbbreviati.map((nome, idx) => ({
             mese: nome,
             indice: idx,
             catture: conteggio[idx] || 0
         }))
 
         return risultato
-    }, [cattureFiltrate])
+    }, [cattureFiltrate, mesiAbbreviati])
 
     // Calcola specie piu catturate (top 8)
     const speciePiuCatturate = useMemo(() => {
@@ -114,7 +119,7 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                 className="w-full flex items-center justify-between min-h-[44px]"
             >
                 <h4 className="text-cyan-400 font-bold text-sm sm:text-base">
-                    grafici statistiche
+                    {t('charts.title')}
                 </h4>
                 {mostraGrafici ? (
                     <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" />
@@ -135,7 +140,7 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                                     : 'bg-gray-700 text-gray-300 active:bg-gray-600'
                             }`}
                         >
-                            per mese
+                            {t('charts.byMonth')}
                         </button>
                         <button
                             onClick={() => setGraficoAttivo('specie')}
@@ -145,7 +150,7 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                                     : 'bg-gray-700 text-gray-300 active:bg-gray-600'
                             }`}
                         >
-                            per specie
+                            {t('charts.bySpecies')}
                         </button>
                         <button
                             onClick={() => setGraficoAttivo('vento')}
@@ -155,7 +160,7 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                                     : 'bg-gray-700 text-gray-300 active:bg-gray-600'
                             }`}
                         >
-                            per vento
+                            {t('charts.byWind')}
                         </button>
                     </div>
 
@@ -163,14 +168,14 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                     {graficoAttivo === 'mese' && (
                         <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
                             <h5 className="text-gray-300 text-xs sm:text-sm mb-3 text-center">
-                                Catture per mese ({cattureFiltrate.length} totali)
+                                {t('charts.catchesByMonth', { count: cattureFiltrate.length })}
                             </h5>
 
                             {/* Intestazione colonne mobile */}
                             <div className="flex items-center gap-2 mb-2 sm:hidden text-gray-500 text-xs">
-                                <span className="w-8 flex-shrink-0">Mese</span>
-                                <span className="flex-1 text-center">Grafico</span>
-                                <span className="w-14 text-right">Catture</span>
+                                <span className="w-8 flex-shrink-0">{t('charts.month')}</span>
+                                <span className="flex-1 text-center">{t('charts.chart')}</span>
+                                <span className="w-14 text-right">{t('map.catches')}</span>
                             </div>
 
                             {/* Barre orizzontali per mobile, verticali per desktop */}
@@ -191,7 +196,7 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                                             />
                                         </div>
                                         <span className="text-cyan-400 text-xs w-14 text-right font-bold">
-                                            {m.catture} <span className="text-gray-500 font-normal">cat.</span>
+                                            {m.catture} <span className="text-gray-500 font-normal">{t('charts.cat')}</span>
                                         </span>
                                     </div>
                                 ))}
@@ -237,20 +242,20 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                     {graficoAttivo === 'specie' && (
                         <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
                             <h5 className="text-gray-300 text-xs sm:text-sm mb-3 text-center">
-                                Specie piu catturate (top 8)
+                                {t('charts.topSpecies')}
                             </h5>
 
                             {speciePiuCatturate.length === 0 ? (
                                 <p className="text-gray-500 text-center py-4 text-sm">
-                                    Nessuna cattura registrata
+                                    {t('analysis.noCatches')}
                                 </p>
                             ) : (
                                 <>
                                     {/* Intestazione colonne */}
                                     <div className="flex items-center gap-2 mb-2 text-gray-500 text-xs">
-                                        <span className="w-20 sm:w-24 flex-shrink-0">Specie</span>
-                                        <span className="flex-1 text-center">Grafico</span>
-                                        <span className="w-16 text-right">Catture</span>
+                                        <span className="w-20 sm:w-24 flex-shrink-0">{t('catch.species')}</span>
+                                        <span className="flex-1 text-center">{t('charts.chart')}</span>
+                                        <span className="w-16 text-right">{t('map.catches')}</span>
                                     </div>
 
                                     <div className="space-y-2">
@@ -270,7 +275,7 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                                                     />
                                                 </div>
                                                 <span className="text-cyan-400 text-xs w-16 text-right font-bold">
-                                                    {s.catture} <span className="text-gray-500 font-normal">cat.</span>
+                                                    {s.catture} <span className="text-gray-500 font-normal">{t('charts.cat')}</span>
                                                 </span>
                                             </div>
                                         ))}
@@ -307,20 +312,20 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                     {graficoAttivo === 'vento' && (
                         <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
                             <h5 className="text-gray-300 text-xs sm:text-sm mb-3 text-center">
-                                Catture per direzione vento
+                                {t('charts.catchesByWind')}
                             </h5>
 
                             {catturePerVento.length === 0 ? (
                                 <p className="text-gray-500 text-center py-4 text-sm">
-                                    Nessun dato vento registrato
+                                    {t('charts.noWindData')}
                                 </p>
                             ) : (
                                 <>
                                     {/* Intestazione colonne */}
                                     <div className="flex items-center gap-2 mb-2 text-gray-500 text-xs">
-                                        <span className="w-12 sm:w-16 flex-shrink-0">Vento</span>
-                                        <span className="flex-1 text-center">Grafico</span>
-                                        <span className="w-16 text-right">Catture</span>
+                                        <span className="w-12 sm:w-16 flex-shrink-0">{t('weather.wind')}</span>
+                                        <span className="flex-1 text-center">{t('charts.chart')}</span>
+                                        <span className="w-16 text-right">{t('map.catches')}</span>
                                     </div>
 
                                     <div className="space-y-2">
@@ -340,7 +345,7 @@ const GraficiStatistiche = ({ catture, filtri }) => {
                                                     />
                                                 </div>
                                                 <span className="text-cyan-400 text-xs w-16 text-right font-bold">
-                                                    {v.catture} <span className="text-gray-500 font-normal">cat.</span>
+                                                    {v.catture} <span className="text-gray-500 font-normal">{t('charts.cat')}</span>
                                                 </span>
                                             </div>
                                         ))}
