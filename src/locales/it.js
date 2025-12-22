@@ -63,7 +63,9 @@ const it = {
     weather: {
         title: 'dati meteo',
         subtitle: 'dati opzionali ma utili per analisi - puoi modificarli in qualsiasi momento',
+        optional: 'I dati meteo sono opzionali ma utili per analisi',
         refresh: 'Aggiorna Meteo da GPS',
+        refreshFromGPS: 'Aggiorna Meteo da GPS',
         loading: 'Caricamento...',
         temperature: 'temperatura (°C)',
         waterTemp: 'temp. acqua (°C)',
@@ -134,6 +136,8 @@ const it = {
         catches: 'catture',
         noSessions: 'Nessuna sessione con coordinate GPS',
         completeSession: 'Completa una sessione di pesca per vederla sulla mappa',
+        unknownLocation: 'Località sconosciuta',
+        noCatches: 'Nessuna cattura',
         legend: {
             zeroCatches: '0 catture',
             oneFour: '1-4',
@@ -150,9 +154,11 @@ const it = {
         of: 'di',
         start: 'Inizio',
         end: 'Fine',
+        time: 'Orario',
         lat: 'Lat',
         lng: 'Lng',
         catches: 'Catture',
+        delete: 'Elimina sessione',
         deleteSession: 'Elimina sessione',
         deleteConfirm: 'Eliminare la sessione a {location}? Le catture associate NON verranno eliminate.',
         deleted: 'Sessione eliminata',
@@ -167,20 +173,26 @@ const it = {
         noMatchingFilters: 'Nessuna cattura corrisponde ai filtri',
         editCatch: 'Modifica cattura',
         deleteCatch: 'Elimina',
-        deleteConfirm: 'Eliminare questa cattura?',
+        deleteConfirm: 'Cancellare la cattura di {species}?',
         deleted: 'Cattura eliminata',
         updated: 'Cattura aggiornata',
         save: 'Salva',
-        cancel: 'Annulla'
+        cancel: 'Annulla',
+        catchData: 'dati cattura',
+        weatherData: 'dati meteo'
     },
 
     // Charts
     charts: {
         title: 'grafici statistiche',
+        statistics: 'Statistiche catture',
+        total: 'totale',
+        mostCaught: 'più catturata',
+        avgWeight: 'peso medio',
         byMonth: 'per mese',
         bySpecies: 'per specie',
         byWind: 'per vento',
-        catchesPerMonth: 'Catture per mese',
+        catchesByMonth: 'Catture per mese ({count} totali)',
         totalCatches: 'totali',
         topSpecies: 'Specie più catturate (top 8)',
         noCatches: 'Nessuna cattura registrata',
@@ -196,11 +208,21 @@ const it = {
 
     // Voice input
     voice: {
-        listening: 'In ascolto...',
+        listening: 'in ascolto',
         speakNow: 'Parla ora',
         stop: 'Stop',
-        notSupported: 'Riconoscimento vocale non supportato',
-        error: 'Errore riconoscimento vocale'
+        notSupported: 'Il tuo browser non supporta il riconoscimento vocale',
+        error: 'Errore riconoscimento',
+        recordWithVoice: 'registra con voce',
+        stopRecording: 'ferma registrazione',
+        startRecording: 'Avvia registrazione vocale',
+        filled: 'Compilato!',
+        noDataRecognized: 'Nessun dato riconosciuto. Prova a dire il nome di una specie.',
+        micDenied: 'Permesso microfono negato. Abilita il microfono nelle impostazioni.',
+        noAudio: 'Nessun audio rilevato. Riprova.',
+        startError: 'Errore avvio riconoscimento vocale',
+        examples: 'Esempi: "Orata" oppure "Spigola 40 centimetri con coreano"',
+        hint: 'Basta dire la specie! Peso, lunghezza ed esca sono opzionali'
     },
 
     // Common
@@ -213,7 +235,11 @@ const it = {
         error: 'Errore',
         success: 'Successo',
         warning: 'Attenzione',
-        info: 'Info'
+        info: 'Info',
+        prev: 'Prec',
+        next: 'Succ',
+        delete: 'Elimina',
+        of: 'di'
     },
 
     // Months
@@ -247,6 +273,34 @@ const it = {
         rain: 'pioggia',
         storm: 'temporale',
         fog: 'nebbia'
+    },
+
+    // Backup
+    backup: {
+        title: 'backup & cloud',
+        dataSize: 'Dimensione dati',
+        localBackup: 'Backup locale',
+        export: 'Esporta',
+        import: 'Importa',
+        autoBackup: 'Backup automatico',
+        createAutoBackup: 'Crea backup automatico',
+        autoBackupHint: 'Salva un punto di ripristino locale',
+        cloudBackup: 'Backup cloud',
+        cloudHint: 'Scarica il file e caricalo manualmente sul cloud',
+        history: 'Cronologia backup',
+        local: 'Locale',
+        auto: 'Automatico',
+        exportSuccess: 'Backup esportato: {catture} catture, {sessioni} sessioni',
+        exportError: 'Errore durante l\'esportazione',
+        restoreConfirm: 'Ripristinare il backup? I dati attuali verranno sovrascritti.',
+        restoreSuccess: 'Ripristino completato: {catture} catture, {sessioni} sessioni',
+        restoreError: 'Errore durante il ripristino',
+        autoBackupSuccess: 'Backup automatico creato con successo!',
+        autoBackupError: 'Errore durante il backup automatico',
+        cloudInstructions: 'File scaricato! Caricalo manualmente su Google Drive o Dropbox',
+        cloudError: 'Errore durante il backup cloud',
+        deleteConfirm: 'Eliminare questo backup dalla cronologia?',
+        deleted: 'Backup eliminato dalla cronologia'
     }
 }
 

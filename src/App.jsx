@@ -4,7 +4,7 @@
  * Tutti i diritti riservati.
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import 'leaflet/dist/leaflet.css'
 
 // Components
@@ -14,6 +14,7 @@ import CatturaForm from './components/CatturaForm'
 import MeteoForm from './components/MeteoForm'
 import ListaGestione from './components/ListaGestione'
 import AnalisiDati from './components/AnalisiDati'
+import BackupManager from './components/BackupManager'
 import PWAInstall from './components/PWAInstall'
 import LanguageSelector from './components/LanguageSelector'
 import { useToast } from './components/Toast'
@@ -405,6 +406,20 @@ function App() {
         }
     }
 
+    // Funzione - Ricarica dati dopo ripristino backup
+    const ricaricaDatiDaStorage = useCallback(() => {
+        setCatture(loadFromStorage('catture', []))
+        setSessioniCompletate(loadFromStorage('sessioni_completate', []))
+        setSpecieMemorizzate(loadFromStorage('specie_memorizzate', specieDefault))
+        setEscheMemorizzate(loadFromStorage('esche_memorizzate', escheDefault))
+        setLocalitaMemorizzate(loadFromStorage('localita_memorizzate', []))
+        setCanneMemorizzate(loadFromStorage('canne_memorizzate', []))
+        setTraviMemorizzate(loadFromStorage('travi_memorizzate', []))
+        setAmiMemorizzati(loadFromStorage('ami_memorizzati', amiDefault))
+        setPiombiMemorizzati(loadFromStorage('piombi_memorizzati', piombiDefault))
+        setNoteMemorizzate(loadFromStorage('note_memorizzate', []))
+    }, [])
+
     // Funzione - Elimina sessione
     const eliminaSessione = (sessioneId) => {
         setSessioniCompletate(prev => prev.filter(s => s.id !== sessioneId))
@@ -563,6 +578,13 @@ function App() {
                             />
                         </div>
                     </Section>
+
+                    {/* Sezione Backup & Cloud */}
+                    <BackupManager
+                        activeSection={activeSection}
+                        setActiveSection={setActiveSection}
+                        onDataRestored={ricaricaDatiDaStorage}
+                    />
 
                     {/* Sezione Analisi */}
                     <AnalisiDati

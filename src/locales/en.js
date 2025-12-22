@@ -63,7 +63,9 @@ const en = {
     weather: {
         title: 'weather data',
         subtitle: 'optional data but useful for analysis - you can edit them anytime',
+        optional: 'Weather data is optional but useful for analysis',
         refresh: 'Refresh Weather from GPS',
+        refreshFromGPS: 'Refresh Weather from GPS',
         loading: 'Loading...',
         temperature: 'temperature (°C)',
         waterTemp: 'water temp. (°C)',
@@ -120,11 +122,12 @@ const en = {
         allMoonPhases: 'all moon phases',
         export: 'export',
         import: 'import',
-        exported: 'Data exported successfully!',
-        imported: 'Imported {count} catches!',
+        exportSuccess: 'Data exported successfully!',
+        importSuccess: 'Imported {count} catches!',
         nothingToExport: 'No catches to export!',
         invalidFile: 'Invalid file: missing catches array',
-        importConfirm: 'Import {count} catches?\n\nThis will replace existing data.\nMake sure you exported current data first.'
+        importConfirm: 'Import {count} catches?\n\nThis will replace existing data.\nMake sure you exported current data first.',
+        importError: 'Error reading JSON file'
     },
 
     // Map
@@ -134,6 +137,8 @@ const en = {
         catches: 'catches',
         noSessions: 'No sessions with GPS coordinates',
         completeSession: 'Complete a fishing session to see it on the map',
+        unknownLocation: 'Unknown location',
+        noCatches: 'No catches',
         legend: {
             zeroCatches: '0 catches',
             oneFour: '1-4',
@@ -150,9 +155,11 @@ const en = {
         of: 'of',
         start: 'Start',
         end: 'End',
+        time: 'Time',
         lat: 'Lat',
         lng: 'Lng',
         catches: 'Catches',
+        delete: 'Delete session',
         deleteSession: 'Delete session',
         deleteConfirm: 'Delete session at {location}? Associated catches will NOT be deleted.',
         deleted: 'Session deleted',
@@ -167,20 +174,26 @@ const en = {
         noMatchingFilters: 'No catches match the filters',
         editCatch: 'Edit catch',
         deleteCatch: 'Delete',
-        deleteConfirm: 'Delete this catch?',
+        deleteConfirm: 'Delete the {species} catch?',
         deleted: 'Catch deleted',
         updated: 'Catch updated',
         save: 'Save',
-        cancel: 'Cancel'
+        cancel: 'Cancel',
+        catchData: 'catch data',
+        weatherData: 'weather data'
     },
 
     // Charts
     charts: {
         title: 'statistics charts',
+        statistics: 'Catch statistics',
+        total: 'total',
+        mostCaught: 'most caught',
+        avgWeight: 'avg weight',
         byMonth: 'by month',
         bySpecies: 'by species',
         byWind: 'by wind',
-        catchesPerMonth: 'Catches per month',
+        catchesByMonth: 'Catches per month ({count} total)',
         totalCatches: 'total',
         topSpecies: 'Most caught species (top 8)',
         noCatches: 'No catches recorded',
@@ -196,11 +209,21 @@ const en = {
 
     // Voice input
     voice: {
-        listening: 'Listening...',
+        listening: 'listening',
         speakNow: 'Speak now',
         stop: 'Stop',
-        notSupported: 'Voice recognition not supported',
-        error: 'Voice recognition error'
+        notSupported: 'Your browser does not support voice recognition',
+        error: 'Recognition error',
+        recordWithVoice: 'record with voice',
+        stopRecording: 'stop recording',
+        startRecording: 'Start voice recording',
+        filled: 'Filled!',
+        noDataRecognized: 'No data recognized. Try saying a species name.',
+        micDenied: 'Microphone permission denied. Enable it in settings.',
+        noAudio: 'No audio detected. Try again.',
+        startError: 'Error starting voice recognition',
+        examples: 'Examples: "Bass" or "Trout 40 centimeters with worm"',
+        hint: 'Just say the species! Weight, length and bait are optional'
     },
 
     // Common
@@ -213,7 +236,11 @@ const en = {
         error: 'Error',
         success: 'Success',
         warning: 'Warning',
-        info: 'Info'
+        info: 'Info',
+        prev: 'Prev',
+        next: 'Next',
+        delete: 'Delete',
+        of: 'of'
     },
 
     // Months
@@ -247,6 +274,34 @@ const en = {
         rain: 'rain',
         storm: 'storm',
         fog: 'fog'
+    },
+
+    // Backup
+    backup: {
+        title: 'backup & cloud',
+        dataSize: 'Data size',
+        localBackup: 'Local backup',
+        export: 'Export',
+        import: 'Import',
+        autoBackup: 'Automatic backup',
+        createAutoBackup: 'Create auto backup',
+        autoBackupHint: 'Save a local restore point',
+        cloudBackup: 'Cloud backup',
+        cloudHint: 'Download file and manually upload to cloud',
+        history: 'Backup history',
+        local: 'Local',
+        auto: 'Automatic',
+        exportSuccess: 'Backup exported: {catture} catches, {sessioni} sessions',
+        exportError: 'Error during export',
+        restoreConfirm: 'Restore backup? Current data will be overwritten.',
+        restoreSuccess: 'Restore completed: {catture} catches, {sessioni} sessions',
+        restoreError: 'Error during restore',
+        autoBackupSuccess: 'Auto backup created successfully!',
+        autoBackupError: 'Error during auto backup',
+        cloudInstructions: 'File downloaded! Upload it manually to Google Drive or Dropbox',
+        cloudError: 'Error during cloud backup',
+        deleteConfirm: 'Delete this backup from history?',
+        deleted: 'Backup deleted from history'
     }
 }
 
