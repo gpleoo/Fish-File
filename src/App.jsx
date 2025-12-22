@@ -15,8 +15,10 @@ import MeteoForm from './components/MeteoForm'
 import ListaGestione from './components/ListaGestione'
 import AnalisiDati from './components/AnalisiDati'
 import PWAInstall from './components/PWAInstall'
+import LanguageSelector from './components/LanguageSelector'
 import { useToast } from './components/Toast'
 import { Wrench } from './components/Icons'
+import { useTranslation } from './locales/LanguageContext'
 
 // Native utilities (Capacitor)
 import { initNativeFeatures, isNative } from './utils/native'
@@ -79,6 +81,9 @@ const loadFromStorage = (key, defaultValue) => {
 function App() {
     // Toast notifications
     const toast = useToast()
+
+    // Translations
+    const { t } = useTranslation()
 
     // State - Sezioni attive
     const [activeSection, setActiveSection] = useState(null)
@@ -421,8 +426,8 @@ function App() {
                     {/* Header */}
                     <div className="text-center mb-5 sm:mb-8">
                         <img src="/logoFishFile.png" alt="Fish File Logo" className="mx-auto mb-3 sm:mb-4 header-logo" />
-                        <p className="text-gray-400 text-sm sm:text-base">registra le tue battute di pesca</p>
-                        {catture.length > 0 && <p className="text-cyan-400 text-xs sm:text-sm mt-1.5 sm:mt-2">{catture.length} catture salvate</p>}
+                        <p className="text-gray-400 text-sm sm:text-base">{t('app.subtitle')}</p>
+                        {catture.length > 0 && <p className="text-cyan-400 text-xs sm:text-sm mt-1.5 sm:mt-2">{t('app.catchesSaved', { count: catture.length })}</p>}
                     </div>
 
                     {/* Sessione di Pesca */}
@@ -468,7 +473,7 @@ function App() {
                     {/* Sezione Gestione */}
                     <Section
                         icon={Wrench}
-                        title="gestione"
+                        title={t('management.title')}
                         isActive={activeSection === 'attrezzature'}
                         onToggle={() => setActiveSection(activeSection === 'attrezzature' ? null : 'attrezzature')}
                     >
@@ -586,6 +591,9 @@ function App() {
 
             {/* PWA Install Button */}
             <PWAInstall />
+
+            {/* Language Selector */}
+            <LanguageSelector />
         </>
     )
 }
