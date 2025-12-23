@@ -343,6 +343,32 @@ const it = {
         attempt: 'Tentativo',
         error: 'Errore - compila manualmente',
         closeAndFillManually: 'Chiudi e compila manualmente'
+    },
+
+    // Privacy & Legal
+    privacy: {
+        title: 'Privacy e Dati',
+        privacyPolicy: 'Informativa Privacy',
+        termsOfService: 'Termini di Servizio',
+        consents: 'Gestione Consensi',
+        locationConsent: 'Consenso Posizione',
+        locationDescription: 'Permette di salvare le coordinate GPS delle catture',
+        microphoneConsent: 'Consenso Microfono',
+        microphoneDescription: 'Permette di usare l\'assistente vocale',
+        exportData: 'Esporta i miei dati',
+        exportDataDescription: 'Scarica tutti i tuoi dati in formato JSON',
+        exportSuccess: 'Dati esportati con successo!',
+        deleteData: 'Elimina tutti i dati',
+        deleteDataDescription: 'Cancella permanentemente tutti i tuoi dati',
+        deleteConfirm: '⚠️ ATTENZIONE!\n\nQuesta azione eliminerà PERMANENTEMENTE:\n- Tutte le catture\n- Tutte le sessioni\n- Tutte le liste salvate\n- Tutte le impostazioni\n\nSei sicuro di voler procedere?',
+        deleteConfirmFinal: 'Digita "ELIMINA" per confermare:',
+        deleteSuccess: 'Tutti i dati sono stati eliminati',
+        deleteCancelled: 'Eliminazione annullata',
+        consentGranted: 'Consenso concesso',
+        consentDenied: 'Consenso negato',
+        consentRequired: 'Questo permesso è necessario per usare questa funzionalità',
+        lastUpdated: 'Ultimo aggiornamento',
+        version: 'Versione'
     }
 }
 

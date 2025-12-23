@@ -344,6 +344,32 @@ const en = {
         attempt: 'Attempt',
         error: 'Error - fill in manually',
         closeAndFillManually: 'Close and fill manually'
+    },
+
+    // Privacy & Legal
+    privacy: {
+        title: 'Privacy & Data',
+        privacyPolicy: 'Privacy Policy',
+        termsOfService: 'Terms of Service',
+        consents: 'Manage Consents',
+        locationConsent: 'Location Consent',
+        locationDescription: 'Allows saving GPS coordinates of catches',
+        microphoneConsent: 'Microphone Consent',
+        microphoneDescription: 'Allows using the voice assistant',
+        exportData: 'Export my data',
+        exportDataDescription: 'Download all your data in JSON format',
+        exportSuccess: 'Data exported successfully!',
+        deleteData: 'Delete all data',
+        deleteDataDescription: 'Permanently delete all your data',
+        deleteConfirm: '⚠️ WARNING!\n\nThis action will PERMANENTLY delete:\n- All catches\n- All sessions\n- All saved lists\n- All settings\n\nAre you sure you want to proceed?',
+        deleteConfirmFinal: 'Type "DELETE" to confirm:',
+        deleteSuccess: 'All data has been deleted',
+        deleteCancelled: 'Deletion cancelled',
+        consentGranted: 'Consent granted',
+        consentDenied: 'Consent denied',
+        consentRequired: 'This permission is required to use this feature',
+        lastUpdated: 'Last updated',
+        version: 'Version'
     }
 }
 
