@@ -101,6 +101,71 @@ export const findBestMatch = (spoken, list, threshold = 0.6) => {
 }
 
 /**
+ * Find the best match for a spoken phrase in a list
+ * Checks each word and combinations of adjacent words
+ * @param {string} spoken - The phrase spoken by the user
+ * @param {string[]} list - The list of valid options
+ * @param {number} threshold - Minimum similarity score (0-1), default 0.6
+ * @returns {object} - { match: string|null, score: number }
+ */
+export const findBestMatchInPhrase = (spoken, list, threshold = 0.6) => {
+    if (!spoken || !list || list.length === 0) {
+        return { match: null, score: 0 }
+    }
+
+    const spokenLower = spoken.toLowerCase().trim()
+    const words = spokenLower.split(/\s+/).filter(w => w.length > 1)
+
+    let bestMatch = null
+    let bestScore = 0
+
+    // First, try exact match with full phrase
+    for (const item of list) {
+        if (item.toLowerCase() === spokenLower) {
+            return { match: item, score: 1 }
+        }
+    }
+
+    // Check each word individually
+    for (const word of words) {
+        const result = findBestMatch(word, list, threshold)
+        if (result.match && result.score > bestScore) {
+            bestScore = result.score
+            bestMatch = result.match
+        }
+    }
+
+    // Check combinations of adjacent words (for multi-word items like "pesce serra")
+    for (let i = 0; i < words.length - 1; i++) {
+        const twoWords = `${words[i]} ${words[i + 1]}`
+        const result = findBestMatch(twoWords, list, threshold)
+        if (result.match && result.score > bestScore) {
+            bestScore = result.score
+            bestMatch = result.match
+        }
+    }
+
+    // Check if any list item is contained in the spoken phrase
+    for (const item of list) {
+        const itemLower = item.toLowerCase()
+        if (spokenLower.includes(itemLower)) {
+            const score = itemLower.length / spokenLower.length + 0.3 // Bonus for containment
+            if (score > bestScore) {
+                bestScore = Math.min(score, 0.95) // Cap at 0.95
+                bestMatch = item
+            }
+        }
+    }
+
+    if (bestScore >= threshold) {
+        console.log(`Best match in phrase: "${spoken}" → "${bestMatch}" (score: ${bestScore.toFixed(2)})`)
+        return { match: bestMatch, score: bestScore }
+    }
+
+    return { match: null, score: bestScore }
+}
+
+/**
  * Parse spoken number (handles both digits and Italian words)
  * Improved to handle phrases like "quaranta centimetri", "circa 40", etc.
  * @param {string} spoken - The spoken number

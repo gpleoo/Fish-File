@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Mic, MicOff, X, Volume2 } from './Icons'
 import { useTranslation } from '../locales/LanguageContext'
-import { findBestMatch, parseSpokenNumber, isAffirmative, isNegative, isNewCatch } from '../utils/fuzzyMatch'
+import { findBestMatchInPhrase, parseSpokenNumber, isAffirmative, isNegative, isNewCatch } from '../utils/fuzzyMatch'
 
 // States for the voice assistant flow
 const STATES = {
@@ -177,7 +177,7 @@ const VoiceAssistant = ({
         try {
             switch (currentState) {
                 case STATES.ASKING_SPECIES: {
-                    const result = findBestMatch(spokenText, specieMemorizzate, 0.5)
+                    const result = findBestMatchInPhrase(spokenText, specieMemorizzate, 0.55)
                     if (result.match) {
                         setCatchData(prev => ({ ...prev, specie: result.match }))
                         setAttempts(0)
@@ -221,7 +221,7 @@ const VoiceAssistant = ({
                 }
 
                 case STATES.ASKING_BAIT: {
-                    const result = findBestMatch(spokenText, escheMemorizzate, 0.5)
+                    const result = findBestMatchInPhrase(spokenText, escheMemorizzate, 0.55)
                     if (result.match) {
                         setCatchData(prev => ({ ...prev, esca: result.match }))
                         setAttempts(0)
