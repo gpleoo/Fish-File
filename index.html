@@ -13,15 +13,15 @@
     <title>Fish File - Diario di Pesca</title>
 
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/Fish-File/manifest.json">
 
     <!-- Icons -->
-    <link rel="icon" type="image/png" href="/logoFishFile.png">
-    <link rel="apple-touch-icon" href="/logoFishFile.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/logoFishFile.png">
+    <link rel="icon" type="image/png" href="/Fish-File/logoFishFile.png">
+    <link rel="apple-touch-icon" href="/Fish-File/logoFishFile.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/Fish-File/logoFishFile.png">
 
     <!-- Splash screens for iOS -->
-    <link rel="apple-touch-startup-image" href="/splash-screen.png">
+    <link rel="apple-touch-startup-image" href="/Fish-File/splash-screen.png">
 </head>
 <body>
     <div id="root"></div>
@@ -31,7 +31,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('/Fish-File/sw.js')
                     .then((registration) => {
                         console.log('SW registered:', registration.scope)
 
