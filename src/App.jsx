@@ -429,7 +429,7 @@ function App() {
             {/* Splash Screen */}
             {mostraSplash && (
                 <div className="fixed inset-0 bg-black flex items-center justify-center z-50 splash-animation">
-                    <img src="/splash-screen.png" alt="Fish File" className="max-w-full max-h-full object-contain" />
+                    <img src={`${import.meta.env.BASE_URL}splash-screen.png`} alt="Fish File" className="max-w-full max-h-full object-contain" />
                 </div>
             )}
 
@@ -438,7 +438,7 @@ function App() {
                 <div className="max-w-4xl mx-auto">
                     {/* Header */}
                     <div className="text-center mb-5 sm:mb-8">
-                        <img src="/logoFishFile.png" alt="Fish File Logo" className="mx-auto mb-3 sm:mb-4 header-logo" />
+                        <img src={`${import.meta.env.BASE_URL}logoFishFile.png`} alt="Fish File Logo" className="mx-auto mb-3 sm:mb-4 header-logo" />
                         <p className="text-gray-400 text-sm sm:text-base">{t('app.subtitle')}</p>
                         {catture.length > 0 && <p className="text-cyan-400 text-xs sm:text-sm mt-1.5 sm:mt-2">{t('app.catchesSaved', { count: catture.length })}</p>}
                     </div>
@@ -577,13 +577,6 @@ function App() {
                         </div>
                     </Section>
 
-                    {/* Sezione Backup & Cloud */}
-                    <BackupManager
-                        activeSection={activeSection}
-                        setActiveSection={setActiveSection}
-                        onDataRestored={ricaricaDatiDaStorage}
-                    />
-
                     {/* Sezione Analisi */}
                     <AnalisiDati
                         activeSection={activeSection}
@@ -609,11 +602,8 @@ function App() {
                 </div>
             </div>
 
-            {/* PWA Install Button */}
-            <PWAInstall />
-
-            {/* Language Selector */}
-            <LanguageSelector />
+            {/* Settings Panel */}
+            <SettingsPanel onDataRestored={ricaricaDatiDaStorage} />
         </>
     )
 }
