@@ -301,6 +301,16 @@ const it = {
         cloudError: 'Errore durante il backup cloud',
         deleteConfirm: 'Eliminare questo backup dalla cronologia?',
         deleted: 'Backup eliminato dalla cronologia'
+    },
+
+    // Settings
+    settings: {
+        title: 'Impostazioni',
+        language: 'Lingua',
+        installApp: 'Installa App',
+        installButton: 'Installa Fish File',
+        installHint: 'Aggiungi l\'app alla schermata home per un accesso rapido',
+        appInstalled: 'App installata con successo!'
     }
 }
 
