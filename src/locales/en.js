@@ -302,6 +302,16 @@ const en = {
         cloudError: 'Error during cloud backup',
         deleteConfirm: 'Delete this backup from history?',
         deleted: 'Backup deleted from history'
+    },
+
+    // Settings
+    settings: {
+        title: 'Settings',
+        language: 'Language',
+        installApp: 'Install App',
+        installButton: 'Install Fish File',
+        installHint: 'Add the app to your home screen for quick access',
+        appInstalled: 'App installed successfully!'
     }
 }
 
