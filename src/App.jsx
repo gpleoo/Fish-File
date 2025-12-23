@@ -319,35 +319,47 @@ function App() {
     }
 
     // Funzioni - Catture
-    const aggiungiCattura = () => {
+    // voiceCatchData è opzionale - usato dall'assistente vocale per passare i dati direttamente
+    const aggiungiCattura = (voiceCatchData = null) => {
         if (!sessioneAttiva) {
             setMessaggioErrore('Avvia prima una sessione di pesca')
-            return
-        }
-        if (!nuovaCattura.specie) {
-            setMessaggioErrore('Inserisci la specie della cattura')
-            return
+            return false
         }
 
-        if (nuovaCattura.latitudine && nuovaCattura.longitudine) {
-            const validazione = validaCoordinate(nuovaCattura.latitudine, nuovaCattura.longitudine)
+        // Se viene passato voiceCatchData, usalo; altrimenti usa nuovaCattura
+        const catchData = voiceCatchData ? {
+            ...nuovaCattura,
+            specie: voiceCatchData.specie,
+            lunghezza: voiceCatchData.lunghezza || '',
+            esca: voiceCatchData.esca || '',
+            data: new Date().toISOString().split('T')[0],
+            ora: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', hour12: false })
+        } : nuovaCattura
+
+        if (!catchData.specie) {
+            setMessaggioErrore('Inserisci la specie della cattura')
+            return false
+        }
+
+        if (catchData.latitudine && catchData.longitudine) {
+            const validazione = validaCoordinate(catchData.latitudine, catchData.longitudine)
             if (!validazione.valid) {
                 setMessaggioErrore(`Coordinate non valide: ${validazione.error}`)
-                return
+                return false
             }
         }
 
         setMessaggioErrore('')
 
         // Auto-aggiungi a liste se non presenti
-        if (nuovaCattura.specie && !specieMemorizzate.includes(nuovaCattura.specie)) {
-            setSpecieMemorizzate(prev => [...prev, nuovaCattura.specie].sort((a, b) => a.localeCompare(b, 'it')))
+        if (catchData.specie && !specieMemorizzate.includes(catchData.specie)) {
+            setSpecieMemorizzate(prev => [...prev, catchData.specie].sort((a, b) => a.localeCompare(b, 'it')))
         }
-        if (nuovaCattura.esca && !escheMemorizzate.includes(nuovaCattura.esca)) {
-            setEscheMemorizzate(prev => [...prev, nuovaCattura.esca].sort((a, b) => a.localeCompare(b, 'it')))
+        if (catchData.esca && !escheMemorizzate.includes(catchData.esca)) {
+            setEscheMemorizzate(prev => [...prev, catchData.esca].sort((a, b) => a.localeCompare(b, 'it')))
         }
 
-        setCatture(prev => [...prev, {...nuovaCattura, meteo: {...meteo}, id: Date.now(), sessioneId: sessioneCorrente.id}])
+        setCatture(prev => [...prev, {...catchData, meteo: {...meteo}, id: Date.now(), sessioneId: sessioneCorrente.id}])
 
         setNuovaCattura({
             data: getDataItalianaAttuale(),
@@ -365,6 +377,7 @@ function App() {
         })
 
         toast.success('Cattura registrata con successo!')
+        return true
     }
 
     // Funzioni - Gestione liste (generiche)
