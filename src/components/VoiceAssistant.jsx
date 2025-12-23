@@ -299,7 +299,7 @@ const VoiceAssistant = ({
         } finally {
             isProcessingRef.current = false
         }
-    }, [speak, t, specieMemorizzate, escheMemorizzate, attempts, onCatchComplete, startListening])
+    }, [speak, t, specieMemorizzate, escheMemorizzate, attempts, onCatchComplete, startListening, catchData])
 
     /**
      * Setup recognition event handlers
