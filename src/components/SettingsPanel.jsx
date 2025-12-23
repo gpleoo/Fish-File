@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Settings, X, Download, Upload, RefreshCw, HardDrive, Trash2, ChevronDown, ChevronUp } from './Icons'
+import { Settings, X, Download, Upload, RefreshCw, HardDrive, Trash2, ChevronDown, ChevronUp, Shield, FileText, ExternalLink, MapPin, Mic } from './Icons'
 import { useToast } from './Toast'
 import { useTranslation } from '../locales/LanguageContext'
 import {
@@ -12,6 +12,10 @@ import {
     saveToGoogleDrive,
     saveToDropbox
 } from '../utils/backupService'
+
+// Privacy Policy URL - Replace with your actual URL when available
+const PRIVACY_POLICY_URL = 'https://gpleoo.github.io/Fish-File/privacy-policy.html'
+const TERMS_OF_SERVICE_URL = 'https://gpleoo.github.io/Fish-File/terms-of-service.html'
 
 const SettingsPanel = ({ onDataRestored }) => {
     const { t, language, toggleLanguage } = useTranslation()
@@ -29,6 +33,15 @@ const SettingsPanel = ({ onDataRestored }) => {
     // PWA Install state
     const [deferredPrompt, setDeferredPrompt] = useState(null)
     const [canInstall, setCanInstall] = useState(false)
+
+    // Privacy state
+    const [showPrivacy, setShowPrivacy] = useState(false)
+    const [locationConsent, setLocationConsent] = useState(() => {
+        return localStorage.getItem('consent_location') === 'true'
+    })
+    const [microphoneConsent, setMicrophoneConsent] = useState(() => {
+        return localStorage.getItem('consent_microphone') === 'true'
+    })
 
     // Load backup history and data size
     useEffect(() => {
@@ -187,6 +200,164 @@ const SettingsPanel = ({ onDataRestored }) => {
             setBackupHistory(getBackupHistory())
             toast.success(t('backup.deleted'))
         }
+    }
+
+    // Privacy handlers
+    const handleLocationConsentToggle = async () => {
+        if (!locationConsent) {
+            // Request permission
+            try {
+                const result = await navigator.permissions.query({ name: 'geolocation' })
+                if (result.state === 'granted' || result.state === 'prompt') {
+                    navigator.geolocation.getCurrentPosition(
+                        () => {
+                            setLocationConsent(true)
+                            localStorage.setItem('consent_location', 'true')
+                            toast.success(t('privacy.consentGranted'))
+                        },
+                        () => {
+                            toast.error(t('privacy.consentDenied'))
+                        }
+                    )
+                } else {
+                    toast.error(t('privacy.consentDenied'))
+                }
+            } catch {
+                // Fallback for browsers without permissions API
+                navigator.geolocation.getCurrentPosition(
+                    () => {
+                        setLocationConsent(true)
+                        localStorage.setItem('consent_location', 'true')
+                        toast.success(t('privacy.consentGranted'))
+                    },
+                    () => {
+                        toast.error(t('privacy.consentDenied'))
+                    }
+                )
+            }
+        } else {
+            setLocationConsent(false)
+            localStorage.setItem('consent_location', 'false')
+            toast.info(t('privacy.consentDenied'))
+        }
+    }
+
+    const handleMicrophoneConsentToggle = async () => {
+        if (!microphoneConsent) {
+            // Request permission
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+                stream.getTracks().forEach(track => track.stop())
+                setMicrophoneConsent(true)
+                localStorage.setItem('consent_microphone', 'true')
+                toast.success(t('privacy.consentGranted'))
+            } catch {
+                toast.error(t('privacy.consentDenied'))
+            }
+        } else {
+            setMicrophoneConsent(false)
+            localStorage.setItem('consent_microphone', 'false')
+            toast.info(t('privacy.consentDenied'))
+        }
+    }
+
+    const handleExportUserData = () => {
+        try {
+            // Collect all user data from localStorage
+            const userData = {
+                exportDate: new Date().toISOString(),
+                appVersion: '1.0',
+                data: {
+                    catture: JSON.parse(localStorage.getItem('catture') || '[]'),
+                    sessioni: JSON.parse(localStorage.getItem('sessioni') || '[]'),
+                    specieMemorizzate: JSON.parse(localStorage.getItem('specieMemorizzate') || '[]'),
+                    escheMemorizzate: JSON.parse(localStorage.getItem('escheMemorizzate') || '[]'),
+                    localitaMemorizzate: JSON.parse(localStorage.getItem('localitaMemorizzate') || '[]'),
+                    canneMemorizzate: JSON.parse(localStorage.getItem('canneMemorizzate') || '[]'),
+                    traviMemorizzate: JSON.parse(localStorage.getItem('traviMemorizzate') || '[]'),
+                    amiMemorizzati: JSON.parse(localStorage.getItem('amiMemorizzati') || '[]'),
+                    piombiMemorizzati: JSON.parse(localStorage.getItem('piombiMemorizzati') || '[]'),
+                    noteMemorizzate: JSON.parse(localStorage.getItem('noteMemorizzate') || '[]')
+                },
+                consents: {
+                    location: localStorage.getItem('consent_location') === 'true',
+                    microphone: localStorage.getItem('consent_microphone') === 'true'
+                },
+                settings: {
+                    language: localStorage.getItem('fishFileLanguage') || 'it'
+                }
+            }
+
+            // Create and download file
+            const blob = new Blob([JSON.stringify(userData, null, 2)], { type: 'application/json' })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `fish-file-my-data-${new Date().toISOString().split('T')[0]}.json`
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            URL.revokeObjectURL(url)
+
+            toast.success(t('privacy.exportSuccess'))
+        } catch (error) {
+            console.error('Export error:', error)
+            toast.error('Errore durante l\'esportazione')
+        }
+    }
+
+    const handleDeleteAllData = () => {
+        // First confirmation
+        if (!window.confirm(t('privacy.deleteConfirm'))) {
+            toast.info(t('privacy.deleteCancelled'))
+            return
+        }
+
+        // Second confirmation with typed input
+        const confirmText = language === 'it' ? 'ELIMINA' : 'DELETE'
+        const userInput = window.prompt(t('privacy.deleteConfirmFinal'))
+
+        if (userInput !== confirmText) {
+            toast.info(t('privacy.deleteCancelled'))
+            return
+        }
+
+        // Delete all data
+        const keysToDelete = [
+            'catture',
+            'sessioni',
+            'specieMemorizzate',
+            'escheMemorizzate',
+            'localitaMemorizzate',
+            'canneMemorizzate',
+            'traviMemorizzate',
+            'amiMemorizzati',
+            'piombiMemorizzati',
+            'noteMemorizzate',
+            'backupHistory',
+            'consent_location',
+            'consent_microphone',
+            'sessioneCorrente',
+            'datiSessione'
+        ]
+
+        keysToDelete.forEach(key => localStorage.removeItem(key))
+
+        // Reset state
+        setLocationConsent(false)
+        setMicrophoneConsent(false)
+        setBackupHistory([])
+        setDataSize('0 KB')
+
+        toast.success(t('privacy.deleteSuccess'))
+
+        // Reload app after short delay
+        setTimeout(() => {
+            if (onDataRestored) {
+                onDataRestored()
+            }
+            window.location.reload()
+        }, 1500)
     }
 
     const formatDate = (dateString) => {
@@ -421,6 +592,133 @@ const SettingsPanel = ({ onDataRestored }) => {
                                     <p className="text-gray-500 text-xs mt-2 text-center">{t('settings.installHint')}</p>
                                 </div>
                             )}
+
+                            {/* Privacy Section */}
+                            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                                <button
+                                    onClick={() => setShowPrivacy(!showPrivacy)}
+                                    className="w-full flex items-center justify-between"
+                                >
+                                    <h3 className="text-cyan-400 font-semibold text-sm flex items-center gap-2">
+                                        <Shield className="w-5 h-5" />
+                                        {t('privacy.title')}
+                                    </h3>
+                                    {showPrivacy ? (
+                                        <ChevronUp className="w-5 h-5 text-gray-400" />
+                                    ) : (
+                                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                                    )}
+                                </button>
+
+                                {showPrivacy && (
+                                    <div className="mt-4 space-y-4">
+                                        {/* Legal Documents */}
+                                        <div className="space-y-2">
+                                            <a
+                                                href={PRIVACY_POLICY_URL}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center justify-between bg-gray-900 rounded-lg p-3 active:bg-gray-700"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <FileText className="w-5 h-5 text-cyan-400" />
+                                                    <span className="text-white text-sm">{t('privacy.privacyPolicy')}</span>
+                                                </div>
+                                                <ExternalLink className="w-4 h-4 text-gray-400" />
+                                            </a>
+                                            <a
+                                                href={TERMS_OF_SERVICE_URL}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center justify-between bg-gray-900 rounded-lg p-3 active:bg-gray-700"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <FileText className="w-5 h-5 text-cyan-400" />
+                                                    <span className="text-white text-sm">{t('privacy.termsOfService')}</span>
+                                                </div>
+                                                <ExternalLink className="w-4 h-4 text-gray-400" />
+                                            </a>
+                                        </div>
+
+                                        {/* Consents */}
+                                        <div className="border-t border-gray-700 pt-4">
+                                            <p className="text-gray-400 text-xs mb-3">{t('privacy.consents')}</p>
+
+                                            {/* Location Consent */}
+                                            <div className="flex items-center justify-between bg-gray-900 rounded-lg p-3 mb-2">
+                                                <div className="flex items-center gap-3">
+                                                    <MapPin className="w-5 h-5 text-green-400" />
+                                                    <div>
+                                                        <p className="text-white text-sm">{t('privacy.locationConsent')}</p>
+                                                        <p className="text-gray-500 text-xs">{t('privacy.locationDescription')}</p>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={handleLocationConsentToggle}
+                                                    className={`w-12 h-6 rounded-full transition-colors ${
+                                                        locationConsent ? 'bg-green-500' : 'bg-gray-600'
+                                                    }`}
+                                                >
+                                                    <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
+                                                        locationConsent ? 'translate-x-6' : 'translate-x-0.5'
+                                                    }`} />
+                                                </button>
+                                            </div>
+
+                                            {/* Microphone Consent */}
+                                            <div className="flex items-center justify-between bg-gray-900 rounded-lg p-3">
+                                                <div className="flex items-center gap-3">
+                                                    <Mic className="w-5 h-5 text-purple-400" />
+                                                    <div>
+                                                        <p className="text-white text-sm">{t('privacy.microphoneConsent')}</p>
+                                                        <p className="text-gray-500 text-xs">{t('privacy.microphoneDescription')}</p>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={handleMicrophoneConsentToggle}
+                                                    className={`w-12 h-6 rounded-full transition-colors ${
+                                                        microphoneConsent ? 'bg-green-500' : 'bg-gray-600'
+                                                    }`}
+                                                >
+                                                    <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
+                                                        microphoneConsent ? 'translate-x-6' : 'translate-x-0.5'
+                                                    }`} />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Data Management */}
+                                        <div className="border-t border-gray-700 pt-4 space-y-2">
+                                            <button
+                                                onClick={handleExportUserData}
+                                                className="w-full flex items-center justify-between bg-gray-900 rounded-lg p-3 active:bg-gray-700"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <Download className="w-5 h-5 text-blue-400" />
+                                                    <div className="text-left">
+                                                        <p className="text-white text-sm">{t('privacy.exportData')}</p>
+                                                        <p className="text-gray-500 text-xs">{t('privacy.exportDataDescription')}</p>
+                                                    </div>
+                                                </div>
+                                                <ChevronDown className="w-4 h-4 text-gray-400 -rotate-90" />
+                                            </button>
+
+                                            <button
+                                                onClick={handleDeleteAllData}
+                                                className="w-full flex items-center justify-between bg-red-900/30 border border-red-500/30 rounded-lg p-3 active:bg-red-900/50"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <Trash2 className="w-5 h-5 text-red-400" />
+                                                    <div className="text-left">
+                                                        <p className="text-red-400 text-sm font-semibold">{t('privacy.deleteData')}</p>
+                                                        <p className="text-red-300/60 text-xs">{t('privacy.deleteDataDescription')}</p>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
 
                             {/* Version */}
                             <div className="text-center pt-2">
