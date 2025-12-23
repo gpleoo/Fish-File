@@ -324,6 +324,15 @@ const VoiceAssistant = ({
 
         recognition.onend = () => {
             setIsListening(false)
+            console.log(`recognition.onend - state: ${currentStateRef.current}, isProcessing: ${isProcessingRef.current}`)
+
+            // Auto-restart listening if we're in a state that needs it
+            if (currentStateRef.current !== STATES.IDLE &&
+                currentStateRef.current !== STATES.ERROR &&
+                !isProcessingRef.current) {
+                console.log('Auto-restarting listening...')
+                setTimeout(() => startListening(), 300)
+            }
         }
 
         return () => {
