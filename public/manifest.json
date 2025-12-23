@@ -2,23 +2,23 @@
   "name": "Fish File - Diario di Pesca",
   "short_name": "Fish File",
   "description": "Il tuo diario di pesca intelligente per registrare catture, meteo e statistiche",
-  "start_url": "/",
+  "start_url": "/Fish-File/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
   "orientation": "portrait-primary",
-  "scope": "/",
+  "scope": "/Fish-File/",
   "lang": "it",
   "categories": ["lifestyle", "sports"],
   "icons": [
     {
-      "src": "/logoFishFile.png",
+      "src": "/Fish-File/logoFishFile.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/logoFishFile.png",
+      "src": "/Fish-File/logoFishFile.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -26,7 +26,7 @@
   ],
   "screenshots": [
     {
-      "src": "/splash-screen.png",
+      "src": "/Fish-File/splash-screen.png",
       "sizes": "1170x2532",
       "type": "image/png",
       "form_factor": "narrow",
@@ -38,8 +38,8 @@
       "name": "Nuova Cattura",
       "short_name": "Cattura",
       "description": "Registra una nuova cattura",
-      "url": "/?action=cattura",
-      "icons": [{ "src": "/logoFishFile.png", "sizes": "96x96" }]
+      "url": "/Fish-File/?action=cattura",
+      "icons": [{ "src": "/Fish-File/logoFishFile.png", "sizes": "96x96" }]
     }
   ]
 }

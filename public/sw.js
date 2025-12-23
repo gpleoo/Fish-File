@@ -4,12 +4,13 @@
  */
 
 const CACHE_NAME = 'fish-file-v1'
+const BASE_PATH = '/Fish-File'
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/logoFishFile.png',
-  '/splash-screen.png',
-  '/manifest.json'
+  `${BASE_PATH}/`,
+  `${BASE_PATH}/index.html`,
+  `${BASE_PATH}/logoFishFile.png`,
+  `${BASE_PATH}/splash-screen.png`,
+  `${BASE_PATH}/manifest.json`
 ]
 
 // Install event - cache static assets
@@ -76,7 +77,7 @@ self.addEventListener('fetch', (event) => {
 
             // Return offline page for navigation requests
             if (event.request.mode === 'navigate') {
-              return caches.match('/')
+              return caches.match(`${BASE_PATH}/`)
             }
 
             return new Response('Offline', {
