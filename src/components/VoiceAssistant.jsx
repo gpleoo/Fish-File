@@ -169,10 +169,15 @@ const VoiceAssistant = ({
      * Process speech result based on current state
      */
     const processResult = useCallback(async (spokenText) => {
-        if (isProcessingRef.current) return
+        console.log(`processResult called with: "${spokenText}", isProcessing: ${isProcessingRef.current}`)
+        if (isProcessingRef.current) {
+            console.log('processResult SKIPPED - already processing')
+            return
+        }
         isProcessingRef.current = true
 
         const currentState = currentStateRef.current
+        console.log(`processResult processing state: ${currentState}`)
 
         try {
             switch (currentState) {
@@ -199,7 +204,9 @@ const VoiceAssistant = ({
                 }
 
                 case STATES.ASKING_LENGTH: {
+                    console.log(`ASKING_LENGTH - received: "${spokenText}"`)
                     const length = parseSpokenNumber(spokenText)
+                    console.log(`ASKING_LENGTH - parsed length: ${length}`)
                     if (length !== null) {
                         setCatchData(prev => ({ ...prev, lunghezza: length.toString() }))
                         setAttempts(0)
@@ -297,6 +304,7 @@ const VoiceAssistant = ({
         recognition.onresult = (event) => {
             const results = event.results[0]
             const spokenText = results[0].transcript
+            console.log(`Speech recognition result: "${spokenText}" (state: ${currentStateRef.current})`)
             setTranscript(spokenText)
             processResult(spokenText)
         }
