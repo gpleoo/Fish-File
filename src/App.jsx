@@ -321,7 +321,13 @@ function App() {
     // Funzioni - Catture
     // voiceCatchData è opzionale - usato dall'assistente vocale per passare i dati direttamente
     const aggiungiCattura = (voiceCatchData = null) => {
+        console.log('=== aggiungiCattura CALLED ===')
+        console.log('voiceCatchData:', JSON.stringify(voiceCatchData))
+        console.log('sessioneAttiva:', sessioneAttiva)
+        console.log('sessioneCorrente:', JSON.stringify(sessioneCorrente))
+
         if (!sessioneAttiva) {
+            console.log('FAILED: No active session')
             setMessaggioErrore('Avvia prima una sessione di pesca')
             return false
         }
@@ -336,7 +342,10 @@ function App() {
             ora: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', hour12: false })
         } : nuovaCattura
 
+        console.log('Final catchData:', JSON.stringify(catchData))
+
         if (!catchData.specie) {
+            console.log('FAILED: No species')
             setMessaggioErrore('Inserisci la specie della cattura')
             return false
         }
@@ -344,6 +353,7 @@ function App() {
         if (catchData.latitudine && catchData.longitudine) {
             const validazione = validaCoordinate(catchData.latitudine, catchData.longitudine)
             if (!validazione.valid) {
+                console.log('FAILED: Invalid coordinates')
                 setMessaggioErrore(`Coordinate non valide: ${validazione.error}`)
                 return false
             }
@@ -359,7 +369,9 @@ function App() {
             setEscheMemorizzate(prev => [...prev, catchData.esca].sort((a, b) => a.localeCompare(b, 'it')))
         }
 
-        setCatture(prev => [...prev, {...catchData, meteo: {...meteo}, id: Date.now(), sessioneId: sessioneCorrente.id}])
+        const newCatch = {...catchData, meteo: {...meteo}, id: Date.now(), sessioneId: sessioneCorrente.id}
+        console.log('Adding catch to catture:', JSON.stringify(newCatch))
+        setCatture(prev => [...prev, newCatch])
 
         setNuovaCattura({
             data: getDataItalianaAttuale(),
@@ -376,6 +388,7 @@ function App() {
             note: nuovaCattura.note
         })
 
+        console.log('SUCCESS: Catch added')
         toast.success('Cattura registrata con successo!')
         return true
     }

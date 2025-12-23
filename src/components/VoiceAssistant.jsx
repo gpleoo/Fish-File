@@ -254,6 +254,9 @@ const VoiceAssistant = ({
                     if (isAffirmative(spokenText)) {
                         // First speak, then save (to avoid interruption)
                         const catchToSave = { ...catchData }
+                        console.log('CONFIRM: catchData before reset:', JSON.stringify(catchData))
+                        console.log('CONFIRM: catchToSave:', JSON.stringify(catchToSave))
+
                         setCatchData({ specie: '', lunghezza: '', esca: '' })
                         setState(STATES.WAITING_NEW_CATCH)
 
@@ -262,6 +265,7 @@ const VoiceAssistant = ({
                         console.log('Confirmation message spoken, saving catch...')
 
                         // Save the catch after speaking
+                        console.log('Calling onCatchComplete with:', JSON.stringify(catchToSave))
                         onCatchComplete(catchToSave)
                         startListening()
                     } else if (isNegative(spokenText)) {
