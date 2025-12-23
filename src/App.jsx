@@ -321,10 +321,14 @@ function App() {
     // Funzioni - Catture
     // voiceCatchData è opzionale - usato dall'assistente vocale per passare i dati direttamente
     const aggiungiCattura = (voiceCatchData = null) => {
+        // Verifica se voiceCatchData è effettivamente dati vocali (non un evento click)
+        const isVoiceData = voiceCatchData && typeof voiceCatchData === 'object' && 'specie' in voiceCatchData
+        const actualVoiceData = isVoiceData ? voiceCatchData : null
+
         console.log('=== aggiungiCattura CALLED ===')
-        console.log('voiceCatchData:', JSON.stringify(voiceCatchData))
+        console.log('isVoiceData:', isVoiceData)
+        console.log('actualVoiceData:', actualVoiceData ? JSON.stringify(actualVoiceData) : 'null')
         console.log('sessioneAttiva:', sessioneAttiva)
-        console.log('sessioneCorrente:', JSON.stringify(sessioneCorrente))
 
         if (!sessioneAttiva) {
             console.log('FAILED: No active session')
@@ -332,12 +336,12 @@ function App() {
             return false
         }
 
-        // Se viene passato voiceCatchData, usalo; altrimenti usa nuovaCattura
-        const catchData = voiceCatchData ? {
+        // Se viene passato actualVoiceData, usalo; altrimenti usa nuovaCattura
+        const catchData = actualVoiceData ? {
             ...nuovaCattura,
-            specie: voiceCatchData.specie,
-            lunghezza: voiceCatchData.lunghezza || '',
-            esca: voiceCatchData.esca || '',
+            specie: actualVoiceData.specie,
+            lunghezza: actualVoiceData.lunghezza || '',
+            esca: actualVoiceData.esca || '',
             data: new Date().toISOString().split('T')[0],
             ora: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', hour12: false })
         } : nuovaCattura
