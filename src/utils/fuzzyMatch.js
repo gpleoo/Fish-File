@@ -101,7 +101,73 @@ export const findBestMatch = (spoken, list, threshold = 0.6) => {
 }
 
 /**
+ * Find the best match for a spoken phrase in a list
+ * Checks each word and combinations of adjacent words
+ * @param {string} spoken - The phrase spoken by the user
+ * @param {string[]} list - The list of valid options
+ * @param {number} threshold - Minimum similarity score (0-1), default 0.6
+ * @returns {object} - { match: string|null, score: number }
+ */
+export const findBestMatchInPhrase = (spoken, list, threshold = 0.6) => {
+    if (!spoken || !list || list.length === 0) {
+        return { match: null, score: 0 }
+    }
+
+    const spokenLower = spoken.toLowerCase().trim()
+    const words = spokenLower.split(/\s+/).filter(w => w.length > 1)
+
+    let bestMatch = null
+    let bestScore = 0
+
+    // First, try exact match with full phrase
+    for (const item of list) {
+        if (item.toLowerCase() === spokenLower) {
+            return { match: item, score: 1 }
+        }
+    }
+
+    // Check each word individually
+    for (const word of words) {
+        const result = findBestMatch(word, list, threshold)
+        if (result.match && result.score > bestScore) {
+            bestScore = result.score
+            bestMatch = result.match
+        }
+    }
+
+    // Check combinations of adjacent words (for multi-word items like "pesce serra")
+    for (let i = 0; i < words.length - 1; i++) {
+        const twoWords = `${words[i]} ${words[i + 1]}`
+        const result = findBestMatch(twoWords, list, threshold)
+        if (result.match && result.score > bestScore) {
+            bestScore = result.score
+            bestMatch = result.match
+        }
+    }
+
+    // Check if any list item is contained in the spoken phrase
+    for (const item of list) {
+        const itemLower = item.toLowerCase()
+        if (spokenLower.includes(itemLower)) {
+            const score = itemLower.length / spokenLower.length + 0.3 // Bonus for containment
+            if (score > bestScore) {
+                bestScore = Math.min(score, 0.95) // Cap at 0.95
+                bestMatch = item
+            }
+        }
+    }
+
+    if (bestScore >= threshold) {
+        console.log(`Best match in phrase: "${spoken}" → "${bestMatch}" (score: ${bestScore.toFixed(2)})`)
+        return { match: bestMatch, score: bestScore }
+    }
+
+    return { match: null, score: bestScore }
+}
+
+/**
  * Parse spoken number (handles both digits and Italian words)
+ * Improved to handle phrases like "quaranta centimetri", "circa 40", etc.
  * @param {string} spoken - The spoken number
  * @returns {number|null} - The parsed number or null
  */
@@ -109,9 +175,18 @@ export const parseSpokenNumber = (spoken) => {
     if (!spoken) return null
 
     const cleaned = spoken.toLowerCase().trim()
+    console.log(`parseSpokenNumber input: "${spoken}" → cleaned: "${cleaned}"`)
+
+    // Remove common filler words
+    const fillerWords = ['centimetri', 'centimetro', 'cm', 'circa', 'quasi', 'più', 'meno', 'e', 'di', 'metri', 'metro']
+    let processedText = cleaned
+    fillerWords.forEach(word => {
+        processedText = processedText.replace(new RegExp(`\\b${word}\\b`, 'g'), ' ')
+    })
+    processedText = processedText.trim()
 
     // Try direct number parsing first
-    const directNum = parseInt(cleaned, 10)
+    const directNum = parseInt(processedText, 10)
     if (!isNaN(directNum) && directNum > 0 && directNum < 500) {
         return directNum
     }
@@ -123,44 +198,54 @@ export const parseSpokenNumber = (spoken) => {
         'dieci': 10, 'undici': 11, 'dodici': 12, 'tredici': 13,
         'quattordici': 14, 'quindici': 15, 'sedici': 16, 'diciassette': 17,
         'diciotto': 18, 'diciannove': 19, 'venti': 20, 'ventuno': 21,
-        'ventidue': 22, 'ventitre': 23, 'ventiquattro': 24, 'venticinque': 25,
+        'ventidue': 22, 'ventitre': 23, 'ventitré': 23, 'ventiquattro': 24, 'venticinque': 25,
         'ventisei': 26, 'ventisette': 27, 'ventotto': 28, 'ventinove': 29,
-        'trenta': 30, 'trentuno': 31, 'trentadue': 32, 'trentatre': 33,
+        'trenta': 30, 'trentuno': 31, 'trentadue': 32, 'trentatre': 33, 'trentatré': 33,
         'trentaquattro': 34, 'trentacinque': 35, 'trentasei': 36,
         'trentasette': 37, 'trentotto': 38, 'trentanove': 39,
-        'quaranta': 40, 'quarantuno': 41, 'quarantadue': 42, 'quarantatre': 43,
+        'quaranta': 40, 'quarantuno': 41, 'quarantadue': 42, 'quarantatre': 43, 'quarantatré': 43,
         'quarantaquattro': 44, 'quarantacinque': 45, 'quarantasei': 46,
         'quarantasette': 47, 'quarantotto': 48, 'quarantanove': 49,
         'cinquanta': 50, 'cinquantuno': 51, 'cinquantadue': 52,
-        'cinquantatre': 53, 'cinquantaquattro': 54, 'cinquantacinque': 55,
+        'cinquantatre': 53, 'cinquantatré': 53, 'cinquantaquattro': 54, 'cinquantacinque': 55,
         'cinquantasei': 56, 'cinquantasette': 57, 'cinquantotto': 58,
         'cinquantanove': 59, 'sessanta': 60, 'sessantuno': 61,
-        'sessantadue': 62, 'sessantatre': 63, 'sessantaquattro': 64,
+        'sessantadue': 62, 'sessantatre': 63, 'sessantatré': 63, 'sessantaquattro': 64,
         'sessantacinque': 65, 'sessantasei': 66, 'sessantasette': 67,
         'sessantotto': 68, 'sessantanove': 69, 'settanta': 70,
-        'settantuno': 71, 'settantadue': 72, 'settantatre': 73,
+        'settantuno': 71, 'settantadue': 72, 'settantatre': 73, 'settantatré': 73,
         'settantaquattro': 74, 'settantacinque': 75, 'settantasei': 76,
         'settantasette': 77, 'settantotto': 78, 'settantanove': 79,
-        'ottanta': 80, 'ottantuno': 81, 'ottantadue': 82, 'ottantatre': 83,
+        'ottanta': 80, 'ottantuno': 81, 'ottantadue': 82, 'ottantatre': 83, 'ottantatré': 83,
         'ottantaquattro': 84, 'ottantacinque': 85, 'ottantasei': 86,
         'ottantasette': 87, 'ottantotto': 88, 'ottantanove': 89,
-        'novanta': 90, 'novantuno': 91, 'novantadue': 92, 'novantatre': 93,
+        'novanta': 90, 'novantuno': 91, 'novantadue': 92, 'novantatre': 93, 'novantatré': 93,
         'novantaquattro': 94, 'novantacinque': 95, 'novantasei': 96,
         'novantasette': 97, 'novantotto': 98, 'novantanove': 99,
         'cento': 100
     }
 
-    // Exact match
-    if (italianNumbers[cleaned] !== undefined) {
-        return italianNumbers[cleaned]
+    // Check each word in the processed text
+    const words = processedText.split(/\s+/)
+    console.log(`parseSpokenNumber words: [${words.join(', ')}]`)
+    for (const word of words) {
+        // Exact match
+        if (italianNumbers[word] !== undefined) {
+            console.log(`parseSpokenNumber exact match: "${word}" → ${italianNumbers[word]}`)
+            return italianNumbers[word]
+        }
     }
 
-    // Fuzzy match for spoken numbers
+    // Fuzzy match for each word
     const numberWords = Object.keys(italianNumbers)
-    const { match, score } = findBestMatch(cleaned, numberWords, 0.7)
+    for (const word of words) {
+        if (word.length < 2) continue
 
-    if (match && italianNumbers[match] !== undefined) {
-        return italianNumbers[match]
+        const { match, score } = findBestMatch(word, numberWords, 0.6)
+        if (match && italianNumbers[match] !== undefined) {
+            console.log(`Fuzzy match: "${word}" → "${match}" (score: ${score})`)
+            return italianNumbers[match]
+        }
     }
 
     // Try to extract number from string (e.g., "circa 40" -> 40)
