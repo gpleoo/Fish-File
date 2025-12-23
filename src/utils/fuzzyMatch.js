@@ -175,6 +175,7 @@ export const parseSpokenNumber = (spoken) => {
     if (!spoken) return null
 
     const cleaned = spoken.toLowerCase().trim()
+    console.log(`parseSpokenNumber input: "${spoken}" → cleaned: "${cleaned}"`)
 
     // Remove common filler words
     const fillerWords = ['centimetri', 'centimetro', 'cm', 'circa', 'quasi', 'più', 'meno', 'e', 'di', 'metri', 'metro']
@@ -226,9 +227,11 @@ export const parseSpokenNumber = (spoken) => {
 
     // Check each word in the processed text
     const words = processedText.split(/\s+/)
+    console.log(`parseSpokenNumber words: [${words.join(', ')}]`)
     for (const word of words) {
         // Exact match
         if (italianNumbers[word] !== undefined) {
+            console.log(`parseSpokenNumber exact match: "${word}" → ${italianNumbers[word]}`)
             return italianNumbers[word]
         }
     }
