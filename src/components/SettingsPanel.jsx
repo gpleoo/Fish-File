@@ -208,20 +208,24 @@ const SettingsPanel = ({ onDataRestored }) => {
             // Request permission
             try {
                 const result = await navigator.permissions.query({ name: 'geolocation' })
-                if (result.state === 'granted' || result.state === 'prompt') {
-                    navigator.geolocation.getCurrentPosition(
-                        () => {
-                            setLocationConsent(true)
-                            localStorage.setItem('consent_location', 'true')
-                            toast.success(t('privacy.consentGranted'))
-                        },
-                        () => {
+                if (result.state === 'denied') {
+                    toast.error(t('privacy.permissionBlocked'), { duration: 5000 })
+                    return
+                }
+                navigator.geolocation.getCurrentPosition(
+                    () => {
+                        setLocationConsent(true)
+                        localStorage.setItem('consent_location', 'true')
+                        toast.success(t('privacy.consentGranted'))
+                    },
+                    (err) => {
+                        if (err.code === err.PERMISSION_DENIED) {
+                            toast.error(t('privacy.permissionBlocked'), { duration: 5000 })
+                        } else {
                             toast.error(t('privacy.consentDenied'))
                         }
-                    )
-                } else {
-                    toast.error(t('privacy.consentDenied'))
-                }
+                    }
+                )
             } catch {
                 // Fallback for browsers without permissions API
                 navigator.geolocation.getCurrentPosition(
@@ -238,7 +242,7 @@ const SettingsPanel = ({ onDataRestored }) => {
         } else {
             setLocationConsent(false)
             localStorage.setItem('consent_location', 'false')
-            toast.info(t('privacy.consentDenied'))
+            toast.info(t('privacy.consentRevoked'))
         }
     }
 
@@ -246,18 +250,30 @@ const SettingsPanel = ({ onDataRestored }) => {
         if (!microphoneConsent) {
             // Request permission
             try {
+                // First check if permission is permanently denied
+                if (navigator.permissions) {
+                    const permStatus = await navigator.permissions.query({ name: 'microphone' })
+                    if (permStatus.state === 'denied') {
+                        toast.error(t('privacy.permissionBlocked'), { duration: 5000 })
+                        return
+                    }
+                }
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
                 stream.getTracks().forEach(track => track.stop())
                 setMicrophoneConsent(true)
                 localStorage.setItem('consent_microphone', 'true')
                 toast.success(t('privacy.consentGranted'))
-            } catch {
-                toast.error(t('privacy.consentDenied'))
+            } catch (err) {
+                if (err.name === 'NotAllowedError') {
+                    toast.error(t('privacy.permissionBlocked'), { duration: 5000 })
+                } else {
+                    toast.error(t('privacy.consentDenied'))
+                }
             }
         } else {
             setMicrophoneConsent(false)
             localStorage.setItem('consent_microphone', 'false')
-            toast.info(t('privacy.consentDenied'))
+            toast.info(t('privacy.consentRevoked'))
         }
     }
 
@@ -645,43 +661,51 @@ const SettingsPanel = ({ onDataRestored }) => {
                                             <p className="text-gray-400 text-xs mb-3">{t('privacy.consents')}</p>
 
                                             {/* Location Consent */}
-                                            <div className="flex items-center justify-between bg-gray-900 rounded-lg p-3 mb-2">
-                                                <div className="flex items-center gap-3">
-                                                    <MapPin className="w-5 h-5 text-green-400" />
-                                                    <div>
-                                                        <p className="text-white text-sm">{t('privacy.locationConsent')}</p>
-                                                        <p className="text-gray-500 text-xs">{t('privacy.locationDescription')}</p>
+                                            <div className="flex items-center justify-between bg-gray-900 rounded-xl p-4 mb-3">
+                                                <div className="flex items-center gap-3 flex-1 mr-4">
+                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${locationConsent ? 'bg-green-500/20' : 'bg-gray-700'}`}>
+                                                        <MapPin className={`w-5 h-5 ${locationConsent ? 'text-green-400' : 'text-gray-400'}`} />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <p className="text-white text-sm font-medium">{t('privacy.locationConsent')}</p>
+                                                        <p className="text-gray-500 text-xs mt-0.5">{t('privacy.locationDescription')}</p>
                                                     </div>
                                                 </div>
                                                 <button
                                                     onClick={handleLocationConsentToggle}
-                                                    className={`w-12 h-6 rounded-full transition-colors ${
-                                                        locationConsent ? 'bg-green-500' : 'bg-gray-600'
+                                                    className={`relative w-14 h-8 rounded-full transition-all duration-300 flex-shrink-0 ${
+                                                        locationConsent
+                                                            ? 'bg-green-500 shadow-lg shadow-green-500/30'
+                                                            : 'bg-gray-600'
                                                     }`}
                                                 >
-                                                    <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
-                                                        locationConsent ? 'translate-x-6' : 'translate-x-0.5'
+                                                    <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300 ${
+                                                        locationConsent ? 'left-7' : 'left-1'
                                                     }`} />
                                                 </button>
                                             </div>
 
                                             {/* Microphone Consent */}
-                                            <div className="flex items-center justify-between bg-gray-900 rounded-lg p-3">
-                                                <div className="flex items-center gap-3">
-                                                    <Mic className="w-5 h-5 text-purple-400" />
-                                                    <div>
-                                                        <p className="text-white text-sm">{t('privacy.microphoneConsent')}</p>
-                                                        <p className="text-gray-500 text-xs">{t('privacy.microphoneDescription')}</p>
+                                            <div className="flex items-center justify-between bg-gray-900 rounded-xl p-4">
+                                                <div className="flex items-center gap-3 flex-1 mr-4">
+                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${microphoneConsent ? 'bg-purple-500/20' : 'bg-gray-700'}`}>
+                                                        <Mic className={`w-5 h-5 ${microphoneConsent ? 'text-purple-400' : 'text-gray-400'}`} />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <p className="text-white text-sm font-medium">{t('privacy.microphoneConsent')}</p>
+                                                        <p className="text-gray-500 text-xs mt-0.5">{t('privacy.microphoneDescription')}</p>
                                                     </div>
                                                 </div>
                                                 <button
                                                     onClick={handleMicrophoneConsentToggle}
-                                                    className={`w-12 h-6 rounded-full transition-colors ${
-                                                        microphoneConsent ? 'bg-green-500' : 'bg-gray-600'
+                                                    className={`relative w-14 h-8 rounded-full transition-all duration-300 flex-shrink-0 ${
+                                                        microphoneConsent
+                                                            ? 'bg-purple-500 shadow-lg shadow-purple-500/30'
+                                                            : 'bg-gray-600'
                                                     }`}
                                                 >
-                                                    <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
-                                                        microphoneConsent ? 'translate-x-6' : 'translate-x-0.5'
+                                                    <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300 ${
+                                                        microphoneConsent ? 'left-7' : 'left-1'
                                                     }`} />
                                                 </button>
                                             </div>

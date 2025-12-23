@@ -367,6 +367,8 @@ const en = {
         deleteCancelled: 'Deletion cancelled',
         consentGranted: 'Consent granted',
         consentDenied: 'Consent denied',
+        consentRevoked: 'Consent revoked',
+        permissionBlocked: 'Permission blocked by browser. Go to site settings (lock icon) to unblock it.',
         consentRequired: 'This permission is required to use this feature',
         lastUpdated: 'Last updated',
         version: 'Version'
