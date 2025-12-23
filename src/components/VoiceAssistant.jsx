@@ -252,16 +252,22 @@ const VoiceAssistant = ({
 
                 case STATES.ASKING_CONFIRM: {
                     if (isAffirmative(spokenText)) {
-                        // Save the catch
-                        onCatchComplete(catchData)
-                        await speak(t('voice.catchRegistered') + ' ' + t('voice.sayNewCatch'))
+                        // First speak, then save (to avoid interruption)
+                        const catchToSave = { ...catchData }
                         setCatchData({ specie: '', lunghezza: '', esca: '' })
                         setState(STATES.WAITING_NEW_CATCH)
+
+                        console.log('Speaking confirmation message...')
+                        await speak(t('voice.catchRegistered') + ' ' + t('voice.sayNewCatch'))
+                        console.log('Confirmation message spoken, saving catch...')
+
+                        // Save the catch after speaking
+                        onCatchComplete(catchToSave)
                         startListening()
                     } else if (isNegative(spokenText)) {
-                        await speak(t('voice.cancelled') + ' ' + t('voice.sayNewCatch'))
                         setCatchData({ specie: '', lunghezza: '', esca: '' })
                         setState(STATES.WAITING_NEW_CATCH)
+                        await speak(t('voice.cancelled') + ' ' + t('voice.sayNewCatch'))
                         startListening()
                     } else {
                         await speak(t('voice.yesOrNo'))
