@@ -26,9 +26,9 @@ npm-debug.log*
 # Cache
 .cache/
 
-# Capacitor native platforms (generated)
-ios/
-android/
+# Capacitor native platforms - tracked for custom permissions
+# ios/
+# android/
 
 # Capacitor plugins cache
 .capacitor/

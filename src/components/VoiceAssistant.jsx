@@ -7,6 +7,14 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Mic, MicOff, X, Volume2 } from './Icons'
 import { useTranslation } from '../locales/LanguageContext'
 import { findBestMatchInPhrase, parseSpokenNumber, isAffirmative, isNegative, isNewCatch } from '../utils/fuzzyMatch'
+import {
+    isNative,
+    requestSpeechPermission,
+    startSpeechRecognition,
+    stopSpeechRecognition,
+    isSpeechRecognitionAvailable
+} from '../utils/native'
+import { SpeechRecognition } from '@capacitor-community/speech-recognition'
 
 // States for the voice assistant flow
 const STATES = {
@@ -40,6 +48,7 @@ const VoiceAssistant = ({
         lunghezza: '',
         esca: ''
     })
+    const [useNativeRecognition, setUseNativeRecognition] = useState(false)
 
     // Refs
     const recognitionRef = useRef(null)
@@ -116,47 +125,75 @@ const VoiceAssistant = ({
     }, [getFemaleVoice])
 
     /**
-     * Initialize speech recognition
+     * Initialize speech recognition (native or web)
      */
-    const initRecognition = useCallback(() => {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    const initRecognition = useCallback(async () => {
+        // Check if native speech recognition is available
+        if (isNative()) {
+            try {
+                const available = await isSpeechRecognitionAvailable()
+                if (available) {
+                    const hasPermission = await requestSpeechPermission()
+                    if (hasPermission) {
+                        console.log('Using native speech recognition')
+                        setUseNativeRecognition(true)
+                        return { native: true }
+                    }
+                }
+            } catch (error) {
+                console.log('Native speech not available, falling back to web:', error)
+            }
+        }
 
-        if (!SpeechRecognition) {
+        // Fallback to web Speech API
+        const WebSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+
+        if (!WebSpeechRecognition) {
             setStatusMessage(t('voice.notSupported'))
             return null
         }
 
-        const recognition = new SpeechRecognition()
+        const recognition = new WebSpeechRecognition()
         recognition.lang = 'it-IT'
         recognition.continuous = false
         recognition.interimResults = false
         recognition.maxAlternatives = 3
 
+        setUseNativeRecognition(false)
         return recognition
     }, [t])
 
     /**
      * Start listening for voice input
      */
-    const startListening = useCallback(() => {
-        if (!recognitionRef.current) return
-
+    const startListening = useCallback(async () => {
         try {
             setIsListening(true)
             setTranscript('')
-            recognitionRef.current.start()
-            console.log('startListening: microphone started')
+
+            if (useNativeRecognition) {
+                // Use native Capacitor speech recognition
+                await startSpeechRecognition({ language: 'it-IT' })
+                console.log('startListening: native microphone started')
+            } else if (recognitionRef.current) {
+                // Use web Speech API
+                recognitionRef.current.start()
+                console.log('startListening: web microphone started')
+            }
         } catch (error) {
             console.error('Recognition start error:', error)
             setIsListening(false)
         }
-    }, [])
+    }, [useNativeRecognition])
 
     /**
      * Stop listening
      */
-    const stopListening = useCallback(() => {
-        if (recognitionRef.current) {
+    const stopListening = useCallback(async () => {
+        if (useNativeRecognition) {
+            // Stop native recognition
+            await stopSpeechRecognition()
+        } else if (recognitionRef.current) {
             try {
                 recognitionRef.current.stop()
             } catch (e) {
@@ -164,7 +201,7 @@ const VoiceAssistant = ({
             }
         }
         setIsListening(false)
-    }, [])
+    }, [useNativeRecognition])
 
     /**
      * Process speech result based on current state
@@ -307,45 +344,89 @@ const VoiceAssistant = ({
     useEffect(() => {
         if (!isOpen) return
 
-        const recognition = initRecognition()
-        if (!recognition) return
+        let nativeListenerCleanup = null
 
-        recognitionRef.current = recognition
+        const setupRecognition = async () => {
+            const recognition = await initRecognition()
+            if (!recognition) return
 
-        recognition.onresult = (event) => {
-            const results = event.results[0]
-            const spokenText = results[0].transcript
-            console.log(`Speech recognition result: "${spokenText}" (state: ${currentStateRef.current})`)
-            setTranscript(spokenText)
-            processResult(spokenText)
-        }
+            // Check if using native recognition
+            if (recognition.native) {
+                // Setup native Capacitor speech recognition listeners
+                const resultListener = await SpeechRecognition.addListener('result', (event) => {
+                    const spokenText = event.matches?.[0] || ''
+                    console.log(`Native speech result: "${spokenText}" (state: ${currentStateRef.current})`)
+                    setTranscript(spokenText)
+                    processResult(spokenText)
+                })
 
-        recognition.onerror = (event) => {
-            console.error('Recognition error:', event.error)
-            setIsListening(false)
+                const errorListener = await SpeechRecognition.addListener('error', (event) => {
+                    console.error('Native recognition error:', event.message)
+                    setIsListening(false)
+                })
 
-            if (event.error === 'no-speech') {
-                // Restart listening if no speech detected
-                if (currentStateRef.current !== STATES.IDLE && currentStateRef.current !== STATES.ERROR) {
-                    setTimeout(() => startListening(), 500)
+                const stateListener = await SpeechRecognition.addListener('listeningState', (event) => {
+                    if (event.status === 'stopped') {
+                        setIsListening(false)
+                        // Auto-restart if needed
+                        if (currentStateRef.current !== STATES.IDLE &&
+                            currentStateRef.current !== STATES.ERROR &&
+                            !isProcessingRef.current) {
+                            console.log('Native: Auto-restarting listening...')
+                            setTimeout(() => startListening(), 300)
+                        }
+                    }
+                })
+
+                nativeListenerCleanup = () => {
+                    resultListener.remove()
+                    errorListener.remove()
+                    stateListener.remove()
+                }
+            } else {
+                // Setup web Speech API handlers
+                recognitionRef.current = recognition
+
+                recognition.onresult = (event) => {
+                    const results = event.results[0]
+                    const spokenText = results[0].transcript
+                    console.log(`Web speech result: "${spokenText}" (state: ${currentStateRef.current})`)
+                    setTranscript(spokenText)
+                    processResult(spokenText)
+                }
+
+                recognition.onerror = (event) => {
+                    console.error('Web recognition error:', event.error)
+                    setIsListening(false)
+
+                    if (event.error === 'no-speech') {
+                        if (currentStateRef.current !== STATES.IDLE && currentStateRef.current !== STATES.ERROR) {
+                            setTimeout(() => startListening(), 500)
+                        }
+                    }
+                }
+
+                recognition.onend = () => {
+                    setIsListening(false)
+                    console.log(`recognition.onend - state: ${currentStateRef.current}, isProcessing: ${isProcessingRef.current}`)
+
+                    if (currentStateRef.current !== STATES.IDLE &&
+                        currentStateRef.current !== STATES.ERROR &&
+                        !isProcessingRef.current) {
+                        console.log('Web: Auto-restarting listening...')
+                        setTimeout(() => startListening(), 300)
+                    }
                 }
             }
         }
 
-        recognition.onend = () => {
-            setIsListening(false)
-            console.log(`recognition.onend - state: ${currentStateRef.current}, isProcessing: ${isProcessingRef.current}`)
-
-            // Auto-restart listening if we're in a state that needs it
-            if (currentStateRef.current !== STATES.IDLE &&
-                currentStateRef.current !== STATES.ERROR &&
-                !isProcessingRef.current) {
-                console.log('Auto-restarting listening...')
-                setTimeout(() => startListening(), 300)
-            }
-        }
+        setupRecognition()
 
         return () => {
+            if (nativeListenerCleanup) {
+                nativeListenerCleanup()
+                stopSpeechRecognition()
+            }
             if (recognitionRef.current) {
                 try {
                     recognitionRef.current.stop()

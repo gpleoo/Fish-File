@@ -9,6 +9,9 @@ import { StatusBar, Style } from '@capacitor/status-bar'
 import { Geolocation } from '@capacitor/geolocation'
 import { Share } from '@capacitor/share'
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
+import { App } from '@capacitor/app'
+import { SpeechRecognition } from '@capacitor-community/speech-recognition'
 
 // Check if running on native platform
 export const isNative = () => Capacitor.isNativePlatform()
@@ -140,12 +143,223 @@ export const readDataFromFile = async (filename) => {
     }
 }
 
+// Camera - take photo
+export const takePhoto = async () => {
+    try {
+        // Request permissions on native
+        if (isNative()) {
+            const permissions = await Camera.requestPermissions()
+            if (permissions.camera !== 'granted') {
+                throw new Error('Permesso fotocamera negato')
+            }
+        }
+
+        const photo = await Camera.getPhoto({
+            quality: 90,
+            allowEditing: false,
+            resultType: CameraResultType.DataUrl,
+            source: CameraSource.Camera,
+            saveToGallery: true,
+            correctOrientation: true
+        })
+
+        return photo.dataUrl
+    } catch (error) {
+        console.error('Camera error:', error)
+        throw error
+    }
+}
+
+// Camera - pick from gallery
+export const pickFromGallery = async () => {
+    try {
+        if (isNative()) {
+            const permissions = await Camera.requestPermissions()
+            if (permissions.photos !== 'granted') {
+                throw new Error('Permesso galleria negato')
+            }
+        }
+
+        const photo = await Camera.getPhoto({
+            quality: 90,
+            allowEditing: false,
+            resultType: CameraResultType.DataUrl,
+            source: CameraSource.Photos,
+            correctOrientation: true
+        })
+
+        return photo.dataUrl
+    } catch (error) {
+        console.error('Gallery error:', error)
+        throw error
+    }
+}
+
+// Camera - choose source (camera or gallery)
+export const getPhoto = async (useCamera = true) => {
+    if (useCamera) {
+        return await takePhoto()
+    } else {
+        return await pickFromGallery()
+    }
+}
+
+// App lifecycle listeners
+let backButtonListeners = []
+let pauseListeners = []
+let resumeListeners = []
+
+export const onBackButton = (callback) => {
+    backButtonListeners.push(callback)
+    return () => {
+        backButtonListeners = backButtonListeners.filter(cb => cb !== callback)
+    }
+}
+
+export const onAppPause = (callback) => {
+    pauseListeners.push(callback)
+    return () => {
+        pauseListeners = pauseListeners.filter(cb => cb !== callback)
+    }
+}
+
+export const onAppResume = (callback) => {
+    resumeListeners.push(callback)
+    return () => {
+        resumeListeners = resumeListeners.filter(cb => cb !== callback)
+    }
+}
+
+// Speech Recognition - check if available
+export const isSpeechRecognitionAvailable = async () => {
+    try {
+        const { available } = await SpeechRecognition.available()
+        return available
+    } catch {
+        return false
+    }
+}
+
+// Speech Recognition - request permissions
+export const requestSpeechPermission = async () => {
+    try {
+        if (isNative()) {
+            const { speechRecognition } = await SpeechRecognition.requestPermissions()
+            return speechRecognition === 'granted'
+        }
+        return true // Web doesn't need explicit permission request
+    } catch (error) {
+        console.error('Speech permission error:', error)
+        return false
+    }
+}
+
+// Speech Recognition - start listening
+export const startSpeechRecognition = async (options = {}) => {
+    try {
+        const defaultOptions = {
+            language: 'it-IT',
+            maxResults: 3,
+            prompt: 'Parla ora...',
+            partialResults: false,
+            popup: false
+        }
+
+        await SpeechRecognition.start({ ...defaultOptions, ...options })
+        return true
+    } catch (error) {
+        console.error('Start speech recognition error:', error)
+        throw error
+    }
+}
+
+// Speech Recognition - stop listening
+export const stopSpeechRecognition = async () => {
+    try {
+        await SpeechRecognition.stop()
+        return true
+    } catch (error) {
+        console.error('Stop speech recognition error:', error)
+        return false
+    }
+}
+
+// Speech Recognition - add listener for results
+let speechResultListeners = []
+
+export const onSpeechResult = (callback) => {
+    speechResultListeners.push(callback)
+    return () => {
+        speechResultListeners = speechResultListeners.filter(cb => cb !== callback)
+    }
+}
+
+// Speech Recognition - add listener for partial results
+let speechPartialListeners = []
+
+export const onSpeechPartialResult = (callback) => {
+    speechPartialListeners.push(callback)
+    return () => {
+        speechPartialListeners = speechPartialListeners.filter(cb => cb !== callback)
+    }
+}
+
+// Speech Recognition - initialize listeners (call once at app start)
+export const initSpeechRecognitionListeners = () => {
+    if (isNative()) {
+        SpeechRecognition.addListener('partialResults', (data) => {
+            speechPartialListeners.forEach(cb => cb(data.matches || []))
+        })
+
+        SpeechRecognition.addListener('listeningState', (data) => {
+            if (data.status === 'stopped') {
+                // Recognition stopped, get final results
+            }
+        })
+    }
+}
+
+// Speech Recognition - get supported languages
+export const getSpeechLanguages = async () => {
+    try {
+        const { languages } = await SpeechRecognition.getSupportedLanguages()
+        return languages
+    } catch {
+        return ['it-IT', 'en-US'] // Fallback
+    }
+}
+
 // Initialize native features on app start
 export const initNativeFeatures = async () => {
     if (isNative()) {
         try {
             await setStatusBarDark()
             console.log(`Running on ${getPlatform()}`)
+
+            // Initialize speech recognition listeners
+            initSpeechRecognitionListeners()
+
+            // Setup back button handler (Android)
+            App.addListener('backButton', ({ canGoBack }) => {
+                if (backButtonListeners.length > 0) {
+                    // Call all registered listeners
+                    backButtonListeners.forEach(cb => cb(canGoBack))
+                } else if (canGoBack) {
+                    window.history.back()
+                } else {
+                    App.exitApp()
+                }
+            })
+
+            // Setup app state listeners
+            App.addListener('appStateChange', ({ isActive }) => {
+                if (isActive) {
+                    resumeListeners.forEach(cb => cb())
+                } else {
+                    pauseListeners.forEach(cb => cb())
+                }
+            })
+
         } catch (error) {
             console.error('Init native features error:', error)
         }
