@@ -311,6 +311,38 @@ const it = {
         installButton: 'Installa Fish File',
         installHint: 'Aggiungi l\'app alla schermata home per un accesso rapido',
         appInstalled: 'App installata con successo!'
+    },
+
+    // Voice Assistant
+    voice: {
+        title: 'Assistente Vocale',
+        button: 'Assistente Vocale',
+        notSupported: 'Il riconoscimento vocale non è supportato su questo browser',
+        starting: 'Avvio assistente...',
+        welcome: 'Ciao! Iniziamo a registrare la cattura.',
+        askSpecies: 'Specie?',
+        askLength: 'Lunghezza?',
+        askBait: 'Esca?',
+        askConfirm: 'Registra cattura?',
+        waitingSpecies: 'In attesa della specie...',
+        waitingLength: 'In attesa della lunghezza...',
+        waitingBait: 'In attesa dell\'esca...',
+        waitingConfirm: 'Rispondi sì o no',
+        waitingNewCatch: 'Di "nuova cattura" per continuare',
+        listening: 'In ascolto...',
+        speaking: 'Sto parlando...',
+        waiting: 'In attesa...',
+        heard: 'Ho sentito',
+        currentData: 'Dati correnti',
+        notUnderstood: 'Non ho capito.',
+        fillManually: 'Compila manualmente',
+        catchRegistered: 'Cattura registrata!',
+        sayNewCatch: 'Di "nuova cattura" per continuare',
+        cancelled: 'Annullato.',
+        yesOrNo: 'Rispondi sì o no',
+        attempt: 'Tentativo',
+        error: 'Errore - compila manualmente',
+        closeAndFillManually: 'Chiudi e compila manualmente'
     }
 }
 

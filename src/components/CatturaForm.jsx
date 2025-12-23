@@ -1,10 +1,11 @@
-import React, { useCallback } from 'react'
-import { Fish } from './Icons'
+import React, { useState, useCallback } from 'react'
+import { Fish, Mic } from './Icons'
 import Section from './Section'
 import InputField from './InputField'
 import SelectField from './SelectField'
-import VoiceInput from './VoiceInput'
+import VoiceAssistant from './VoiceAssistant'
 import { useTranslation } from '../locales/LanguageContext'
+import { useToast } from './Toast'
 
 const CatturaForm = ({
     activeSection,
@@ -23,14 +24,28 @@ const CatturaForm = ({
     aggiungiCattura
 }) => {
     const { t } = useTranslation()
+    const toast = useToast()
+    const [showVoiceAssistant, setShowVoiceAssistant] = useState(false)
 
-    // Handler per risultato input vocale
-    const handleVoiceResult = useCallback((parsedData, rawText) => {
+    // Handler per cattura completata dall'assistente vocale
+    const handleVoiceCatchComplete = useCallback((catchData) => {
+        // Ottieni data e ora correnti
+        const now = new Date()
+        const data = now.toISOString().split('T')[0]
+        const ora = now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', hour12: false })
+
         setNuovaCattura(prev => ({
             ...prev,
-            ...parsedData
+            specie: catchData.specie,
+            lunghezza: catchData.lunghezza,
+            esca: catchData.esca,
+            data: data,
+            ora: ora
         }))
-    }, [setNuovaCattura])
+
+        // Chiama aggiungiCattura se disponibile
+        toast.success(t('voice.catchRegistered'))
+    }, [setNuovaCattura, toast, t])
 
     return (
         <Section
@@ -46,11 +61,22 @@ const CatturaForm = ({
                 </p>
             </div>
 
-            {/* Input vocale */}
-            <VoiceInput
-                onResult={handleVoiceResult}
-                specieDisponibili={specieMemorizzate}
-                escheDisponibili={escheMemorizzate}
+            {/* Pulsante Assistente Vocale */}
+            <button
+                onClick={() => setShowVoiceAssistant(true)}
+                className="w-full mb-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-lg font-bold flex items-center justify-center gap-2 active:opacity-80 transition-opacity"
+            >
+                <Mic className="w-5 h-5" />
+                {t('voice.button')}
+            </button>
+
+            {/* Modal Assistente Vocale */}
+            <VoiceAssistant
+                isOpen={showVoiceAssistant}
+                onClose={() => setShowVoiceAssistant(false)}
+                specieMemorizzate={specieMemorizzate}
+                escheMemorizzate={escheMemorizzate}
+                onCatchComplete={handleVoiceCatchComplete}
             />
 
             {/* Campi data e ora */}
