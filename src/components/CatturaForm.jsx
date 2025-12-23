@@ -29,23 +29,16 @@ const CatturaForm = ({
 
     // Handler per cattura completata dall'assistente vocale
     const handleVoiceCatchComplete = useCallback((catchData) => {
-        // Ottieni data e ora correnti
-        const now = new Date()
-        const data = now.toISOString().split('T')[0]
-        const ora = now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', hour12: false })
+        console.log('Voice catch complete:', catchData)
 
-        setNuovaCattura(prev => ({
-            ...prev,
-            specie: catchData.specie,
-            lunghezza: catchData.lunghezza,
-            esca: catchData.esca,
-            data: data,
-            ora: ora
-        }))
+        // Chiama aggiungiCattura passando i dati vocali direttamente
+        const success = aggiungiCattura(catchData)
 
-        // Chiama aggiungiCattura se disponibile
-        toast.success(t('voice.catchRegistered'))
-    }, [setNuovaCattura, toast, t])
+        if (!success) {
+            // Se fallisce (es. nessuna sessione attiva), mostra errore
+            console.log('Voice catch failed - no active session?')
+        }
+    }, [aggiungiCattura])
 
     return (
         <Section
