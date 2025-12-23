@@ -139,12 +139,13 @@ const VoiceAssistant = ({
      * Start listening for voice input
      */
     const startListening = useCallback(() => {
-        if (!recognitionRef.current || isProcessingRef.current) return
+        if (!recognitionRef.current) return
 
         try {
             setIsListening(true)
             setTranscript('')
             recognitionRef.current.start()
+            console.log('startListening: microphone started')
         } catch (error) {
             console.error('Recognition start error:', error)
             setIsListening(false)
