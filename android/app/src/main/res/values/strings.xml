@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Fish File</string>
+    <string name="title_activity_main">Fish File</string>
+    <string name="package_name">com.fishfile.app</string>
+    <string name="custom_url_scheme">com.fishfile.app</string>
+</resources>
