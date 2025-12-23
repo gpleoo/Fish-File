@@ -47,7 +47,7 @@ const calculateOffset = (index, total) => {
 
     // Disposizione a cerchio per marker sovrapposti
     const angle = (2 * Math.PI * index) / total
-    const radius = 0.0008 * Math.ceil(total / 6) // ~80m per livello
+    const radius = 0.0002 * Math.ceil(total / 6) // ~22m per livello
 
     return {
         lat: Math.cos(angle) * radius,
