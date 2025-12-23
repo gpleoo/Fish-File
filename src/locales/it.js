@@ -366,6 +366,8 @@ const it = {
         deleteCancelled: 'Eliminazione annullata',
         consentGranted: 'Consenso concesso',
         consentDenied: 'Consenso negato',
+        consentRevoked: 'Consenso revocato',
+        permissionBlocked: 'Permesso bloccato dal browser. Vai nelle impostazioni del sito (icona lucchetto) per sbloccarlo.',
         consentRequired: 'Questo permesso è necessario per usare questa funzionalità',
         lastUpdated: 'Ultimo aggiornamento',
         version: 'Versione'
