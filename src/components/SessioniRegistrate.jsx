@@ -190,9 +190,9 @@ const SessioniRegistrate = ({ sessioni, catture, onDeleteSessione, filtri }) => 
                                             <div className="mt-2">
                                                 <p className="text-gray-400 text-xs mb-1.5 sm:mb-2">{t('map.catches')}:</p>
                                                 <div className="flex flex-wrap gap-1">
-                                                    {cattureSessione.map((c, idx) => (
+                                                    {cattureSessione.map((c) => (
                                                         <span
-                                                            key={idx}
+                                                            key={c.id || `${c.specie}-${c.data}-${c.ora}`}
                                                             className="bg-gray-800 text-gray-300 px-2 py-1 rounded text-xs"
                                                         >
                                                             {c.specie} {c.peso ? `(${c.peso}g)` : ''}
