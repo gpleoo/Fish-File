@@ -22,7 +22,7 @@ const SPONSORS_DATA = {
     associations: [
         {
             name: 'LR Surfcasting Academy',
-            description: 'Accademia dedicata alla formazione e promozione del surfcasting sportivo. Corsi per principianti e avanzati, eventi e raduni lungo le coste italiane.',
+            description: 'Accademia dedicata alla formazione e promozione del surfcasting sportivo. Corsi per principianti intermedi e avanzati, eventi e raduni lungo le coste italiane.',
             website: 'https://www.lrsurfcasting.it',
             email: 'academy@lrsurfcasting.it',
             phone: '+39 333 9876 543'
