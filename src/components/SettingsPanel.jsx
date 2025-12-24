@@ -279,24 +279,31 @@ const SettingsPanel = ({ onDataRestored }) => {
         if (!microphoneConsent) {
             // Request permission
             try {
-                // First check if permission is permanently denied
-                if (navigator.permissions) {
-                    const permStatus = await navigator.permissions.query({ name: 'microphone' })
-                    if (permStatus.state === 'denied') {
-                        toast.error(t('privacy.permissionBlocked'), { duration: 5000 })
-                        return
-                    }
+                // Check if mediaDevices is available
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    toast.error('Il tuo browser non supporta l\'accesso al microfono')
+                    return
                 }
+
+                // Try to get microphone access directly
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
                 stream.getTracks().forEach(track => track.stop())
                 setMicrophoneConsent(true)
+                setMicrophoneBlocked(false)
                 localStorage.setItem('consent_microphone', 'true')
                 toast.success(t('privacy.consentGranted'))
             } catch (err) {
-                if (err.name === 'NotAllowedError') {
+                console.error('Microphone permission error:', err.name, err.message)
+
+                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    setMicrophoneBlocked(true)
                     toast.error(t('privacy.permissionBlocked'), { duration: 5000 })
+                } else if (err.name === 'NotFoundError') {
+                    toast.error('Nessun microfono trovato sul dispositivo')
+                } else if (err.name === 'NotReadableError' || err.name === 'AbortError') {
+                    toast.error('Microfono già in uso da un\'altra applicazione')
                 } else {
-                    toast.error(t('privacy.consentDenied'))
+                    toast.error(`Errore microfono: ${err.message || err.name}`)
                 }
             }
         } else {
