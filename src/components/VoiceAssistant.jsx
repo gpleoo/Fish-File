@@ -87,8 +87,8 @@ const VoiceAssistant = ({
         const italianVoice = voices.find(v => v.lang.startsWith('it'))
         if (italianVoice) return italianVoice
 
-        // Fallback to default
-        return voices[0]
+        // Fallback to default (may be undefined if no voices)
+        return voices[0] || null
     }, [])
 
     /**
