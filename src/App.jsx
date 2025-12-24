@@ -4,7 +4,7 @@
  * Tutti i diritti riservati.
  */
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
 
 // Components
@@ -166,6 +166,13 @@ function App() {
         altaMareaOra: '', bassaMareaOra: '', altezzaOnde: '', frequenzaOnde: ''
     })
 
+    // Ref to track if component is mounted (for async operations)
+    const isMountedRef = useRef(true)
+    useEffect(() => {
+        isMountedRef.current = true
+        return () => { isMountedRef.current = false }
+    }, [])
+
     // Effects - Salvataggio localStorage
     useEffect(() => { localStorage.setItem('diarioPesca_catture', JSON.stringify(catture)) }, [catture])
     useEffect(() => { localStorage.setItem('diarioPesca_specie', JSON.stringify(specieMemorizzate)) }, [specieMemorizzate])
@@ -232,6 +239,9 @@ function App() {
             parseFloat(datiSessione.latitudine),
             parseFloat(datiSessione.longitudine)
         )
+
+        // Check if component is still mounted before updating state
+        if (!isMountedRef.current) return
 
         if (result.success && result.data) {
             setMeteo(prev => ({
@@ -311,6 +321,9 @@ function App() {
         toast.info('Recupero dati meteo...')
 
         const result = await fetchWeatherData(lat, lng)
+
+        // Check if component is still mounted before updating state
+        if (!isMountedRef.current) return
 
         if (result.success && result.data) {
             setMeteo(prev => ({
