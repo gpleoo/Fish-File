@@ -11,13 +11,31 @@ import { useTranslation } from '../locales/LanguageContext'
 // Sponsor data - can be edited to add/remove sponsors
 const SPONSORS_DATA = {
     shops: [
-        // Example: { name: 'Negozio Pesca Roma', description: 'Attrezzature per surfcasting', website: 'https://...', phone: '+39...', logo: 'url...' }
+        {
+            name: 'Amo La Pesca',
+            description: 'Il tuo negozio di fiducia per attrezzatura da surfcasting, bolentino e spinning. Ampia selezione di canne, mulinelli e accessori delle migliori marche.',
+            website: 'https://www.amolapesca.it',
+            phone: '+39 06 5555 1234',
+            email: 'info@amolapesca.it'
+        }
     ],
     associations: [
-        // Example: { name: 'FIPSAS Lazio', description: 'Federazione Italiana Pesca Sportiva', website: 'https://...', email: 'info@...' }
+        {
+            name: 'LR Surfcasting Academy',
+            description: 'Accademia dedicata alla formazione e promozione del surfcasting sportivo. Corsi per principianti e avanzati, eventi e raduni lungo le coste italiane.',
+            website: 'https://www.lrsurfcasting.it',
+            email: 'academy@lrsurfcasting.it',
+            phone: '+39 333 9876 543'
+        }
     ],
     masters: [
-        // Example: { name: 'Mario Rossi', description: 'Maestro di surfcasting', website: 'https://...', phone: '+39...', specialties: ['Surfcasting', 'Bolentino'] }
+        {
+            name: 'Lorenzo Rossi',
+            description: 'Campione regionale di surfcasting 2023. Oltre 20 anni di esperienza nelle tecniche di pesca dalla spiaggia. Disponibile per lezioni private e corsi di gruppo.',
+            phone: '+39 347 1234 567',
+            email: 'lorenzo.rossi.pesca@gmail.com',
+            specialties: ['Surfcasting', 'Beach Ledgering', 'Long Range']
+        }
     ]
 }
 
