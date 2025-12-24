@@ -176,7 +176,14 @@ const SettingsPanel = ({ onDataRestored }) => {
             toast.error(t('backup.restoreError'))
         } finally {
             setIsLoading(false)
-            event.target.value = ''
+            // Reset input to allow re-importing same file
+            try {
+                event.target.value = ''
+            } catch (e) {
+                // Fallback for browsers that don't allow direct value reset
+                event.target.type = 'text'
+                event.target.type = 'file'
+            }
         }
     }
 
