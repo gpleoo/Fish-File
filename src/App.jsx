@@ -14,6 +14,7 @@ import CatturaForm from './components/CatturaForm'
 import MeteoForm from './components/MeteoForm'
 import ListaGestione from './components/ListaGestione'
 import AnalisiDati from './components/AnalisiDati'
+import SponsorSection from './components/SponsorSection'
 import SettingsPanel from './components/SettingsPanel'
 import { useToast } from './components/Toast'
 import { Wrench } from './components/Icons'
@@ -611,6 +612,12 @@ function App() {
                         specieMemorizzate={specieMemorizzate}
                         escheMemorizzate={escheMemorizzate}
                         onImportaDati={importaDati}
+                    />
+
+                    {/* Sezione Sponsor */}
+                    <SponsorSection
+                        activeSection={activeSection}
+                        setActiveSection={setActiveSection}
                     />
 
                     {/* Footer */}

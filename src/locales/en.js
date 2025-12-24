@@ -372,6 +372,23 @@ const en = {
         consentRequired: 'This permission is required to use this feature',
         lastUpdated: 'Last updated',
         version: 'Version'
+    },
+
+    // Sponsors
+    sponsors: {
+        title: 'partners & sponsors',
+        description: 'Our partners who support Fish File and the fishing community',
+        shops: 'Fishing Shops',
+        associations: 'Associations',
+        masters: 'Fishing Masters',
+        noShops: 'No partner shops at the moment',
+        noAssociations: 'No partner associations at the moment',
+        noMasters: 'No partner masters at the moment',
+        becomeSponsor: 'Want to become a Fish File partner?',
+        contactUs: 'Contact us',
+        website: 'Website',
+        call: 'Call',
+        email: 'Email'
     }
 }
 
