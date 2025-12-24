@@ -135,13 +135,12 @@ const VoiceAssistant = ({
                 if (available) {
                     const hasPermission = await requestSpeechPermission()
                     if (hasPermission) {
-                        console.log('Using native speech recognition')
                         setUseNativeRecognition(true)
                         return { native: true }
                     }
                 }
             } catch (error) {
-                console.log('Native speech not available, falling back to web:', error)
+                // Fall back to web speech
             }
         }
 
@@ -174,11 +173,9 @@ const VoiceAssistant = ({
             if (useNativeRecognition) {
                 // Use native Capacitor speech recognition
                 await startSpeechRecognition({ language: 'it-IT' })
-                console.log('startListening: native microphone started')
             } else if (recognitionRef.current) {
                 // Use web Speech API
                 recognitionRef.current.start()
-                console.log('startListening: web microphone started')
             }
         } catch (error) {
             console.error('Recognition start error:', error)
@@ -207,15 +204,12 @@ const VoiceAssistant = ({
      * Process speech result based on current state
      */
     const processResult = useCallback(async (spokenText) => {
-        console.log(`processResult called with: "${spokenText}", isProcessing: ${isProcessingRef.current}`)
         if (isProcessingRef.current) {
-            console.log('processResult SKIPPED - already processing')
             return
         }
         isProcessingRef.current = true
 
         const currentState = currentStateRef.current
-        console.log(`processResult processing state: ${currentState}`)
 
         try {
             switch (currentState) {
@@ -242,9 +236,7 @@ const VoiceAssistant = ({
                 }
 
                 case STATES.ASKING_LENGTH: {
-                    console.log(`ASKING_LENGTH - received: "${spokenText}"`)
                     const length = parseSpokenNumber(spokenText)
-                    console.log(`ASKING_LENGTH - parsed length: ${length}`)
                     if (length !== null) {
                         setCatchData(prev => ({ ...prev, lunghezza: length.toString() }))
                         setAttempts(0)
@@ -291,18 +283,13 @@ const VoiceAssistant = ({
                     if (isAffirmative(spokenText)) {
                         // First speak, then save (to avoid interruption)
                         const catchToSave = { ...catchData }
-                        console.log('CONFIRM: catchData before reset:', JSON.stringify(catchData))
-                        console.log('CONFIRM: catchToSave:', JSON.stringify(catchToSave))
 
                         setCatchData({ specie: '', lunghezza: '', esca: '' })
                         setState(STATES.WAITING_NEW_CATCH)
 
-                        console.log('Speaking confirmation message...')
                         await speak(t('voice.catchRegistered') + ' ' + t('voice.sayNewCatch'))
-                        console.log('Confirmation message spoken, saving catch...')
 
                         // Save the catch after speaking
-                        console.log('Calling onCatchComplete with:', JSON.stringify(catchToSave))
                         onCatchComplete(catchToSave)
                         startListening()
                     } else if (isNegative(spokenText)) {
@@ -355,7 +342,6 @@ const VoiceAssistant = ({
                 // Setup native Capacitor speech recognition listeners
                 const resultListener = await SpeechRecognition.addListener('result', (event) => {
                     const spokenText = event.matches?.[0] || ''
-                    console.log(`Native speech result: "${spokenText}" (state: ${currentStateRef.current})`)
                     setTranscript(spokenText)
                     processResult(spokenText)
                 })
@@ -372,7 +358,6 @@ const VoiceAssistant = ({
                         if (currentStateRef.current !== STATES.IDLE &&
                             currentStateRef.current !== STATES.ERROR &&
                             !isProcessingRef.current) {
-                            console.log('Native: Auto-restarting listening...')
                             setTimeout(() => startListening(), 300)
                         }
                     }
@@ -390,7 +375,6 @@ const VoiceAssistant = ({
                 recognition.onresult = (event) => {
                     const results = event.results[0]
                     const spokenText = results[0].transcript
-                    console.log(`Web speech result: "${spokenText}" (state: ${currentStateRef.current})`)
                     setTranscript(spokenText)
                     processResult(spokenText)
                 }
@@ -408,12 +392,10 @@ const VoiceAssistant = ({
 
                 recognition.onend = () => {
                     setIsListening(false)
-                    console.log(`recognition.onend - state: ${currentStateRef.current}, isProcessing: ${isProcessingRef.current}`)
 
                     if (currentStateRef.current !== STATES.IDLE &&
                         currentStateRef.current !== STATES.ERROR &&
                         !isProcessingRef.current) {
-                        console.log('Web: Auto-restarting listening...')
                         setTimeout(() => startListening(), 300)
                     }
                 }
