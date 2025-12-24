@@ -29,20 +29,12 @@ const CatturaForm = ({
 
     // Handler per cattura completata dall'assistente vocale
     const handleVoiceCatchComplete = useCallback((catchData) => {
-        console.log('=== handleVoiceCatchComplete CALLED ===')
-        console.log('Received catchData:', JSON.stringify(catchData))
-
         // Chiama aggiungiCattura passando i dati vocali direttamente
         const success = aggiungiCattura(catchData)
 
-        console.log('aggiungiCattura returned:', success)
-
         if (!success) {
             // Se fallisce (es. nessuna sessione attiva), mostra errore
-            console.log('Voice catch FAILED - check session or data')
             toast.error('Errore nel salvataggio della cattura')
-        } else {
-            console.log('Voice catch SAVED successfully')
         }
     }, [aggiungiCattura, toast])
 

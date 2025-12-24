@@ -325,13 +325,7 @@ function App() {
         const isVoiceData = voiceCatchData && typeof voiceCatchData === 'object' && 'specie' in voiceCatchData
         const actualVoiceData = isVoiceData ? voiceCatchData : null
 
-        console.log('=== aggiungiCattura CALLED ===')
-        console.log('isVoiceData:', isVoiceData)
-        console.log('actualVoiceData:', actualVoiceData ? JSON.stringify(actualVoiceData) : 'null')
-        console.log('sessioneAttiva:', sessioneAttiva)
-
         if (!sessioneAttiva) {
-            console.log('FAILED: No active session')
             setMessaggioErrore('Avvia prima una sessione di pesca')
             return false
         }
@@ -346,10 +340,7 @@ function App() {
             ora: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', hour12: false })
         } : nuovaCattura
 
-        console.log('Final catchData:', JSON.stringify(catchData))
-
         if (!catchData.specie) {
-            console.log('FAILED: No species')
             setMessaggioErrore('Inserisci la specie della cattura')
             return false
         }
@@ -357,7 +348,6 @@ function App() {
         if (catchData.latitudine && catchData.longitudine) {
             const validazione = validaCoordinate(catchData.latitudine, catchData.longitudine)
             if (!validazione.valid) {
-                console.log('FAILED: Invalid coordinates')
                 setMessaggioErrore(`Coordinate non valide: ${validazione.error}`)
                 return false
             }
@@ -374,7 +364,6 @@ function App() {
         }
 
         const newCatch = {...catchData, meteo: {...meteo}, id: Date.now(), sessioneId: sessioneCorrente.id}
-        console.log('Adding catch to catture:', JSON.stringify(newCatch))
         setCatture(prev => [...prev, newCatch])
 
         setNuovaCattura({
@@ -392,7 +381,6 @@ function App() {
             note: nuovaCattura.note
         })
 
-        console.log('SUCCESS: Catch added')
         toast.success('Cattura registrata con successo!')
         return true
     }
