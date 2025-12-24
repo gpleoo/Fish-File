@@ -42,6 +42,35 @@ const SettingsPanel = ({ onDataRestored }) => {
     const [microphoneConsent, setMicrophoneConsent] = useState(() => {
         return localStorage.getItem('consent_microphone') === 'true'
     })
+    const [microphoneBlocked, setMicrophoneBlocked] = useState(false)
+    const [locationBlocked, setLocationBlocked] = useState(false)
+
+    // Check actual browser permission state when panel opens
+    useEffect(() => {
+        if (isOpen && navigator.permissions) {
+            // Check microphone permission
+            navigator.permissions.query({ name: 'microphone' }).then(status => {
+                if (status.state === 'denied') {
+                    setMicrophoneBlocked(true)
+                    setMicrophoneConsent(false)
+                    localStorage.setItem('consent_microphone', 'false')
+                } else {
+                    setMicrophoneBlocked(false)
+                }
+            }).catch(() => {})
+
+            // Check location permission
+            navigator.permissions.query({ name: 'geolocation' }).then(status => {
+                if (status.state === 'denied') {
+                    setLocationBlocked(true)
+                    setLocationConsent(false)
+                    localStorage.setItem('consent_location', 'false')
+                } else {
+                    setLocationBlocked(false)
+                }
+            }).catch(() => {})
+        }
+    }, [isOpen])
 
     // Load backup history and data size
     useEffect(() => {
@@ -661,22 +690,29 @@ const SettingsPanel = ({ onDataRestored }) => {
                                             <p className="text-gray-400 text-xs mb-3">{t('privacy.consents')}</p>
 
                                             {/* Location Consent */}
-                                            <div className="flex items-center justify-between bg-gray-900 rounded-xl p-4 mb-3">
+                                            <div className={`flex items-center justify-between rounded-xl p-4 mb-3 ${locationBlocked ? 'bg-red-900/20 border border-red-500/30' : 'bg-gray-900'}`}>
                                                 <div className="flex items-center gap-3 flex-1 mr-4">
-                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${locationConsent ? 'bg-green-500/20' : 'bg-gray-700'}`}>
-                                                        <MapPin className={`w-5 h-5 ${locationConsent ? 'text-green-400' : 'text-gray-400'}`} />
+                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${locationBlocked ? 'bg-red-500/20' : locationConsent ? 'bg-green-500/20' : 'bg-gray-700'}`}>
+                                                        <MapPin className={`w-5 h-5 ${locationBlocked ? 'text-red-400' : locationConsent ? 'text-green-400' : 'text-gray-400'}`} />
                                                     </div>
                                                     <div className="flex-1">
                                                         <p className="text-white text-sm font-medium">{t('privacy.locationConsent')}</p>
-                                                        <p className="text-gray-500 text-xs mt-0.5">{t('privacy.locationDescription')}</p>
+                                                        {locationBlocked ? (
+                                                            <p className="text-red-400 text-xs mt-0.5">{t('privacy.permissionBlocked')}</p>
+                                                        ) : (
+                                                            <p className="text-gray-500 text-xs mt-0.5">{t('privacy.locationDescription')}</p>
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <button
                                                     onClick={handleLocationConsentToggle}
+                                                    disabled={locationBlocked}
                                                     className={`relative w-14 h-8 rounded-full transition-all duration-300 flex-shrink-0 ${
-                                                        locationConsent
-                                                            ? 'bg-green-500 shadow-lg shadow-green-500/30'
-                                                            : 'bg-gray-600'
+                                                        locationBlocked
+                                                            ? 'bg-red-500/50 cursor-not-allowed'
+                                                            : locationConsent
+                                                                ? 'bg-green-500 shadow-lg shadow-green-500/30'
+                                                                : 'bg-gray-600'
                                                     }`}
                                                 >
                                                     <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300 ${
@@ -686,22 +722,29 @@ const SettingsPanel = ({ onDataRestored }) => {
                                             </div>
 
                                             {/* Microphone Consent */}
-                                            <div className="flex items-center justify-between bg-gray-900 rounded-xl p-4">
+                                            <div className={`flex items-center justify-between rounded-xl p-4 ${microphoneBlocked ? 'bg-red-900/20 border border-red-500/30' : 'bg-gray-900'}`}>
                                                 <div className="flex items-center gap-3 flex-1 mr-4">
-                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${microphoneConsent ? 'bg-purple-500/20' : 'bg-gray-700'}`}>
-                                                        <Mic className={`w-5 h-5 ${microphoneConsent ? 'text-purple-400' : 'text-gray-400'}`} />
+                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${microphoneBlocked ? 'bg-red-500/20' : microphoneConsent ? 'bg-purple-500/20' : 'bg-gray-700'}`}>
+                                                        <Mic className={`w-5 h-5 ${microphoneBlocked ? 'text-red-400' : microphoneConsent ? 'text-purple-400' : 'text-gray-400'}`} />
                                                     </div>
                                                     <div className="flex-1">
                                                         <p className="text-white text-sm font-medium">{t('privacy.microphoneConsent')}</p>
-                                                        <p className="text-gray-500 text-xs mt-0.5">{t('privacy.microphoneDescription')}</p>
+                                                        {microphoneBlocked ? (
+                                                            <p className="text-red-400 text-xs mt-0.5">{t('privacy.permissionBlocked')}</p>
+                                                        ) : (
+                                                            <p className="text-gray-500 text-xs mt-0.5">{t('privacy.microphoneDescription')}</p>
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <button
                                                     onClick={handleMicrophoneConsentToggle}
+                                                    disabled={microphoneBlocked}
                                                     className={`relative w-14 h-8 rounded-full transition-all duration-300 flex-shrink-0 ${
-                                                        microphoneConsent
-                                                            ? 'bg-purple-500 shadow-lg shadow-purple-500/30'
-                                                            : 'bg-gray-600'
+                                                        microphoneBlocked
+                                                            ? 'bg-red-500/50 cursor-not-allowed'
+                                                            : microphoneConsent
+                                                                ? 'bg-purple-500 shadow-lg shadow-purple-500/30'
+                                                                : 'bg-gray-600'
                                                     }`}
                                                 >
                                                     <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300 ${
