@@ -12,7 +12,7 @@ const RegistroCatture = ({ catture, setCatture, filtri }) => {
 
     // Filtra catture
     const getCattureFiltrate = () => catture.filter(c => {
-        const [anno, mese] = c.data.split('-')
+        const [anno, mese] = (c.data || '').split('-')
         return (filtri.anno === 'tutti' || anno === filtri.anno) &&
                (filtri.mese === 'tutti' || mese === filtri.mese) &&
                (filtri.specie === 'tutte' || c.specie === filtri.specie) &&

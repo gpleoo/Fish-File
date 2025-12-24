@@ -72,6 +72,9 @@ const ToastContainer = ({ toasts, removeToast }) => {
     )
 }
 
+// Maximum number of toasts visible at once
+const MAX_TOASTS = 5
+
 // Toast Provider Component
 export const ToastProvider = ({ children }) => {
     const [toasts, setToasts] = useState([])
@@ -80,7 +83,14 @@ export const ToastProvider = ({ children }) => {
         const id = Date.now() + Math.random()
         const newToast = { id, message, type, title }
 
-        setToasts(prev => [...prev, newToast])
+        setToasts(prev => {
+            // Remove oldest toasts if we exceed the limit
+            const updated = [...prev, newToast]
+            if (updated.length > MAX_TOASTS) {
+                return updated.slice(-MAX_TOASTS)
+            }
+            return updated
+        })
 
         // Auto-remove after duration
         if (duration > 0) {

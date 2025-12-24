@@ -6,28 +6,36 @@
 
 // Mappa codici meteo Open-Meteo -> condizioni (match con dropdown MeteoForm)
 // Dropdown options: 'sereno', 'nuvoloso', 'coperto', 'pioggia', 'temporale', 'nebbia'
+// Reference: https://open-meteo.com/en/docs (WMO Weather interpretation codes)
 const WEATHER_CODES = {
-    0: 'sereno',
-    1: 'sereno',           // prevalentemente sereno -> sereno
-    2: 'nuvoloso',         // parzialmente nuvoloso -> nuvoloso
-    3: 'coperto',          // nuvoloso -> coperto
-    45: 'nebbia',
-    48: 'nebbia',          // nebbia con brina -> nebbia
-    51: 'pioggia',         // pioggerella -> pioggia
-    53: 'pioggia',
-    55: 'pioggia',
-    61: 'pioggia',
-    63: 'pioggia',
-    65: 'pioggia',
-    71: 'pioggia',         // neve -> pioggia (non c'è opzione neve)
-    73: 'pioggia',
-    75: 'pioggia',
-    80: 'pioggia',         // rovesci -> pioggia
-    81: 'pioggia',
-    82: 'pioggia',
-    95: 'temporale',
-    96: 'temporale',
-    99: 'temporale'
+    0: 'sereno',           // Clear sky
+    1: 'sereno',           // Mainly clear -> sereno
+    2: 'nuvoloso',         // Partly cloudy -> nuvoloso
+    3: 'coperto',          // Overcast -> coperto
+    45: 'nebbia',          // Fog
+    48: 'nebbia',          // Depositing rime fog -> nebbia
+    51: 'pioggia',         // Light drizzle -> pioggia
+    53: 'pioggia',         // Moderate drizzle
+    55: 'pioggia',         // Dense drizzle
+    56: 'pioggia',         // Light freezing drizzle
+    57: 'pioggia',         // Dense freezing drizzle
+    61: 'pioggia',         // Slight rain
+    63: 'pioggia',         // Moderate rain
+    65: 'pioggia',         // Heavy rain
+    66: 'pioggia',         // Light freezing rain
+    67: 'pioggia',         // Heavy freezing rain
+    71: 'pioggia',         // Slight snow -> pioggia (no snow option)
+    73: 'pioggia',         // Moderate snow
+    75: 'pioggia',         // Heavy snow
+    77: 'pioggia',         // Snow grains
+    80: 'pioggia',         // Slight rain showers
+    81: 'pioggia',         // Moderate rain showers
+    82: 'pioggia',         // Violent rain showers
+    85: 'pioggia',         // Slight snow showers
+    86: 'pioggia',         // Heavy snow showers
+    95: 'temporale',       // Thunderstorm
+    96: 'temporale',       // Thunderstorm with slight hail
+    99: 'temporale'        // Thunderstorm with heavy hail
 }
 
 // Converti gradi in direzione cardinale (formato completo per dropdown)

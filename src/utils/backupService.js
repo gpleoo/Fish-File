@@ -190,7 +190,13 @@ export const importBackupFromFile = (file) => {
         }
 
         reader.onerror = () => reject(new Error('Error reading file'))
-        reader.readAsText(file)
+        reader.onabort = () => reject(new Error('File reading was aborted'))
+
+        try {
+            reader.readAsText(file)
+        } catch (err) {
+            reject(new Error('Cannot read file: ' + (err.message || 'Unknown error')))
+        }
     })
 }
 
