@@ -136,7 +136,13 @@ const AnalisiDati = ({
         reader.readAsText(file)
 
         // Reset input per permettere reimport stesso file
-        event.target.value = ''
+        try {
+            event.target.value = ''
+        } catch (e) {
+            // Fallback for browsers that don't allow direct value reset
+            event.target.type = 'text'
+            event.target.type = 'file'
+        }
     }
 
     // Reset filtri

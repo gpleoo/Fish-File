@@ -176,7 +176,14 @@ const SettingsPanel = ({ onDataRestored }) => {
             toast.error(t('backup.restoreError'))
         } finally {
             setIsLoading(false)
-            event.target.value = ''
+            // Reset input to allow re-importing same file
+            try {
+                event.target.value = ''
+            } catch (e) {
+                // Fallback for browsers that don't allow direct value reset
+                event.target.type = 'text'
+                event.target.type = 'file'
+            }
         }
     }
 
@@ -374,23 +381,24 @@ const SettingsPanel = ({ onDataRestored }) => {
             return
         }
 
-        // Delete all data
+        // Delete all data - use correct prefixed keys
         const keysToDelete = [
-            'catture',
-            'sessioni',
-            'specieMemorizzate',
-            'escheMemorizzate',
-            'localitaMemorizzate',
-            'canneMemorizzate',
-            'traviMemorizzate',
-            'amiMemorizzati',
-            'piombiMemorizzati',
-            'noteMemorizzate',
+            'diarioPesca_catture',
+            'diarioPesca_specie',
+            'diarioPesca_esche',
+            'diarioPesca_localita',
+            'diarioPesca_note',
+            'diarioPesca_canne',
+            'diarioPesca_travi',
+            'diarioPesca_ami',
+            'diarioPesca_piombi',
+            'diarioPesca_sessioneAttiva',
+            'diarioPesca_datiSessione',
+            'diarioPesca_sessioneCorrente',
+            'diarioPesca_sessioniCompletate',
             'backupHistory',
             'consent_location',
-            'consent_microphone',
-            'sessioneCorrente',
-            'datiSessione'
+            'consent_microphone'
         ]
 
         keysToDelete.forEach(key => localStorage.removeItem(key))

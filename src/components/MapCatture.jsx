@@ -167,8 +167,13 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
     useEffect(() => {
         if (!isExpanded || !mapRef.current) return
 
+        let isCancelled = false
+
         // Delay per permettere al DOM di aggiornarsi
         const initTimeout = setTimeout(() => {
+            // Check if effect was cancelled (user closed map quickly)
+            if (isCancelled || !mapRef.current) return
+
             if (mapInstanceRef.current) {
                 mapInstanceRef.current.invalidateSize()
                 return
@@ -177,25 +182,33 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
             const defaultCenter = [42.5, 12.5]
             const defaultZoom = 6
 
-            mapInstanceRef.current = L.map(mapRef.current, {
-                center: defaultCenter,
-                zoom: defaultZoom,
-                zoomControl: true,
-                attributionControl: true
-            })
+            try {
+                mapInstanceRef.current = L.map(mapRef.current, {
+                    center: defaultCenter,
+                    zoom: defaultZoom,
+                    zoomControl: true,
+                    attributionControl: true
+                })
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-                maxZoom: 19
-            }).addTo(mapInstanceRef.current)
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                    maxZoom: 19
+                }).addTo(mapInstanceRef.current)
 
-            markersLayerRef.current = L.layerGroup().addTo(mapInstanceRef.current)
+                markersLayerRef.current = L.layerGroup().addTo(mapInstanceRef.current)
 
-            // Aggiungi marker
-            updateMarkers()
+                // Aggiungi marker
+                updateMarkers()
+            } catch (e) {
+                // Map container may have been removed
+                console.warn('Map initialization skipped:', e.message)
+            }
         }, 100)
 
-        return () => clearTimeout(initTimeout)
+        return () => {
+            isCancelled = true
+            clearTimeout(initTimeout)
+        }
     }, [isExpanded])
 
     // Funzione per aggiornare i marker
