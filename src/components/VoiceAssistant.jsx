@@ -55,11 +55,19 @@ const VoiceAssistant = ({
     const synthRef = useRef(window.speechSynthesis)
     const isProcessingRef = useRef(false)
     const currentStateRef = useRef(state)
+    const isMountedRef = useRef(true)
+    const restartTimeoutRef = useRef(null)
 
     // Keep currentStateRef in sync
     useEffect(() => {
         currentStateRef.current = state
     }, [state])
+
+    // Helper to update state synchronously (ref + state)
+    const setStateSync = useCallback((newState) => {
+        currentStateRef.current = newState
+        setState(newState)
+    }, [])
 
     // Max attempts before manual input
     const MAX_ATTEMPTS = 3
@@ -235,14 +243,14 @@ const VoiceAssistant = ({
                         setCatchData(prev => ({ ...prev, specie: result.match }))
                         setAttempts(0)
                         await speak(`${result.match}. ${t('voice.askLength')}`)
-                        setState(STATES.ASKING_LENGTH)
+                        setStateSync(STATES.ASKING_LENGTH)
                         startListening()
                     } else {
                         const newAttempts = attempts + 1
                         setAttempts(newAttempts)
                         if (newAttempts >= MAX_ATTEMPTS) {
                             await speak(t('voice.fillManually'))
-                            setState(STATES.ERROR)
+                            setStateSync(STATES.ERROR)
                         } else {
                             await speak(t('voice.notUnderstood') + ' ' + t('voice.askSpecies'))
                             startListening()
@@ -257,14 +265,14 @@ const VoiceAssistant = ({
                         setCatchData(prev => ({ ...prev, lunghezza: length.toString() }))
                         setAttempts(0)
                         await speak(`${length} centimetri. ${t('voice.askBait')}`)
-                        setState(STATES.ASKING_BAIT)
+                        setStateSync(STATES.ASKING_BAIT)
                         startListening()
                     } else {
                         const newAttempts = attempts + 1
                         setAttempts(newAttempts)
                         if (newAttempts >= MAX_ATTEMPTS) {
                             await speak(t('voice.fillManually'))
-                            setState(STATES.ERROR)
+                            setStateSync(STATES.ERROR)
                         } else {
                             await speak(t('voice.notUnderstood') + ' ' + t('voice.askLength'))
                             startListening()
@@ -279,14 +287,14 @@ const VoiceAssistant = ({
                         setCatchData(prev => ({ ...prev, esca: result.match }))
                         setAttempts(0)
                         await speak(`${result.match}. ${t('voice.askConfirm')}`)
-                        setState(STATES.ASKING_CONFIRM)
+                        setStateSync(STATES.ASKING_CONFIRM)
                         startListening()
                     } else {
                         const newAttempts = attempts + 1
                         setAttempts(newAttempts)
                         if (newAttempts >= MAX_ATTEMPTS) {
                             await speak(t('voice.fillManually'))
-                            setState(STATES.ERROR)
+                            setStateSync(STATES.ERROR)
                         } else {
                             await speak(t('voice.notUnderstood') + ' ' + t('voice.askBait'))
                             startListening()
@@ -301,7 +309,7 @@ const VoiceAssistant = ({
                         const catchToSave = { ...catchData }
 
                         setCatchData({ specie: '', lunghezza: '', esca: '' })
-                        setState(STATES.WAITING_NEW_CATCH)
+                        setStateSync(STATES.WAITING_NEW_CATCH)
 
                         await speak(t('voice.catchRegistered') + ' ' + t('voice.sayNewCatch'))
 
@@ -310,7 +318,7 @@ const VoiceAssistant = ({
                         startListening()
                     } else if (isNegative(spokenText)) {
                         setCatchData({ specie: '', lunghezza: '', esca: '' })
-                        setState(STATES.WAITING_NEW_CATCH)
+                        setStateSync(STATES.WAITING_NEW_CATCH)
                         await speak(t('voice.cancelled') + ' ' + t('voice.sayNewCatch'))
                         startListening()
                     } else {
@@ -324,7 +332,7 @@ const VoiceAssistant = ({
                     if (isNewCatch(spokenText)) {
                         setAttempts(0)
                         await speak(t('voice.askSpecies'))
-                        setState(STATES.ASKING_SPECIES)
+                        setStateSync(STATES.ASKING_SPECIES)
                         startListening()
                     } else {
                         // Keep listening silently
@@ -339,7 +347,7 @@ const VoiceAssistant = ({
         } finally {
             isProcessingRef.current = false
         }
-    }, [speak, t, specieMemorizzate, escheMemorizzate, attempts, onCatchComplete, startListening, catchData])
+    }, [speak, t, specieMemorizzate, escheMemorizzate, attempts, onCatchComplete, startListening, catchData, setStateSync])
 
     /**
      * Setup recognition event handlers
@@ -347,37 +355,83 @@ const VoiceAssistant = ({
     useEffect(() => {
         if (!isOpen) return
 
+        // Mark as mounted
+        isMountedRef.current = true
         let nativeListenerCleanup = null
+
+        // Helper to safely restart listening with conflict prevention
+        const safeRestartListening = () => {
+            // Clear any existing restart timeout
+            if (restartTimeoutRef.current) {
+                clearTimeout(restartTimeoutRef.current)
+                restartTimeoutRef.current = null
+            }
+
+            // Only restart if still mounted and in valid state
+            if (!isMountedRef.current) return
+            if (currentStateRef.current === STATES.IDLE ||
+                currentStateRef.current === STATES.ERROR) return
+            if (isProcessingRef.current) return
+
+            restartTimeoutRef.current = setTimeout(() => {
+                if (isMountedRef.current &&
+                    currentStateRef.current !== STATES.IDLE &&
+                    currentStateRef.current !== STATES.ERROR &&
+                    !isProcessingRef.current) {
+                    startListening()
+                }
+                restartTimeoutRef.current = null
+            }, 800)
+        }
 
         const setupRecognition = async () => {
             const recognition = await initRecognition()
-            if (!recognition) return
+
+            // Check if still mounted after async operation
+            if (!isMountedRef.current || !recognition) return
 
             // Check if using native recognition
             if (recognition.native) {
                 // Setup native Capacitor speech recognition listeners
                 const resultListener = await SpeechRecognition.addListener('result', (event) => {
+                    if (!isMountedRef.current) return
                     const spokenText = event.matches?.[0] || ''
                     setTranscript(spokenText)
                     processResult(spokenText)
                 })
 
+                // Check again after async listener setup
+                if (!isMountedRef.current) {
+                    resultListener.remove()
+                    return
+                }
+
                 const errorListener = await SpeechRecognition.addListener('error', (event) => {
+                    if (!isMountedRef.current) return
                     console.error('Native recognition error:', event.message)
                     setIsListening(false)
                 })
 
+                if (!isMountedRef.current) {
+                    resultListener.remove()
+                    errorListener.remove()
+                    return
+                }
+
                 const stateListener = await SpeechRecognition.addListener('listeningState', (event) => {
+                    if (!isMountedRef.current) return
                     if (event.status === 'stopped') {
                         setIsListening(false)
-                        // Auto-restart with longer delay to prevent conflicts
-                        if (currentStateRef.current !== STATES.IDLE &&
-                            currentStateRef.current !== STATES.ERROR &&
-                            !isProcessingRef.current) {
-                            setTimeout(() => startListening(), 800)
-                        }
+                        safeRestartListening()
                     }
                 })
+
+                if (!isMountedRef.current) {
+                    resultListener.remove()
+                    errorListener.remove()
+                    stateListener.remove()
+                    return
+                }
 
                 nativeListenerCleanup = () => {
                     resultListener.remove()
@@ -389,6 +443,7 @@ const VoiceAssistant = ({
                 recognitionRef.current = recognition
 
                 recognition.onresult = (event) => {
+                    if (!isMountedRef.current) return
                     const results = event.results[0]
                     const spokenText = results[0].transcript
                     setTranscript(spokenText)
@@ -396,6 +451,7 @@ const VoiceAssistant = ({
                 }
 
                 recognition.onerror = (event) => {
+                    if (!isMountedRef.current) return
                     // Don't log no-speech errors - they're normal
                     if (event.error !== 'no-speech' && event.error !== 'aborted') {
                         console.error('Web recognition error:', event.error)
@@ -404,14 +460,9 @@ const VoiceAssistant = ({
                 }
 
                 recognition.onend = () => {
+                    if (!isMountedRef.current) return
                     setIsListening(false)
-
-                    // Auto-restart with longer delay to prevent conflicts
-                    if (currentStateRef.current !== STATES.IDLE &&
-                        currentStateRef.current !== STATES.ERROR &&
-                        !isProcessingRef.current) {
-                        setTimeout(() => startListening(), 800)
-                    }
+                    safeRestartListening()
                 }
             }
         }
@@ -419,6 +470,15 @@ const VoiceAssistant = ({
         setupRecognition()
 
         return () => {
+            // Mark as unmounted first
+            isMountedRef.current = false
+
+            // Clear any pending restart timeout
+            if (restartTimeoutRef.current) {
+                clearTimeout(restartTimeoutRef.current)
+                restartTimeoutRef.current = null
+            }
+
             if (nativeListenerCleanup) {
                 nativeListenerCleanup()
                 stopSpeechRecognition()
@@ -456,14 +516,14 @@ const VoiceAssistant = ({
     useEffect(() => {
         if (isOpen && state === STATES.IDLE) {
             const startAssistant = async () => {
-                setState(STATES.ASKING_SPECIES)
+                setStateSync(STATES.ASKING_SPECIES)
                 setStatusMessage(t('voice.starting'))
                 await speak(t('voice.welcome') + ' ' + t('voice.askSpecies'))
                 startListening()
             }
             startAssistant()
         }
-    }, [isOpen, state, speak, t, startListening])
+    }, [isOpen, state, speak, t, startListening, setStateSync])
 
     /**
      * Reset when closed
@@ -471,7 +531,7 @@ const VoiceAssistant = ({
     useEffect(() => {
         if (!isOpen) {
             stopListening()
-            setState(STATES.IDLE)
+            setStateSync(STATES.IDLE)
             setAttempts(0)
             setCatchData({ specie: '', lunghezza: '', esca: '' })
             setTranscript('')
@@ -480,7 +540,7 @@ const VoiceAssistant = ({
                 synthRef.current.cancel()
             }
         }
-    }, [isOpen, stopListening])
+    }, [isOpen, stopListening, setStateSync])
 
     /**
      * Update status message based on state
