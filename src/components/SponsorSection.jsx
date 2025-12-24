@@ -40,23 +40,46 @@ const SPONSORS_DATA = {
 }
 
 const SponsorCard = ({ sponsor, type }) => {
+    const [isOpen, setIsOpen] = useState(false)
     const hasContact = sponsor.website || sponsor.phone || sponsor.email
 
     return (
-        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-cyan-500 transition-colors">
-            <div className="flex items-start gap-3">
+        <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+            {/* Header compatto - sempre visibile */}
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full flex items-center gap-3 p-3 hover:bg-gray-750 transition-colors text-left"
+            >
                 {sponsor.logo ? (
-                    <img src={sponsor.logo} alt={sponsor.name} className="w-12 h-12 rounded-lg object-cover" />
+                    <img src={sponsor.logo} alt={sponsor.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
                 ) : (
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-                        {type === 'shop' && <Store className="w-6 h-6 text-white" />}
-                        {type === 'association' && <Users className="w-6 h-6 text-white" />}
-                        {type === 'master' && <Award className="w-6 h-6 text-white" />}
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+                        {type === 'shop' && <Store className="w-5 h-5 text-white" />}
+                        {type === 'association' && <Users className="w-5 h-5 text-white" />}
+                        {type === 'master' && <Award className="w-5 h-5 text-white" />}
                     </div>
                 )}
                 <div className="flex-1 min-w-0">
                     <h4 className="text-white font-semibold truncate">{sponsor.name}</h4>
-                    <p className="text-gray-400 text-sm">{sponsor.description}</p>
+                    {sponsor.specialties && !isOpen && (
+                        <p className="text-cyan-400 text-xs truncate">{sponsor.specialties.join(' • ')}</p>
+                    )}
+                    {!sponsor.specialties && !isOpen && (
+                        <p className="text-gray-500 text-xs truncate">Tocca per dettagli</p>
+                    )}
+                </div>
+                {isOpen ? (
+                    <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                )}
+            </button>
+
+            {/* Contenuto espandibile */}
+            {isOpen && (
+                <div className="px-3 pb-3 border-t border-gray-700">
+                    <p className="text-gray-400 text-sm mt-3">{sponsor.description}</p>
+
                     {sponsor.specialties && (
                         <div className="flex flex-wrap gap-1 mt-2">
                             {sponsor.specialties.map((spec, i) => (
@@ -66,39 +89,39 @@ const SponsorCard = ({ sponsor, type }) => {
                             ))}
                         </div>
                     )}
-                </div>
-            </div>
 
-            {hasContact && (
-                <div className="flex gap-2 mt-3 pt-3 border-t border-gray-700">
-                    {sponsor.website && (
-                        <a
-                            href={sponsor.website}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 flex items-center justify-center gap-1.5 bg-cyan-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-cyan-700 transition-colors"
-                        >
-                            <Globe className="w-4 h-4" />
-                            Sito
-                        </a>
-                    )}
-                    {sponsor.phone && (
-                        <a
-                            href={`tel:${sponsor.phone}`}
-                            className="flex-1 flex items-center justify-center gap-1.5 bg-green-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
-                        >
-                            <Phone className="w-4 h-4" />
-                            Chiama
-                        </a>
-                    )}
-                    {sponsor.email && (
-                        <a
-                            href={`mailto:${sponsor.email}`}
-                            className="flex-1 flex items-center justify-center gap-1.5 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                        >
-                            <ExternalLink className="w-4 h-4" />
-                            Email
-                        </a>
+                    {hasContact && (
+                        <div className="flex gap-2 mt-3 pt-3 border-t border-gray-700">
+                            {sponsor.website && (
+                                <a
+                                    href={sponsor.website}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex-1 flex items-center justify-center gap-1.5 bg-cyan-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-cyan-700 active:bg-cyan-800 transition-colors"
+                                >
+                                    <Globe className="w-4 h-4" />
+                                    Sito
+                                </a>
+                            )}
+                            {sponsor.phone && (
+                                <a
+                                    href={`tel:${sponsor.phone}`}
+                                    className="flex-1 flex items-center justify-center gap-1.5 bg-green-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-green-700 active:bg-green-800 transition-colors"
+                                >
+                                    <Phone className="w-4 h-4" />
+                                    Chiama
+                                </a>
+                            )}
+                            {sponsor.email && (
+                                <a
+                                    href={`mailto:${sponsor.email}`}
+                                    className="flex-1 flex items-center justify-center gap-1.5 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors"
+                                >
+                                    <ExternalLink className="w-4 h-4" />
+                                    Email
+                                </a>
+                            )}
+                        </div>
                     )}
                 </div>
             )}

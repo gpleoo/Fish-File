@@ -327,7 +327,7 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
     return (
         <div className="fixed inset-0 z-50 bg-gray-900 flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between p-3 sm:p-4 bg-gray-800 border-b border-gray-700">
+            <div className="flex items-center justify-between p-3 sm:p-4 bg-gray-800 border-b border-gray-700 relative z-[1000]">
                 <div className="flex items-center gap-3">
                     <Map className="w-6 h-6 text-cyan-400" />
                     <div>
@@ -338,8 +338,17 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
                     </div>
                 </div>
                 <button
-                    onClick={() => setIsExpanded(false)}
-                    className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white transition-colors"
+                    onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setIsExpanded(false)
+                    }}
+                    onTouchEnd={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setIsExpanded(false)
+                    }}
+                    className="p-3 rounded-lg bg-red-600 hover:bg-red-700 active:bg-red-800 text-white transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center touch-manipulation"
                     aria-label="Chiudi mappa"
                 >
                     <X className="w-6 h-6" />
