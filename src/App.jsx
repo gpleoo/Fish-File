@@ -66,7 +66,13 @@ const loadFromStorage = (key, defaultValue) => {
         if (saved) {
             const parsed = JSON.parse(saved)
             if (Array.isArray(parsed)) {
-                return parsed.sort((a, b) => a.localeCompare ? a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' }) : 0)
+                return parsed.sort((a, b) => {
+                    // Only sort if both items are strings
+                    if (typeof a === 'string' && typeof b === 'string') {
+                        return a.localeCompare(b, 'it', { numeric: true, sensitivity: 'base' })
+                    }
+                    return 0
+                })
             }
             return parsed
         }
