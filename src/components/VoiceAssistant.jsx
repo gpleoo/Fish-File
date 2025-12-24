@@ -166,6 +166,11 @@ const VoiceAssistant = ({
      * Start listening for voice input
      */
     const startListening = useCallback(async () => {
+        // Prevent starting if already listening
+        if (isListening) {
+            return
+        }
+
         try {
             setIsListening(true)
             setTranscript('')
@@ -174,14 +179,25 @@ const VoiceAssistant = ({
                 // Use native Capacitor speech recognition
                 await startSpeechRecognition({ language: 'it-IT' })
             } else if (recognitionRef.current) {
+                // Stop any existing recognition first
+                try {
+                    recognitionRef.current.abort()
+                } catch (e) {
+                    // Ignore abort errors
+                }
+                // Small delay before starting
+                await new Promise(resolve => setTimeout(resolve, 100))
                 // Use web Speech API
                 recognitionRef.current.start()
             }
         } catch (error) {
-            console.error('Recognition start error:', error)
+            // Only log if it's not an "already started" error
+            if (!error.message?.includes('already started')) {
+                console.error('Recognition start error:', error)
+            }
             setIsListening(false)
         }
-    }, [useNativeRecognition])
+    }, [useNativeRecognition, isListening])
 
     /**
      * Stop listening
@@ -354,11 +370,11 @@ const VoiceAssistant = ({
                 const stateListener = await SpeechRecognition.addListener('listeningState', (event) => {
                     if (event.status === 'stopped') {
                         setIsListening(false)
-                        // Auto-restart if needed
+                        // Auto-restart with longer delay to prevent conflicts
                         if (currentStateRef.current !== STATES.IDLE &&
                             currentStateRef.current !== STATES.ERROR &&
                             !isProcessingRef.current) {
-                            setTimeout(() => startListening(), 300)
+                            setTimeout(() => startListening(), 800)
                         }
                     }
                 })
@@ -380,23 +396,21 @@ const VoiceAssistant = ({
                 }
 
                 recognition.onerror = (event) => {
-                    console.error('Web recognition error:', event.error)
-                    setIsListening(false)
-
-                    if (event.error === 'no-speech') {
-                        if (currentStateRef.current !== STATES.IDLE && currentStateRef.current !== STATES.ERROR) {
-                            setTimeout(() => startListening(), 500)
-                        }
+                    // Don't log no-speech errors - they're normal
+                    if (event.error !== 'no-speech' && event.error !== 'aborted') {
+                        console.error('Web recognition error:', event.error)
                     }
+                    setIsListening(false)
                 }
 
                 recognition.onend = () => {
                     setIsListening(false)
 
+                    // Auto-restart with longer delay to prevent conflicts
                     if (currentStateRef.current !== STATES.IDLE &&
                         currentStateRef.current !== STATES.ERROR &&
                         !isProcessingRef.current) {
-                        setTimeout(() => startListening(), 300)
+                        setTimeout(() => startListening(), 800)
                     }
                 }
             }
