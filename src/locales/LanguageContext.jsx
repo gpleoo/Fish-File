@@ -1,9 +1,19 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import it from './it'
 import en from './en'
+import es from './es'
+import fr from './fr'
 
 // Available languages
-const languages = { it, en }
+const languages = { it, en, es, fr }
+
+// Language metadata
+export const languageInfo = {
+    it: { name: 'Italiano', flag: '🇮🇹' },
+    en: { name: 'English', flag: '🇬🇧' },
+    es: { name: 'Español', flag: '🇪🇸' },
+    fr: { name: 'Français', flag: '🇫🇷' }
+}
 const STORAGE_KEY = 'diarioPesca_language'
 
 // Create context
@@ -78,7 +88,8 @@ export const LanguageProvider = ({ children }) => {
         toggleLanguage,
         t,
         translations,
-        availableLanguages: Object.keys(languages)
+        availableLanguages: Object.keys(languages),
+        languageInfo
     }
 
     return (

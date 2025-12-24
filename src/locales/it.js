@@ -313,6 +313,16 @@ const it = {
         appInstalled: 'App installata con successo!'
     },
 
+    // Units
+    units: {
+        title: 'Unità di Misura',
+        weight: 'Peso',
+        length: 'Lunghezza',
+        temperature: 'Temperatura',
+        timeFormat: 'Formato Orario',
+        dateFormat: 'Formato Data'
+    },
+
     // Voice Assistant
     voice: {
         title: 'Assistente Vocale',

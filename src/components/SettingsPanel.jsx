@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Settings, X, Download, Upload, RefreshCw, HardDrive, Trash2, ChevronDown, ChevronUp, Shield, FileText, ExternalLink, MapPin, Mic } from './Icons'
 import { useToast } from './Toast'
 import { useTranslation } from '../locales/LanguageContext'
+import { useUnits, unitOptions } from '../locales/UnitsContext'
 import {
     exportBackupToFile,
     importBackupFromFile,
@@ -18,7 +19,8 @@ const PRIVACY_POLICY_URL = 'https://gpleoo.github.io/Fish-File/privacy-policy.ht
 const TERMS_OF_SERVICE_URL = 'https://gpleoo.github.io/Fish-File/terms-of-service.html'
 
 const SettingsPanel = ({ onDataRestored }) => {
-    const { t, language, toggleLanguage } = useTranslation()
+    const { t, language, setLanguage, availableLanguages, languageInfo } = useTranslation()
+    const { units, setUnit } = useUnits()
     const toast = useToast()
     const [isOpen, setIsOpen] = useState(false)
     const fileInputRef = useRef(null)
@@ -489,27 +491,127 @@ const SettingsPanel = ({ onDataRestored }) => {
                             {/* Language Section */}
                             <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
                                 <h3 className="text-cyan-400 font-semibold mb-3 text-sm">{t('settings.language')}</h3>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => language !== 'it' && toggleLanguage()}
-                                        className={`flex-1 py-3 px-4 rounded-lg font-bold text-sm transition-colors ${
-                                            language === 'it'
-                                                ? 'bg-cyan-600 text-white'
-                                                : 'bg-gray-700 text-gray-300 active:bg-gray-600'
-                                        }`}
-                                    >
-                                        🇮🇹 Italiano
-                                    </button>
-                                    <button
-                                        onClick={() => language !== 'en' && toggleLanguage()}
-                                        className={`flex-1 py-3 px-4 rounded-lg font-bold text-sm transition-colors ${
-                                            language === 'en'
-                                                ? 'bg-cyan-600 text-white'
-                                                : 'bg-gray-700 text-gray-300 active:bg-gray-600'
-                                        }`}
-                                    >
-                                        🇬🇧 English
-                                    </button>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {availableLanguages.map((lang) => (
+                                        <button
+                                            key={lang}
+                                            onClick={() => setLanguage(lang)}
+                                            className={`py-2.5 px-2 rounded-lg font-bold text-xs transition-colors flex flex-col items-center gap-1 ${
+                                                language === lang
+                                                    ? 'bg-cyan-600 text-white'
+                                                    : 'bg-gray-700 text-gray-300 active:bg-gray-600'
+                                            }`}
+                                        >
+                                            <span className="text-lg">{languageInfo[lang]?.flag}</span>
+                                            <span>{lang.toUpperCase()}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Units Section */}
+                            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                                <h3 className="text-cyan-400 font-semibold mb-3 text-sm">{t('units.title')}</h3>
+                                <div className="space-y-4">
+                                    {/* Weight */}
+                                    <div>
+                                        <p className="text-gray-400 text-xs mb-2">{t('units.weight')}</p>
+                                        <div className="flex gap-2">
+                                            {unitOptions.weight.map((unit) => (
+                                                <button
+                                                    key={unit}
+                                                    onClick={() => setUnit('weight', unit)}
+                                                    className={`flex-1 py-2 px-3 rounded-lg font-bold text-sm transition-colors ${
+                                                        units.weight === unit
+                                                            ? 'bg-cyan-600 text-white'
+                                                            : 'bg-gray-700 text-gray-300 active:bg-gray-600'
+                                                    }`}
+                                                >
+                                                    {unit}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Length */}
+                                    <div>
+                                        <p className="text-gray-400 text-xs mb-2">{t('units.length')}</p>
+                                        <div className="flex gap-2">
+                                            {unitOptions.length.map((unit) => (
+                                                <button
+                                                    key={unit}
+                                                    onClick={() => setUnit('length', unit)}
+                                                    className={`flex-1 py-2 px-3 rounded-lg font-bold text-sm transition-colors ${
+                                                        units.length === unit
+                                                            ? 'bg-cyan-600 text-white'
+                                                            : 'bg-gray-700 text-gray-300 active:bg-gray-600'
+                                                    }`}
+                                                >
+                                                    {unit}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Temperature */}
+                                    <div>
+                                        <p className="text-gray-400 text-xs mb-2">{t('units.temperature')}</p>
+                                        <div className="flex gap-2">
+                                            {unitOptions.temperature.map((unit) => (
+                                                <button
+                                                    key={unit}
+                                                    onClick={() => setUnit('temperature', unit)}
+                                                    className={`flex-1 py-2 px-3 rounded-lg font-bold text-sm transition-colors ${
+                                                        units.temperature === unit
+                                                            ? 'bg-cyan-600 text-white'
+                                                            : 'bg-gray-700 text-gray-300 active:bg-gray-600'
+                                                    }`}
+                                                >
+                                                    °{unit}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Time Format */}
+                                    <div>
+                                        <p className="text-gray-400 text-xs mb-2">{t('units.timeFormat')}</p>
+                                        <div className="flex gap-2">
+                                            {unitOptions.timeFormat.map((format) => (
+                                                <button
+                                                    key={format}
+                                                    onClick={() => setUnit('timeFormat', format)}
+                                                    className={`flex-1 py-2 px-3 rounded-lg font-bold text-sm transition-colors ${
+                                                        units.timeFormat === format
+                                                            ? 'bg-cyan-600 text-white'
+                                                            : 'bg-gray-700 text-gray-300 active:bg-gray-600'
+                                                    }`}
+                                                >
+                                                    {format}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Date Format */}
+                                    <div>
+                                        <p className="text-gray-400 text-xs mb-2">{t('units.dateFormat')}</p>
+                                        <div className="flex gap-2">
+                                            {unitOptions.dateFormat.map((format) => (
+                                                <button
+                                                    key={format}
+                                                    onClick={() => setUnit('dateFormat', format)}
+                                                    className={`flex-1 py-1.5 px-1 rounded-lg font-bold text-xs transition-colors ${
+                                                        units.dateFormat === format
+                                                            ? 'bg-cyan-600 text-white'
+                                                            : 'bg-gray-700 text-gray-300 active:bg-gray-600'
+                                                    }`}
+                                                >
+                                                    {format.replace('/YYYY', '')}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

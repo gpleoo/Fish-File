@@ -356,8 +356,8 @@ function App() {
             specie: actualVoiceData.specie,
             lunghezza: actualVoiceData.lunghezza || '',
             esca: actualVoiceData.esca || '',
-            data: new Date().toISOString().split('T')[0],
-            ora: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', hour12: false })
+            data: getDataItalianaAttuale(),
+            ora: getOraItalianaAttuale()
         } : nuovaCattura
 
         if (!catchData.specie) {
@@ -444,16 +444,16 @@ function App() {
 
     // Funzione - Ricarica dati dopo ripristino backup
     const ricaricaDatiDaStorage = useCallback(() => {
-        setCatture(loadFromStorage('catture', []))
-        setSessioniCompletate(loadFromStorage('sessioni_completate', []))
-        setSpecieMemorizzate(loadFromStorage('specie_memorizzate', specieDefault))
-        setEscheMemorizzate(loadFromStorage('esche_memorizzate', escheDefault))
-        setLocalitaMemorizzate(loadFromStorage('localita_memorizzate', []))
-        setCanneMemorizzate(loadFromStorage('canne_memorizzate', []))
-        setTraviMemorizzate(loadFromStorage('travi_memorizzate', []))
-        setAmiMemorizzati(loadFromStorage('ami_memorizzati', amiDefault))
-        setPiombiMemorizzati(loadFromStorage('piombi_memorizzati', piombiDefault))
-        setNoteMemorizzate(loadFromStorage('note_memorizzate', []))
+        setCatture(loadFromStorage('diarioPesca_catture', []))
+        setSessioniCompletate(loadFromStorage('diarioPesca_sessioniCompletate', []))
+        setSpecieMemorizzate(loadFromStorage('diarioPesca_specie', specieDefault))
+        setEscheMemorizzate(loadFromStorage('diarioPesca_esche', escheDefault))
+        setLocalitaMemorizzate(loadFromStorage('diarioPesca_localita', []))
+        setCanneMemorizzate(loadFromStorage('diarioPesca_canne', []))
+        setTraviMemorizzate(loadFromStorage('diarioPesca_travi', []))
+        setAmiMemorizzati(loadFromStorage('diarioPesca_ami', amiDefault))
+        setPiombiMemorizzati(loadFromStorage('diarioPesca_piombi', piombiDefault))
+        setNoteMemorizzate(loadFromStorage('diarioPesca_note', []))
     }, [])
 
     // Funzione - Elimina sessione

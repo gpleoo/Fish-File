@@ -314,6 +314,16 @@ const en = {
         appInstalled: 'App installed successfully!'
     },
 
+    // Units
+    units: {
+        title: 'Units of Measurement',
+        weight: 'Weight',
+        length: 'Length',
+        temperature: 'Temperature',
+        timeFormat: 'Time Format',
+        dateFormat: 'Date Format'
+    },
+
     // Voice Assistant
     voice: {
         title: 'Voice Assistant',
