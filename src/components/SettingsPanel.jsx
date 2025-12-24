@@ -38,6 +38,9 @@ const SettingsPanel = ({ onDataRestored }) => {
 
     // Privacy state
     const [showPrivacy, setShowPrivacy] = useState(false)
+    const [showLanguage, setShowLanguage] = useState(false)
+    const [showUnits, setShowUnits] = useState(false)
+    const [showBackup, setShowBackup] = useState(false)
     const [locationConsent, setLocationConsent] = useState(() => {
         return localStorage.getItem('consent_location') === 'true'
     })
@@ -490,146 +493,194 @@ const SettingsPanel = ({ onDataRestored }) => {
                         <div className="p-4 space-y-6">
                             {/* Language Section */}
                             <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                                <h3 className="text-cyan-400 font-semibold mb-3 text-sm">{t('settings.language')}</h3>
-                                <div className="grid grid-cols-4 gap-2">
-                                    {availableLanguages.map((lang) => (
-                                        <button
-                                            key={lang}
-                                            onClick={() => setLanguage(lang)}
-                                            className={`py-2.5 px-2 rounded-lg font-bold text-xs transition-colors flex flex-col items-center gap-1 ${
-                                                language === lang
-                                                    ? 'bg-cyan-600 text-white'
-                                                    : 'bg-gray-700 text-gray-300 active:bg-gray-600'
-                                            }`}
-                                        >
-                                            <span className="text-lg">{languageInfo[lang]?.flag}</span>
-                                            <span>{lang.toUpperCase()}</span>
-                                        </button>
-                                    ))}
-                                </div>
+                                <button
+                                    onClick={() => setShowLanguage(!showLanguage)}
+                                    className="w-full flex items-center justify-between"
+                                >
+                                    <h3 className="text-cyan-400 font-semibold text-sm flex items-center gap-2">
+                                        <span>🌍</span>
+                                        {t('settings.language')}
+                                        <span className="text-gray-500 text-xs font-normal">({languageInfo[language]?.flag} {language.toUpperCase()})</span>
+                                    </h3>
+                                    {showLanguage ? (
+                                        <ChevronUp className="w-5 h-5 text-gray-400" />
+                                    ) : (
+                                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                                    )}
+                                </button>
+
+                                {showLanguage && (
+                                    <div className="grid grid-cols-4 gap-2 mt-4">
+                                        {availableLanguages.map((lang) => (
+                                            <button
+                                                key={lang}
+                                                onClick={() => setLanguage(lang)}
+                                                className={`py-2.5 px-2 rounded-lg font-bold text-xs transition-colors flex flex-col items-center gap-1 ${
+                                                    language === lang
+                                                        ? 'bg-cyan-600 text-white'
+                                                        : 'bg-gray-700 text-gray-300 active:bg-gray-600'
+                                                }`}
+                                            >
+                                                <span className="text-lg">{languageInfo[lang]?.flag}</span>
+                                                <span>{lang.toUpperCase()}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Units Section */}
                             <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                                <h3 className="text-cyan-400 font-semibold mb-3 text-sm">{t('units.title')}</h3>
-                                <div className="space-y-4">
-                                    {/* Weight */}
-                                    <div>
-                                        <p className="text-gray-400 text-xs mb-2">{t('units.weight')}</p>
-                                        <div className="flex gap-2">
-                                            {unitOptions.weight.map((unit) => (
-                                                <button
-                                                    key={unit}
-                                                    onClick={() => setUnit('weight', unit)}
-                                                    className={`flex-1 py-2 px-3 rounded-lg font-bold text-sm transition-colors ${
-                                                        units.weight === unit
-                                                            ? 'bg-cyan-600 text-white'
-                                                            : 'bg-gray-700 text-gray-300 active:bg-gray-600'
-                                                    }`}
-                                                >
-                                                    {unit}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
+                                <button
+                                    onClick={() => setShowUnits(!showUnits)}
+                                    className="w-full flex items-center justify-between"
+                                >
+                                    <h3 className="text-cyan-400 font-semibold text-sm flex items-center gap-2">
+                                        <span>📏</span>
+                                        {t('units.title')}
+                                    </h3>
+                                    {showUnits ? (
+                                        <ChevronUp className="w-5 h-5 text-gray-400" />
+                                    ) : (
+                                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                                    )}
+                                </button>
 
-                                    {/* Length */}
-                                    <div>
-                                        <p className="text-gray-400 text-xs mb-2">{t('units.length')}</p>
-                                        <div className="flex gap-2">
-                                            {unitOptions.length.map((unit) => (
-                                                <button
-                                                    key={unit}
-                                                    onClick={() => setUnit('length', unit)}
-                                                    className={`flex-1 py-2 px-3 rounded-lg font-bold text-sm transition-colors ${
-                                                        units.length === unit
-                                                            ? 'bg-cyan-600 text-white'
-                                                            : 'bg-gray-700 text-gray-300 active:bg-gray-600'
-                                                    }`}
-                                                >
-                                                    {unit}
-                                                </button>
-                                            ))}
+                                {showUnits && (
+                                    <div className="space-y-4 mt-4">
+                                        {/* Weight */}
+                                        <div>
+                                            <p className="text-gray-400 text-xs mb-2">{t('units.weight')}</p>
+                                            <div className="flex gap-2">
+                                                {unitOptions.weight.map((unit) => (
+                                                    <button
+                                                        key={unit}
+                                                        onClick={() => setUnit('weight', unit)}
+                                                        className={`flex-1 py-2 px-3 rounded-lg font-bold text-sm transition-colors ${
+                                                            units.weight === unit
+                                                                ? 'bg-cyan-600 text-white'
+                                                                : 'bg-gray-700 text-gray-300 active:bg-gray-600'
+                                                        }`}
+                                                    >
+                                                        {unit}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Temperature */}
-                                    <div>
-                                        <p className="text-gray-400 text-xs mb-2">{t('units.temperature')}</p>
-                                        <div className="flex gap-2">
-                                            {unitOptions.temperature.map((unit) => (
-                                                <button
-                                                    key={unit}
-                                                    onClick={() => setUnit('temperature', unit)}
-                                                    className={`flex-1 py-2 px-3 rounded-lg font-bold text-sm transition-colors ${
-                                                        units.temperature === unit
-                                                            ? 'bg-cyan-600 text-white'
-                                                            : 'bg-gray-700 text-gray-300 active:bg-gray-600'
-                                                    }`}
-                                                >
-                                                    °{unit}
-                                                </button>
-                                            ))}
+                                        {/* Length */}
+                                        <div>
+                                            <p className="text-gray-400 text-xs mb-2">{t('units.length')}</p>
+                                            <div className="flex gap-2">
+                                                {unitOptions.length.map((unit) => (
+                                                    <button
+                                                        key={unit}
+                                                        onClick={() => setUnit('length', unit)}
+                                                        className={`flex-1 py-2 px-3 rounded-lg font-bold text-sm transition-colors ${
+                                                            units.length === unit
+                                                                ? 'bg-cyan-600 text-white'
+                                                                : 'bg-gray-700 text-gray-300 active:bg-gray-600'
+                                                        }`}
+                                                    >
+                                                        {unit}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Time Format */}
-                                    <div>
-                                        <p className="text-gray-400 text-xs mb-2">{t('units.timeFormat')}</p>
-                                        <div className="flex gap-2">
-                                            {unitOptions.timeFormat.map((format) => (
-                                                <button
-                                                    key={format}
-                                                    onClick={() => setUnit('timeFormat', format)}
-                                                    className={`flex-1 py-2 px-3 rounded-lg font-bold text-sm transition-colors ${
-                                                        units.timeFormat === format
-                                                            ? 'bg-cyan-600 text-white'
-                                                            : 'bg-gray-700 text-gray-300 active:bg-gray-600'
-                                                    }`}
-                                                >
-                                                    {format}
-                                                </button>
-                                            ))}
+                                        {/* Temperature */}
+                                        <div>
+                                            <p className="text-gray-400 text-xs mb-2">{t('units.temperature')}</p>
+                                            <div className="flex gap-2">
+                                                {unitOptions.temperature.map((unit) => (
+                                                    <button
+                                                        key={unit}
+                                                        onClick={() => setUnit('temperature', unit)}
+                                                        className={`flex-1 py-2 px-3 rounded-lg font-bold text-sm transition-colors ${
+                                                            units.temperature === unit
+                                                                ? 'bg-cyan-600 text-white'
+                                                                : 'bg-gray-700 text-gray-300 active:bg-gray-600'
+                                                        }`}
+                                                    >
+                                                        °{unit}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Date Format */}
-                                    <div>
-                                        <p className="text-gray-400 text-xs mb-2">{t('units.dateFormat')}</p>
-                                        <div className="flex gap-2">
-                                            {unitOptions.dateFormat.map((format) => (
-                                                <button
-                                                    key={format}
-                                                    onClick={() => setUnit('dateFormat', format)}
-                                                    className={`flex-1 py-1.5 px-1 rounded-lg font-bold text-xs transition-colors ${
-                                                        units.dateFormat === format
-                                                            ? 'bg-cyan-600 text-white'
-                                                            : 'bg-gray-700 text-gray-300 active:bg-gray-600'
-                                                    }`}
-                                                >
-                                                    {format.replace('/YYYY', '')}
-                                                </button>
-                                            ))}
+                                        {/* Time Format */}
+                                        <div>
+                                            <p className="text-gray-400 text-xs mb-2">{t('units.timeFormat')}</p>
+                                            <div className="flex gap-2">
+                                                {unitOptions.timeFormat.map((format) => (
+                                                    <button
+                                                        key={format}
+                                                        onClick={() => setUnit('timeFormat', format)}
+                                                        className={`flex-1 py-2 px-3 rounded-lg font-bold text-sm transition-colors ${
+                                                            units.timeFormat === format
+                                                                ? 'bg-cyan-600 text-white'
+                                                                : 'bg-gray-700 text-gray-300 active:bg-gray-600'
+                                                        }`}
+                                                    >
+                                                        {format}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Date Format */}
+                                        <div>
+                                            <p className="text-gray-400 text-xs mb-2">{t('units.dateFormat')}</p>
+                                            <div className="flex gap-2">
+                                                {unitOptions.dateFormat.map((format) => (
+                                                    <button
+                                                        key={format}
+                                                        onClick={() => setUnit('dateFormat', format)}
+                                                        className={`flex-1 py-1.5 px-1 rounded-lg font-bold text-xs transition-colors ${
+                                                            units.dateFormat === format
+                                                                ? 'bg-cyan-600 text-white'
+                                                                : 'bg-gray-700 text-gray-300 active:bg-gray-600'
+                                                        }`}
+                                                    >
+                                                        {format.replace('/YYYY', '')}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
 
                             {/* Backup Section */}
                             <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                                <h3 className="text-cyan-400 font-semibold mb-3 text-sm">{t('backup.title')}</h3>
+                                <button
+                                    onClick={() => setShowBackup(!showBackup)}
+                                    className="w-full flex items-center justify-between"
+                                >
+                                    <h3 className="text-cyan-400 font-semibold text-sm flex items-center gap-2">
+                                        <span>💾</span>
+                                        {t('backup.title')}
+                                    </h3>
+                                    {showBackup ? (
+                                        <ChevronUp className="w-5 h-5 text-gray-400" />
+                                    ) : (
+                                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                                    )}
+                                </button>
 
-                                {/* Data Size */}
-                                <div className="bg-gray-900 rounded-lg p-3 mb-4 flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <HardDrive className="w-5 h-5 text-cyan-400" />
-                                        <span className="text-gray-300 text-sm">{t('backup.dataSize')}</span>
-                                    </div>
-                                    <span className="text-cyan-400 font-bold">{dataSize}</span>
-                                </div>
+                                {showBackup && (
+                                    <div className="mt-4">
+                                        {/* Data Size */}
+                                        <div className="bg-gray-900 rounded-lg p-3 mb-4 flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <HardDrive className="w-5 h-5 text-cyan-400" />
+                                                <span className="text-gray-300 text-sm">{t('backup.dataSize')}</span>
+                                            </div>
+                                            <span className="text-cyan-400 font-bold">{dataSize}</span>
+                                        </div>
 
-                                {/* Local Backup */}
-                                <div className="mb-4">
+                                        {/* Local Backup */}
+                                        <div className="mb-4">
                                     <p className="text-gray-400 text-xs mb-2">{t('backup.localBackup')}</p>
                                     <div className="grid grid-cols-2 gap-2">
                                         <button
@@ -712,30 +763,32 @@ const SettingsPanel = ({ onDataRestored }) => {
                                             )}
                                         </button>
 
-                                        {showHistory && (
-                                            <div className="space-y-2 max-h-40 overflow-y-auto">
-                                                {backupHistory.map((backup) => (
-                                                    <div
-                                                        key={backup.id}
-                                                        className="bg-gray-900 rounded-lg p-2 flex items-center justify-between text-xs"
-                                                    >
-                                                        <div className="flex items-center gap-2">
-                                                            <span>{getBackupTypeIcon(backup.type)}</span>
-                                                            <div>
-                                                                <p className="text-white font-medium">{getBackupTypeName(backup.type)}</p>
-                                                                <p className="text-gray-500">{formatDate(backup.date)}</p>
-                                                            </div>
-                                                        </div>
-                                                        <button
-                                                            onClick={() => handleDeleteBackup(backup.id)}
-                                                            className="text-red-400 p-1"
+                                            {showHistory && (
+                                                <div className="space-y-2 max-h-40 overflow-y-auto">
+                                                    {backupHistory.map((backup) => (
+                                                        <div
+                                                            key={backup.id}
+                                                            className="bg-gray-900 rounded-lg p-2 flex items-center justify-between text-xs"
                                                         >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
+                                                            <div className="flex items-center gap-2">
+                                                                <span>{getBackupTypeIcon(backup.type)}</span>
+                                                                <div>
+                                                                    <p className="text-white font-medium">{getBackupTypeName(backup.type)}</p>
+                                                                    <p className="text-gray-500">{formatDate(backup.date)}</p>
+                                                                </div>
+                                                            </div>
+                                                            <button
+                                                                onClick={() => handleDeleteBackup(backup.id)}
+                                                                className="text-red-400 p-1"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                     </div>
                                 )}
                             </div>
