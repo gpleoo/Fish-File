@@ -13,7 +13,7 @@ const SPONSORS_DATA = {
     shops: [
         {
             name: 'Amo La Pesca',
-            description: 'Il tuo negozio di fiducia per attrezzatura da surfcasting, bolentino e spinning. Ampia selezione di canne, mulinelli e accessori delle migliori marche.',
+            description: 'Il tuo negozio di fiducia per attrezzatura da surfcasting, bolentino, spinning, traina, bolognese. Ampia selezione di canne, mulinelli e accessori delle migliori marche.',
             website: 'https://www.amolapesca.it',
             phone: '+39 06 5555 1234',
             email: 'info@amolapesca.it'
@@ -31,10 +31,10 @@ const SPONSORS_DATA = {
     masters: [
         {
             name: 'Lorenzo Rossi',
-            description: 'Campione regionale di surfcasting 2023. Oltre 20 anni di esperienza nelle tecniche di pesca dalla spiaggia. Disponibile per lezioni private e corsi di gruppo.',
+            description: 'Surfcaster da oltre 30 anni di esperienza nelle tecniche di pesca dalla spiaggia, il cui motto è "Pesci nel secchio". Disponibile per lezioni private e corsi di gruppo.',
             phone: '+39 347 1234 567',
             email: 'lorenzo.rossi.pesca@gmail.com',
-            specialties: ['Surfcasting', 'Beach Ledgering', 'Long Range']
+            specialties: ['Surfcasting']
         }
     ]
 }
