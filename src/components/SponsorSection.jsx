@@ -56,7 +56,7 @@ const SponsorCard = ({ sponsor, type }) => {
                 )}
                 <div className="flex-1 min-w-0">
                     <h4 className="text-white font-semibold truncate">{sponsor.name}</h4>
-                    <p className="text-gray-400 text-sm line-clamp-2">{sponsor.description}</p>
+                    <p className="text-gray-400 text-sm">{sponsor.description}</p>
                     {sponsor.specialties && (
                         <div className="flex flex-wrap gap-1 mt-2">
                             {sponsor.specialties.map((spec, i) => (

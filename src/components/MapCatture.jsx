@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useMemo } from 'react'
+import React, { useEffect, useRef, useMemo, useState } from 'react'
 import L from 'leaflet'
 import { useTranslation } from '../locales/LanguageContext'
+import { Map, Maximize, X } from './Icons'
 
 // Colori in base al numero di catture
 const getColorByCount = (count) => {
@@ -60,6 +61,7 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
     const mapRef = useRef(null)
     const mapInstanceRef = useRef(null)
     const markersLayerRef = useRef(null)
+    const [isExpanded, setIsExpanded] = useState(false)
 
     // Raggruppa sessioni per posizione e calcola catture
     const sessioniConDati = useMemo(() => {
@@ -161,37 +163,43 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
         return risultato
     }, [sessioniConDati])
 
-    // Inizializza mappa
+    // Inizializza mappa quando espansa
     useEffect(() => {
-        if (!mapRef.current || mapInstanceRef.current) return
+        if (!isExpanded || !mapRef.current) return
 
-        const defaultCenter = [42.5, 12.5]
-        const defaultZoom = 6
-
-        mapInstanceRef.current = L.map(mapRef.current, {
-            center: defaultCenter,
-            zoom: defaultZoom,
-            zoomControl: true,
-            attributionControl: true
-        })
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            maxZoom: 19
-        }).addTo(mapInstanceRef.current)
-
-        markersLayerRef.current = L.layerGroup().addTo(mapInstanceRef.current)
-
-        return () => {
+        // Delay per permettere al DOM di aggiornarsi
+        const initTimeout = setTimeout(() => {
             if (mapInstanceRef.current) {
-                mapInstanceRef.current.remove()
-                mapInstanceRef.current = null
+                mapInstanceRef.current.invalidateSize()
+                return
             }
-        }
-    }, [])
 
-    // Aggiorna marker
-    useEffect(() => {
+            const defaultCenter = [42.5, 12.5]
+            const defaultZoom = 6
+
+            mapInstanceRef.current = L.map(mapRef.current, {
+                center: defaultCenter,
+                zoom: defaultZoom,
+                zoomControl: true,
+                attributionControl: true
+            })
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                maxZoom: 19
+            }).addTo(mapInstanceRef.current)
+
+            markersLayerRef.current = L.layerGroup().addTo(mapInstanceRef.current)
+
+            // Aggiungi marker
+            updateMarkers()
+        }, 100)
+
+        return () => clearTimeout(initTimeout)
+    }, [isExpanded])
+
+    // Funzione per aggiornare i marker
+    const updateMarkers = () => {
         if (!mapInstanceRef.current || !markersLayerRef.current) return
 
         markersLayerRef.current.clearLayers()
@@ -245,7 +253,35 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
                 mapInstanceRef.current.fitBounds(bounds, { padding: [50, 50] })
             }
         }
-    }, [sessioniConOffset, t])
+    }
+
+    // Aggiorna marker quando cambiano i dati
+    useEffect(() => {
+        if (isExpanded && mapInstanceRef.current) {
+            updateMarkers()
+        }
+    }, [sessioniConOffset, t, isExpanded])
+
+    // Cleanup mappa quando si chiude
+    useEffect(() => {
+        if (!isExpanded && mapInstanceRef.current) {
+            mapInstanceRef.current.remove()
+            mapInstanceRef.current = null
+            markersLayerRef.current = null
+        }
+    }, [isExpanded])
+
+    // Blocca scroll del body quando la mappa è aperta
+    useEffect(() => {
+        if (isExpanded) {
+            document.body.style.overflow = 'hidden'
+        } else {
+            document.body.style.overflow = ''
+        }
+        return () => {
+            document.body.style.overflow = ''
+        }
+    }, [isExpanded])
 
     // Statistiche totali
     const totali = useMemo(() => {
@@ -256,42 +292,95 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
         }
     }, [sessioniConOffset])
 
+    // Vista collassata - bottone per aprire la mappa
+    if (!isExpanded) {
+        return (
+            <div className="bg-gray-800 rounded-lg border border-gray-700 p-3 sm:p-4 mb-3 sm:mb-4">
+                <button
+                    onClick={() => setIsExpanded(true)}
+                    className="w-full flex items-center justify-between p-3 bg-gray-750 hover:bg-gray-700 rounded-lg transition-colors"
+                    disabled={sessioniConOffset.length === 0}
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                            <Map className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="text-left">
+                            <h4 className="text-cyan-400 font-bold text-sm sm:text-base">{t('map.title')}</h4>
+                            <span className="text-gray-400 text-xs sm:text-sm">
+                                {sessioniConOffset.length === 0
+                                    ? t('map.noSessions')
+                                    : `${totali.sessioni} ${t('sessions.title')} - ${totali.catture} ${t('map.catches')}`
+                                }
+                            </span>
+                        </div>
+                    </div>
+                    {sessioniConOffset.length > 0 && (
+                        <Maximize className="w-5 h-5 text-cyan-400" />
+                    )}
+                </button>
+            </div>
+        )
+    }
+
+    // Vista espansa - fullscreen
     return (
-        <div className="bg-gray-800 rounded-lg border border-gray-700 p-3 sm:p-4 mb-3 sm:mb-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-0 mb-2 sm:mb-3">
-                <h4 className="text-cyan-400 font-bold text-sm sm:text-base">{t('map.title')}</h4>
-                <span className="text-gray-400 text-xs sm:text-sm">
-                    {totali.sessioni} {t('sessions.title')} - {totali.catture} {t('map.catches')}
-                </span>
+        <div className="fixed inset-0 z-50 bg-gray-900 flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-3 sm:p-4 bg-gray-800 border-b border-gray-700">
+                <div className="flex items-center gap-3">
+                    <Map className="w-6 h-6 text-cyan-400" />
+                    <div>
+                        <h4 className="text-white font-bold text-base sm:text-lg">{t('map.title')}</h4>
+                        <span className="text-gray-400 text-xs sm:text-sm">
+                            {totali.sessioni} {t('sessions.title')} - {totali.catture} {t('map.catches')}
+                        </span>
+                    </div>
+                </div>
+                <button
+                    onClick={() => setIsExpanded(false)}
+                    className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white transition-colors"
+                    aria-label="Chiudi mappa"
+                >
+                    <X className="w-6 h-6" />
+                </button>
             </div>
 
-            {sessioniConOffset.length === 0 ? (
-                <div className="text-gray-500 text-center py-6 sm:py-8">
-                    <p className="text-sm sm:text-base">{t('map.noSessions')}</p>
-                    <p className="text-xs sm:text-sm mt-2">{t('map.completeSession')}</p>
-                </div>
-            ) : (
-                <div
-                    ref={mapRef}
-                    className="rounded-lg overflow-hidden map-container"
-                />
-            )}
+            {/* Mappa */}
+            <div className="flex-1 relative">
+                {sessioniConOffset.length === 0 ? (
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-500">
+                        <div className="text-center">
+                            <Map className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                            <p className="text-sm sm:text-base">{t('map.noSessions')}</p>
+                            <p className="text-xs sm:text-sm mt-2">{t('map.completeSession')}</p>
+                        </div>
+                    </div>
+                ) : (
+                    <div
+                        ref={mapRef}
+                        className="absolute inset-0"
+                    />
+                )}
+            </div>
 
-            {/* Legenda colori - responsive */}
+            {/* Legenda colori */}
             {sessioniConOffset.length > 0 && (
-                <div className="mt-2 sm:mt-3 grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3 justify-center">
-                    <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
-                        <span className="w-3 h-3 rounded-full bg-red-500 flex-shrink-0" /> 0 {t('map.catches')}
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
-                        <span className="w-3 h-3 rounded-full bg-pink-500 flex-shrink-0" /> 1-4
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
-                        <span className="w-3 h-3 rounded-full bg-green-500 flex-shrink-0" /> 5-8
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
-                        <span className="w-3 h-3 rounded-full bg-blue-500 flex-shrink-0" /> 9+
-                    </span>
+                <div className="p-3 bg-gray-800 border-t border-gray-700">
+                    <div className="flex flex-wrap gap-3 sm:gap-4 justify-center">
+                        <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
+                            <span className="w-3 h-3 rounded-full bg-red-500 flex-shrink-0" /> 0 {t('map.catches')}
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
+                            <span className="w-3 h-3 rounded-full bg-pink-500 flex-shrink-0" /> 1-4
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
+                            <span className="w-3 h-3 rounded-full bg-green-500 flex-shrink-0" /> 5-8
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
+                            <span className="w-3 h-3 rounded-full bg-blue-500 flex-shrink-0" /> 9+
+                        </span>
+                    </div>
                 </div>
             )}
         </div>
