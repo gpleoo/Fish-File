@@ -26,6 +26,10 @@ import { initNativeFeatures, isNative } from './utils/native'
 // Weather service
 import { fetchWeatherData } from './utils/weatherService'
 
+// Ads
+import { useAds } from './contexts/AdContext'
+import BannerAdPlaceholder from './components/BannerAdPlaceholder'
+
 // Default data
 const specieDefault = ['Cefalo', 'Gronco', 'Leccia stella', 'Marmora', 'Occhiata', 'Ombrina', 'Opa', 'Orata', 'Pesce serra', 'Sarago', 'Spigola', 'Sughero']
 const escheDefault = ['Americano', 'Arenicola', 'Bibi', 'Canolicchio', 'Cefalo', 'Coreano', 'Gambero', 'Granchio', 'Muriddu', 'Seppia']
@@ -90,6 +94,9 @@ function App() {
 
     // Translations
     const { t } = useTranslation()
+
+    // Ads
+    const { showBanner, trackCatch, showSessionEndAd } = useAds()
 
     // State - Sezioni attive
     const [activeSection, setActiveSection] = useState(null)
@@ -199,6 +206,14 @@ function App() {
         initNativeFeatures()
     }, [])
 
+    // Effect - Show banner ad after splash
+    useEffect(() => {
+        if (!mostraSplash) {
+            // Mostra banner dopo che lo splash è finito
+            showBanner()
+        }
+    }, [mostraSplash, showBanner])
+
     // Funzioni - Sessione
     const avviaSessione = async () => {
         if (!datiSessione.localita || !datiSessione.latitudine || !datiSessione.longitudine) {
@@ -256,7 +271,7 @@ function App() {
         }
     }
 
-    const terminaSessione = () => {
+    const terminaSessione = async () => {
         if (sessioneCorrente) {
             const cattureQuesta = catture.filter(c => c.sessioneId === sessioneCorrente.id).length
             const sessioneCompletata = {
@@ -270,6 +285,9 @@ function App() {
         setSessioneAttiva(false)
         setSessioneCorrente(null)
         setDatiSessione({ localita: '', latitudine: '', longitudine: '' })
+
+        // Show interstitial ad at session end
+        await showSessionEndAd()
     }
 
     const ottieniPosizioneGPS = () => {
@@ -402,6 +420,10 @@ function App() {
         })
 
         toast.success('Cattura registrata con successo!')
+
+        // Track catch for ad display (every 3 catches)
+        trackCatch()
+
         return true
     }
 
@@ -639,12 +661,15 @@ function App() {
                         setActiveSection={setActiveSection}
                     />
 
-                    {/* Footer */}
-                    <div className="text-center mt-6 sm:mt-8 pb-6 sm:pb-8 bottom-safe">
+                    {/* Footer - con spazio extra per il banner pubblicitario */}
+                    <div className="text-center mt-6 sm:mt-8 pb-20 sm:pb-24 bottom-safe">
                         <p className="text-gray-600 text-xs">Fish File v1.0 - 2025 Giampietro Leonoro</p>
                     </div>
                 </div>
             </div>
+
+            {/* Banner Ad */}
+            <BannerAdPlaceholder />
 
             {/* Settings Panel */}
             <SettingsPanel onDataRestored={ricaricaDatiDaStorage} />
