@@ -105,7 +105,7 @@ const MeteoForm = ({
 
             {/* Temperatura aria */}
             <InputField
-                label={`${t('weather.temperature').replace('(°C)', '')}(${tempSymbol})`}
+                label={`${t('weather.temperatureLabel')} (${tempSymbol})`}
                 type="number"
                 value={meteo.temperatura}
                 onChange={(e) => setMeteo(p => ({ ...p, temperatura: e.target.value }))}
@@ -114,7 +114,7 @@ const MeteoForm = ({
 
             {/* Temperatura acqua */}
             <InputField
-                label={`${t('weather.waterTemp').replace('(°C)', '')}(${tempSymbol})`}
+                label={`${t('weather.waterTempLabel')} (${tempSymbol})`}
                 type="number"
                 value={meteo.temperaturaAcqua}
                 onChange={(e) => setMeteo(p => ({ ...p, temperaturaAcqua: e.target.value }))}
