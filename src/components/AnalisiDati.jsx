@@ -6,7 +6,7 @@ import GraficiStatistiche from './GraficiStatistiche'
 import RegistroCatture from './RegistroCatture'
 import MapCatture from './MapCatture'
 import SessioniRegistrate from './SessioniRegistrate'
-import { ventiRosaDeiVenti, fasiLunari, condizioniMeteo } from './MeteoForm'
+import { ventiRosaDeiVenti, moonPhaseKeys, weatherConditionKeys } from './MeteoForm'
 import { useToast } from './Toast'
 import { useTranslation } from '../locales/LanguageContext'
 
@@ -261,8 +261,8 @@ const AnalisiDati = ({
                                 className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
                             >
                                 <option value="tutte">{t('analysis.allConditions')}</option>
-                                {condizioniMeteo.map(c => (
-                                    <option key={c} value={c}>{c}</option>
+                                {weatherConditionKeys.map(key => (
+                                    <option key={key} value={key}>{t(`weatherConditions.${key}`)}</option>
                                 ))}
                             </select>
 
@@ -273,8 +273,8 @@ const AnalisiDati = ({
                                 className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
                             >
                                 <option value="tutte">{t('analysis.allMoonPhases')}</option>
-                                {fasiLunari.map(f => (
-                                    <option key={f} value={f}>{f}</option>
+                                {moonPhaseKeys.map(key => (
+                                    <option key={key} value={key}>{t(`moonPhases.${key}`)}</option>
                                 ))}
                             </select>
                         </div>

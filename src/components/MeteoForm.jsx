@@ -3,8 +3,9 @@ import { Cloud, RefreshCw } from './Icons'
 import Section from './Section'
 import InputField from './InputField'
 import { useTranslation } from '../locales/LanguageContext'
+import { useUnits } from '../locales/UnitsContext'
 
-// Costanti meteo
+// Costanti meteo - chiavi per le traduzioni
 const ventiRosaDeiVenti = [
     'N (Tramontana - 4°/1° Quadrante - 0°)',
     'NNE (Tramontana-Grecale - 1° Quadrante - 22,5°)',
@@ -24,24 +25,26 @@ const ventiRosaDeiVenti = [
     'NNW (Maestrale-Tramontana - 4° Quadrante - 337,5°)'
 ]
 
-const fasiLunari = [
-    'luna nuova',
-    'crescente',
-    'primo quarto',
-    'gibbosa crescente',
-    'piena',
-    'gibbosa calante',
-    'ultimo quarto',
-    'calante'
+// Chiavi per le traduzioni delle fasi lunari
+const moonPhaseKeys = [
+    'newMoon',
+    'waxingCrescent',
+    'firstQuarter',
+    'waxingGibbous',
+    'fullMoon',
+    'waningGibbous',
+    'lastQuarter',
+    'waningCrescent'
 ]
 
-const condizioniMeteo = [
-    'sereno',
-    'nuvoloso',
-    'coperto',
-    'pioggia',
-    'temporale',
-    'nebbia'
+// Chiavi per le traduzioni delle condizioni meteo
+const weatherConditionKeys = [
+    'clear',
+    'cloudy',
+    'overcast',
+    'rain',
+    'storm',
+    'fog'
 ]
 
 const MeteoForm = ({
@@ -52,7 +55,19 @@ const MeteoForm = ({
     onRefreshMeteo
 }) => {
     const { t } = useTranslation()
+    const { units, getTemperatureSymbol } = useUnits()
     const [isLoading, setIsLoading] = useState(false)
+
+    // Genera le opzioni tradotte
+    const fasiLunari = moonPhaseKeys.map(key => ({
+        key,
+        label: t(`moonPhases.${key}`)
+    }))
+
+    const condizioniMeteo = weatherConditionKeys.map(key => ({
+        key,
+        label: t(`weatherConditions.${key}`)
+    }))
 
     const handleRefresh = async () => {
         if (onRefreshMeteo) {
@@ -61,6 +76,9 @@ const MeteoForm = ({
             setIsLoading(false)
         }
     }
+
+    // Label dinamiche con unità corrette
+    const tempSymbol = getTemperatureSymbol()
 
     return (
         <Section
@@ -87,7 +105,7 @@ const MeteoForm = ({
 
             {/* Temperatura aria */}
             <InputField
-                label={t('weather.temperature')}
+                label={`${t('weather.temperature').replace('(°C)', '')}(${tempSymbol})`}
                 type="number"
                 value={meteo.temperatura}
                 onChange={(e) => setMeteo(p => ({ ...p, temperatura: e.target.value }))}
@@ -96,7 +114,7 @@ const MeteoForm = ({
 
             {/* Temperatura acqua */}
             <InputField
-                label={t('weather.waterTemp')}
+                label={`${t('weather.waterTemp').replace('(°C)', '')}(${tempSymbol})`}
                 type="number"
                 value={meteo.temperaturaAcqua}
                 onChange={(e) => setMeteo(p => ({ ...p, temperaturaAcqua: e.target.value }))}
@@ -152,7 +170,7 @@ const MeteoForm = ({
                 >
                     <option value="">{t('weather.select')}</option>
                     {condizioniMeteo.map(c => (
-                        <option key={c} value={c}>{c}</option>
+                        <option key={c.key} value={c.key}>{c.label}</option>
                     ))}
                 </select>
             </div>
@@ -169,7 +187,7 @@ const MeteoForm = ({
                 >
                     <option value="">{t('weather.select')}</option>
                     {fasiLunari.map(f => (
-                        <option key={f} value={f}>{f}</option>
+                        <option key={f.key} value={f.key}>{f.label}</option>
                     ))}
                 </select>
             </div>
@@ -210,5 +228,5 @@ const MeteoForm = ({
 }
 
 // Esporta anche le costanti per uso in altri componenti
-export { ventiRosaDeiVenti, fasiLunari, condizioniMeteo }
+export { ventiRosaDeiVenti, moonPhaseKeys, weatherConditionKeys }
 export default MeteoForm
