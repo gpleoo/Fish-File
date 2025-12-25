@@ -69,5 +69,22 @@
 	<!-- Speech Recognition Permission -->
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Fish File usa il riconoscimento vocale per permetterti di registrare catture a voce.</string>
+
+	<!-- AdMob App ID (Test ID - Replace with real ID in production) -->
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3940256099942544~1458002511</string>
+
+	<!-- App Tracking Transparency (iOS 14+) -->
+	<key>NSUserTrackingUsageDescription</key>
+	<string>Fish File utilizza il tracciamento per mostrarti pubblicità più rilevanti.</string>
+
+	<!-- SKAdNetwork IDs for AdMob -->
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
+	</array>
 </dict>
 </plist>
