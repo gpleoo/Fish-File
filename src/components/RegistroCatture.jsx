@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import { ChevronDown, ChevronUp, Trash2 } from './Icons'
 import { useTranslation } from '../locales/LanguageContext'
+import { useUnits } from '../locales/UnitsContext'
 
 const ITEMS_PER_PAGE = 10
 
 const RegistroCatture = ({ catture, setCatture, filtri }) => {
     const { t } = useTranslation()
+    const units = useUnits()
     const [paginaCatture, setPaginaCatture] = useState(0)
     const [cattureEspanse, setCattureEspanse] = useState({})
     const [mostraCatture, setMostraCatture] = useState(false)
@@ -85,7 +87,7 @@ const RegistroCatture = ({ catture, setCatture, filtri }) => {
 
                                             {/* Dettagli espansi */}
                                             {isEspansa && (
-                                                <DettagliCattura cattura={c} t={t} />
+                                                <DettagliCattura cattura={c} t={t} units={units} />
                                             )}
                                         </div>
                                         <button
@@ -133,19 +135,22 @@ const RegistroCatture = ({ catture, setCatture, filtri }) => {
 }
 
 // Sub-component: Dettagli cattura espansa
-const DettagliCattura = ({ cattura: c, t }) => (
+const DettagliCattura = ({ cattura: c, t, units }) => {
+    const { convertWeight, convertLength, convertTemperature, getWeightSymbol, getLengthSymbol, getTemperatureSymbol } = units
+
+    return (
     <>
         <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-700">
             <h5 className="text-cyan-400 font-semibold mb-1.5 sm:mb-2 text-xs sm:text-sm">{t('registry.catchData')}</h5>
             <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-xs sm:text-sm">
                 {c.peso && (
                     <p className="text-gray-300">
-                        <span className="text-cyan-400">{t('catch.weight')}:</span> {(parseFloat(c.peso) / 1000).toFixed(2)} kg
+                        <span className="text-cyan-400">{t('catch.weightLabel')} ({getWeightSymbol()}):</span> {convertWeight(c.peso)} {getWeightSymbol()}
                     </p>
                 )}
                 {c.lunghezza && (
                     <p className="text-gray-300">
-                        <span className="text-cyan-400">{t('catch.length')}:</span> {c.lunghezza} cm
+                        <span className="text-cyan-400">{t('catch.lengthLabel')} ({getLengthSymbol()}):</span> {convertLength(c.lunghezza)} {getLengthSymbol()}
                     </p>
                 )}
                 {c.localita && (
@@ -193,22 +198,22 @@ const DettagliCattura = ({ cattura: c, t }) => (
                 <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-xs sm:text-sm">
                     {c.meteo.temperatura && (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400">{t('weather.temperature')}:</span> {c.meteo.temperatura}C
+                            <span className="text-cyan-400">{t('weather.temperatureLabel')} ({getTemperatureSymbol()}):</span> {convertTemperature(c.meteo.temperatura)}{getTemperatureSymbol()}
                         </p>
                     )}
                     {c.meteo.temperaturaAcqua && (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400">{t('weather.waterTemp')}:</span> {c.meteo.temperaturaAcqua}C
+                            <span className="text-cyan-400">{t('weather.waterTempLabel')} ({getTemperatureSymbol()}):</span> {convertTemperature(c.meteo.temperaturaAcqua)}{getTemperatureSymbol()}
                         </p>
                     )}
                     {c.meteo.pressione && (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400">{t('weather.pressure')}:</span> {c.meteo.pressione} hPa
+                            <span className="text-cyan-400">{t('weather.pressureLabel')} (hPa):</span> {c.meteo.pressione} hPa
                         </p>
                     )}
                     {c.meteo.vento && (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400">{t('weather.wind')}:</span> {c.meteo.vento} nodi
+                            <span className="text-cyan-400">{t('weather.windLabel')} (knots):</span> {c.meteo.vento}
                         </p>
                     )}
                     {c.meteo.direzioneVento && (
@@ -218,18 +223,19 @@ const DettagliCattura = ({ cattura: c, t }) => (
                     )}
                     {c.meteo.condizioni && (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400">{t('weather.conditions')}:</span> {c.meteo.condizioni}
+                            <span className="text-cyan-400">{t('weather.conditions')}:</span> {t(`weatherConditions.${c.meteo.condizioni}`) || c.meteo.condizioni}
                         </p>
                     )}
                     {c.meteo.faseLunare && (
                         <p className="text-gray-300">
-                            <span className="text-cyan-400">{t('weather.moonPhase')}:</span> {c.meteo.faseLunare}
+                            <span className="text-cyan-400">{t('weather.moonPhase')}:</span> {t(`moonPhases.${c.meteo.faseLunare}`) || c.meteo.faseLunare}
                         </p>
                     )}
                 </div>
             </div>
         )}
     </>
-)
+    )
+}
 
 export default RegistroCatture

@@ -5,6 +5,7 @@ import InputField from './InputField'
 import SelectField from './SelectField'
 import VoiceAssistant from './VoiceAssistant'
 import { useTranslation } from '../locales/LanguageContext'
+import { useUnits } from '../locales/UnitsContext'
 import { useToast } from './Toast'
 
 const CatturaForm = ({
@@ -25,6 +26,7 @@ const CatturaForm = ({
 }) => {
     const { t } = useTranslation()
     const toast = useToast()
+    const { getWeightSymbol, getLengthSymbol } = useUnits()
     const [showVoiceAssistant, setShowVoiceAssistant] = useState(false)
 
     // Handler per cattura completata dall'assistente vocale
@@ -94,7 +96,7 @@ const CatturaForm = ({
 
             {/* Peso e lunghezza */}
             <InputField
-                label={t('catch.weight')}
+                label={`${t('catch.weightLabel')} (${getWeightSymbol()})`}
                 type="number"
                 value={nuovaCattura.peso}
                 onChange={(e) => setNuovaCattura(p => ({ ...p, peso: e.target.value }))}
@@ -102,7 +104,7 @@ const CatturaForm = ({
                 step="1"
             />
             <InputField
-                label={t('catch.length')}
+                label={`${t('catch.lengthLabel')} (${getLengthSymbol()})`}
                 type="number"
                 value={nuovaCattura.lunghezza}
                 onChange={(e) => setNuovaCattura(p => ({ ...p, lunghezza: e.target.value }))}
