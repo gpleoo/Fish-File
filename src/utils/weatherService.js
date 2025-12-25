@@ -24,7 +24,7 @@ const WEATHER_CODES = {
     65: 'rain',            // Heavy rain
     66: 'rain',            // Light freezing rain
     67: 'rain',            // Heavy freezing rain
-    71: 'rain',            // Slight snow
+    71: 'rain',            // Slight snow (mapped to rain as no snow option)
     73: 'rain',            // Moderate snow
     75: 'rain',            // Heavy snow
     77: 'rain',            // Snow grains
@@ -36,6 +36,12 @@ const WEATHER_CODES = {
     95: 'storm',           // Thunderstorm
     96: 'storm',           // Thunderstorm with slight hail
     99: 'storm'            // Thunderstorm with heavy hail
+}
+
+// Funzione helper per ottenere condizione meteo con fallback
+const getWeatherCondition = (code) => {
+    if (code === null || code === undefined) return 'clear'
+    return WEATHER_CODES[code] || 'cloudy' // fallback a 'cloudy' per codici sconosciuti
 }
 
 // Converti gradi in direzione cardinale (formato completo per dropdown)
@@ -199,8 +205,8 @@ export const fetchWeatherData = async (lat, lng) => {
             pressione: current.surface_pressure ? Math.round(current.surface_pressure).toString() : '',
             vento: current.wind_speed_10m ? Math.round(current.wind_speed_10m).toString() : '',
             direzioneVento: degreesToDirection(current.wind_direction_10m) || '',
-            condizioni: WEATHER_CODES[current.weather_code] || '',
-            faseLunare: calcolaFaseLunare(),
+            condizioni: getWeatherCondition(current.weather_code),
+            faseLunare: calcolaFaseLunare() || 'waxingCrescent', // fallback sicuro
             // Campi maree - non disponibili da API, l'utente li inserisce manualmente
             altaMareaOra: '',
             bassaMareaOra: '',
