@@ -339,8 +339,8 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
     // Vista espansa - fullscreen
     return (
         <div className="fixed inset-0 z-50 bg-gray-900 flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between p-3 sm:p-4 bg-gray-800 border-b border-gray-700 relative z-[1000]">
+            {/* Header - con padding top extra per dispositivi mobili */}
+            <div className="flex items-center justify-between p-3 sm:p-4 pt-12 sm:pt-4 bg-gray-800 border-b border-gray-700 relative z-[1000]" style={{ paddingTop: 'max(3rem, env(safe-area-inset-top, 3rem))' }}>
                 <div className="flex items-center gap-3">
                     <Map className="w-6 h-6 text-cyan-400" />
                     <div>
