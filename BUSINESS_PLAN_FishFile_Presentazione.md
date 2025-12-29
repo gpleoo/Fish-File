@@ -16,7 +16,7 @@ Registra le catture parlando (mani libere), traccia attrezzatura e meteo, sugger
 
 **Mercato:** 2 milioni di pescatori italiani, 25+ milioni in Europa
 **Tecnologia:** Unica al mondo - voce AI con riconoscimento dialetti in 4 lingue
-**Prodotto:** Già funzionante con app nativa iOS/Android (Capacitor)
+**Prodotto:** Già funzionante con app nativa iPhone e Android (Capacitor)
 **Multilingua:** Italiano, English, Español, Français - già integrato
 **Potenziale:** App di riferimento in Italia e pronta per espansione Europa immediata
 
@@ -114,8 +114,9 @@ I pescatori italiani (2 milioni di persone) oggi:
 - Supporto in italiano
 - Conoscenza spots e culture locale
 
-### 📱 App Nativa iOS/Android
+### 📱 App Nativa iPhone e Android
 - **Capacitor** per performance native
+- Disponibile su **Apple App Store** e **Google Play Store**
 - Accesso a GPS, fotocamera, microfono
 - Push notifications
 - Widget mobile
@@ -176,7 +177,7 @@ I pescatori italiani (2 milioni di persone) oggi:
 | **🔮 Previsioni AI** | 🔜 Roadmap | ⚠️ Base | ❌ | ❌ | ❌ |
 | **🇮🇹 Lingua Italiana Nativa** | ✅✅ | ⚠️ Tradotta | ⚠️ Tradotta | ⚠️ Tradotta | ❌ |
 | **🌍 Multilingua (4+ lingue)** | ✅✅ IT/EN/ES/FR | ✅ | ✅ | ⚠️ 2 lingue | ❌ |
-| **📱 App Nativa iOS/Android** | ✅✅ Capacitor | ✅ | ✅ | ✅ | ⚠️ Solo web |
+| **📱 App Nativa iPhone + Android** | ✅✅ Capacitor | ✅ | ✅ | ✅ | ⚠️ Solo web |
 | **📥 Import/Export Backup** | ✅✅ | ⚠️ Premium | ⚠️ Premium | ❌ | ❌ |
 | **💰 Prezzo Mensile** | €4.99 | $7.00 | $7.00 | €3.99 | Gratis+ads |
 | **💰 Prezzo Annuale** | €39.99 | $60 | $50 | €19.99 | N/A |
@@ -734,7 +735,7 @@ Competitor hanno 3-4 di queste, noi tutte.
 - Analytics e filtri multipli
 - **Export/Import dati completo**
 - **Multilingua: Italiano, English, Español, Français**
-- **App nativa iOS/Android** (Capacitor)
+- **App nativa iPhone e Android** (Capacitor)
 - **AdMob integrato** per monetizzazione
 - UI ottimizzata dark mode
 
@@ -935,7 +936,7 @@ Siamo alla ricerca di un **partner strategico** che condivida la nostra visione 
 
 ✅ **Tecnologia Unica** - Voce AI che nessuno ha
 ✅ **Mercato Grande** - 2M pescatori in Italia, 25M in Europa
-✅ **Prodotto Pronto** - App nativa iOS/Android funzionante
+✅ **Prodotto Pronto** - App nativa iPhone e Android funzionante
 ✅ **Multilingua** - IT/EN/ES/FR già integrati, pronto per Europa
 ✅ **Competitor Deboli** - Nessuno forte in italiano
 ✅ **Business Scalabile** - Margini 80%+, AdMob + Premium

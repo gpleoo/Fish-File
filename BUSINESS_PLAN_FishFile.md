@@ -14,7 +14,7 @@
 
 Permette di registrare le catture parlando (senza toccare il telefono), tiene traccia di attrezzatura e condizioni meteo, e suggerisce i momenti migliori per pescare.
 
-**Già pronto:** App nativa iOS/Android, 4 lingue (IT/EN/ES/FR), AdMob integrato
+**Già pronto:** App nativa iPhone e Android, 4 lingue (IT/EN/ES/FR), AdMob integrato
 **Cosa cerchiamo:** €50.000 per il 20% dell'azienda
 **A cosa servono:** Lanciare l'app e acquisire i primi 5.000 utenti
 **Quando recuperi l'investimento:** 3-5 anni con moltiplicatore 12-20x
@@ -68,8 +68,9 @@ I pescatori italiani (2 milioni di persone) oggi devono:
 - Pronto per espansione mercati europei
 - Assistente vocale funziona in tutte le lingue
 
-### 📱 App Nativa iOS/Android
+### 📱 App Nativa iPhone e Android
 - **Capacitor** per performance native
+- Disponibile su **Apple App Store** e **Google Play Store**
 - Accesso a GPS, fotocamera, microfono
 - **AdMob integrato** per monetizzazione
 - Offline-first architecture
@@ -98,7 +99,7 @@ I pescatori italiani (2 milioni di persone) oggi devono:
 | **Gestione Attrezzatura Completa** | ✅ ✅ | ⚠️ Base | ⚠️ Base | ❌ |
 | **Dati Onde (altezza + frequenza)** | ✅ | ❌ | ❌ | ❌ |
 | **Multilingua (4+ lingue)** | ✅ ✅ IT/EN/ES/FR | ✅ | ✅ | ⚠️ 2 lingue |
-| **App Nativa iOS/Android** | ✅ ✅ Capacitor | ✅ | ✅ | ✅ |
+| **App Nativa iPhone + Android** | ✅ ✅ Capacitor | ✅ | ✅ | ✅ |
 | **Import/Export Backup** | ✅ ✅ | ⚠️ Premium | ⚠️ Premium | ❌ |
 | **Lingua Italiana Nativa** | ✅ ✅ | ⚠️ Tradotta | ⚠️ Tradotta | ⚠️ Tradotta |
 | **Prezzo Mensile** | €4.99 | $7.00 | $7.00 | €3.99 |
@@ -118,7 +119,7 @@ I pescatori italiani (2 milioni di persone) oggi devono:
 **Noi:**
 - ✅ Abbiamo la tecnologia migliore (voce AI)
 - ✅ Siamo italiani ma pronti per l'Europa (4 lingue)
-- ✅ App nativa iOS/Android già pronta
+- ✅ App nativa iPhone e Android già pronta
 - ✅ Abbiamo più funzioni di tutti
 - ✅ Prezzo competitivo
 
@@ -677,7 +678,7 @@ L'app è **già funzionante al 100%** con:
 - Dati meteo, maree, luna, onde
 - **Export/Import dati completo**
 - **Multilingua: Italiano, English, Español, Français**
-- **App nativa iOS/Android** (Capacitor)
+- **App nativa iPhone e Android** (Capacitor)
 - **AdMob integrato** per monetizzazione
 - UI ottimizzata dark mode
 
@@ -742,7 +743,7 @@ L'app è **già funzionante al 100%** con:
 - App già sviluppata (€40K di lavoro fatto)
 - Tecnologia unica (assistente vocale)
 - **4 lingue già integrate** (pronto per Europa)
-- **App nativa iOS/Android** già funzionante
+- **App nativa iPhone e Android** già funzionante
 - Mercato da €10M in Italia non servito
 - Proiezione €130K incassi anno 3
 - Comparable: altre app simili valuate €200-300K in fase seed
@@ -960,7 +961,7 @@ L'app è **già funzionante al 100%** con:
 
 ✅ **Tecnologia Unica** - Nessuno ha voce AI in italiano
 ✅ **Mercato Grande** - 2M pescatori Italia, 25M Europa
-✅ **Prodotto Pronto** - App nativa iOS/Android già funzionante
+✅ **Prodotto Pronto** - App nativa iPhone e Android già funzionante
 ✅ **Multilingua** - IT/EN/ES/FR già integrati, pronto per Europa
 ✅ **Business Model Provato** - Freemium + AdMob (Fishbrain fa $14M/anno)
 ✅ **Competitor Deboli** - In italiano non c'è nessuno forte
