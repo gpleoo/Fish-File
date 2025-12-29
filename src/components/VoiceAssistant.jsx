@@ -57,11 +57,21 @@ const VoiceAssistant = ({
     const currentStateRef = useRef(state)
     const isMountedRef = useRef(true)
     const restartTimeoutRef = useRef(null)
+    const catchDataRef = useRef(catchData)
+    const attemptsRef = useRef(attempts)
 
-    // Keep currentStateRef in sync
+    // Keep refs in sync with state
     useEffect(() => {
         currentStateRef.current = state
     }, [state])
+
+    useEffect(() => {
+        catchDataRef.current = catchData
+    }, [catchData])
+
+    useEffect(() => {
+        attemptsRef.current = attempts
+    }, [attempts])
 
     // Helper to update state synchronously (ref + state)
     const setStateSync = useCallback((newState) => {
@@ -226,6 +236,7 @@ const VoiceAssistant = ({
 
     /**
      * Process speech result based on current state
+     * Uses refs for catchData and attempts to avoid effect re-triggers
      */
     const processResult = useCallback(async (spokenText) => {
         if (isProcessingRef.current) {
@@ -244,16 +255,17 @@ const VoiceAssistant = ({
                         setAttempts(0)
                         await speak(`${result.match}. ${t('voice.askLength')}`)
                         setStateSync(STATES.ASKING_LENGTH)
-                        startListening()
+                        // Small delay to ensure state is updated before listening
+                        setTimeout(() => startListening(), 100)
                     } else {
-                        const newAttempts = attempts + 1
+                        const newAttempts = attemptsRef.current + 1
                         setAttempts(newAttempts)
                         if (newAttempts >= MAX_ATTEMPTS) {
                             await speak(t('voice.fillManually'))
                             setStateSync(STATES.ERROR)
                         } else {
                             await speak(t('voice.notUnderstood') + ' ' + t('voice.askSpecies'))
-                            startListening()
+                            setTimeout(() => startListening(), 100)
                         }
                     }
                     break
@@ -266,16 +278,16 @@ const VoiceAssistant = ({
                         setAttempts(0)
                         await speak(`${length} centimetri. ${t('voice.askBait')}`)
                         setStateSync(STATES.ASKING_BAIT)
-                        startListening()
+                        setTimeout(() => startListening(), 100)
                     } else {
-                        const newAttempts = attempts + 1
+                        const newAttempts = attemptsRef.current + 1
                         setAttempts(newAttempts)
                         if (newAttempts >= MAX_ATTEMPTS) {
                             await speak(t('voice.fillManually'))
                             setStateSync(STATES.ERROR)
                         } else {
                             await speak(t('voice.notUnderstood') + ' ' + t('voice.askLength'))
-                            startListening()
+                            setTimeout(() => startListening(), 100)
                         }
                     }
                     break
@@ -288,16 +300,16 @@ const VoiceAssistant = ({
                         setAttempts(0)
                         await speak(`${result.match}. ${t('voice.askConfirm')}`)
                         setStateSync(STATES.ASKING_CONFIRM)
-                        startListening()
+                        setTimeout(() => startListening(), 100)
                     } else {
-                        const newAttempts = attempts + 1
+                        const newAttempts = attemptsRef.current + 1
                         setAttempts(newAttempts)
                         if (newAttempts >= MAX_ATTEMPTS) {
                             await speak(t('voice.fillManually'))
                             setStateSync(STATES.ERROR)
                         } else {
                             await speak(t('voice.notUnderstood') + ' ' + t('voice.askBait'))
-                            startListening()
+                            setTimeout(() => startListening(), 100)
                         }
                     }
                     break
@@ -306,7 +318,7 @@ const VoiceAssistant = ({
                 case STATES.ASKING_CONFIRM: {
                     if (isAffirmative(spokenText)) {
                         // First speak, then save (to avoid interruption)
-                        const catchToSave = { ...catchData }
+                        const catchToSave = { ...catchDataRef.current }
 
                         setCatchData({ specie: '', lunghezza: '', esca: '' })
                         setStateSync(STATES.WAITING_NEW_CATCH)
@@ -315,15 +327,15 @@ const VoiceAssistant = ({
 
                         // Save the catch after speaking
                         onCatchComplete(catchToSave)
-                        startListening()
+                        setTimeout(() => startListening(), 100)
                     } else if (isNegative(spokenText)) {
                         setCatchData({ specie: '', lunghezza: '', esca: '' })
                         setStateSync(STATES.WAITING_NEW_CATCH)
                         await speak(t('voice.cancelled') + ' ' + t('voice.sayNewCatch'))
-                        startListening()
+                        setTimeout(() => startListening(), 100)
                     } else {
                         await speak(t('voice.yesOrNo'))
-                        startListening()
+                        setTimeout(() => startListening(), 100)
                     }
                     break
                 }
@@ -333,10 +345,10 @@ const VoiceAssistant = ({
                         setAttempts(0)
                         await speak(t('voice.askSpecies'))
                         setStateSync(STATES.ASKING_SPECIES)
-                        startListening()
+                        setTimeout(() => startListening(), 100)
                     } else {
                         // Keep listening silently
-                        startListening()
+                        setTimeout(() => startListening(), 100)
                     }
                     break
                 }
@@ -347,7 +359,7 @@ const VoiceAssistant = ({
         } finally {
             isProcessingRef.current = false
         }
-    }, [speak, t, specieMemorizzate, escheMemorizzate, attempts, onCatchComplete, startListening, catchData, setStateSync])
+    }, [speak, t, specieMemorizzate, escheMemorizzate, onCatchComplete, startListening, setStateSync])
 
     /**
      * Setup recognition event handlers
