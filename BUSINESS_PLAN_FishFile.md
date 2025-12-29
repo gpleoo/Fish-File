@@ -10,10 +10,11 @@
 
 # 📋 In Breve
 
-**Fish File** è la prima app italiana per pescatori con **assistente vocale intelligente**.
+**Fish File** è la prima app multilingua per pescatori con **assistente vocale intelligente**.
 
 Permette di registrare le catture parlando (senza toccare il telefono), tiene traccia di attrezzatura e condizioni meteo, e suggerisce i momenti migliori per pescare.
 
+**Già pronto:** App nativa iOS/Android, 4 lingue (IT/EN/ES/FR), AdMob integrato
 **Cosa cerchiamo:** €50.000 per il 20% dell'azienda
 **A cosa servono:** Lanciare l'app e acquisire i primi 5.000 utenti
 **Quando recuperi l'investimento:** 3-5 anni con moltiplicatore 12-20x
@@ -61,7 +62,25 @@ I pescatori italiani (2 milioni di persone) oggi devono:
 - Statistiche: dove/quando/con cosa peschi meglio
 - Filtri intelligenti per trovare pattern
 
-### 🇮🇹 100% Italiano
+### 🌍 Multilingua Nativo
+- **4 lingue già integrate:** Italiano, English, Español, Français
+- Cambio lingua immediato nelle impostazioni
+- Pronto per espansione mercati europei
+- Assistente vocale funziona in tutte le lingue
+
+### 📱 App Nativa iOS/Android
+- **Capacitor** per performance native
+- Accesso a GPS, fotocamera, microfono
+- **AdMob integrato** per monetizzazione
+- Offline-first architecture
+
+### 💾 Backup Completo
+- **Export dati** in formato JSON
+- **Import dati** da backup precedenti
+- Trasferimento dati tra dispositivi
+- Nessuna perdita dati
+
+### 🇮🇹 Made in Italy
 - Fatto da pescatori italiani per pescatori italiani
 - Nomi pesci corretti (non traduzioni strane)
 - Supporto e assistenza in italiano
@@ -78,6 +97,9 @@ I pescatori italiani (2 milioni di persone) oggi devono:
 | **Riconosce Dialetti** | ✅ ✅ | ❌ | ❌ | ❌ |
 | **Gestione Attrezzatura Completa** | ✅ ✅ | ⚠️ Base | ⚠️ Base | ❌ |
 | **Dati Onde (altezza + frequenza)** | ✅ | ❌ | ❌ | ❌ |
+| **Multilingua (4+ lingue)** | ✅ ✅ IT/EN/ES/FR | ✅ | ✅ | ⚠️ 2 lingue |
+| **App Nativa iOS/Android** | ✅ ✅ Capacitor | ✅ | ✅ | ✅ |
+| **Import/Export Backup** | ✅ ✅ | ⚠️ Premium | ⚠️ Premium | ❌ |
 | **Lingua Italiana Nativa** | ✅ ✅ | ⚠️ Tradotta | ⚠️ Tradotta | ⚠️ Tradotta |
 | **Prezzo Mensile** | €4.99 | $7.00 | $7.00 | €3.99 |
 | **Utenti Attivi** | 0 (lancio) | 15M | 5M | 3M |
@@ -95,7 +117,8 @@ I pescatori italiani (2 milioni di persone) oggi devono:
 
 **Noi:**
 - ✅ Abbiamo la tecnologia migliore (voce AI)
-- ✅ Siamo italiani al 100%
+- ✅ Siamo italiani ma pronti per l'Europa (4 lingue)
+- ✅ App nativa iOS/Android già pronta
 - ✅ Abbiamo più funzioni di tutti
 - ✅ Prezzo competitivo
 
@@ -643,18 +666,22 @@ Presentiamo 3 scenari di crescita per dare una visione completa delle possibilit
 
 # 🛣️ Sviluppo Futuro
 
-## Già Fatto ✅ (Gennaio 2026)
+## Già Fatto ✅ (Dicembre 2025)
 
-L'app è **già funzionante** con:
+L'app è **già funzionante al 100%** con:
 - Registrazione catture vocale e manuale
-- Gestione sessioni di pesca
+- Gestione sessioni di pesca con GPS
 - Statistiche e filtri avanzati
 - Mappe interattive
 - Gestione attrezzatura completa
 - Dati meteo, maree, luna, onde
-- Export dati
+- **Export/Import dati completo**
+- **Multilingua: Italiano, English, Español, Français**
+- **App nativa iOS/Android** (Capacitor)
+- **AdMob integrato** per monetizzazione
+- UI ottimizzata dark mode
 
-**Valore:** €30.000 di sviluppo già investito dal fondatore
+**Valore:** €40.000 di sviluppo già investito dal fondatore
 
 ## Primo Anno (2026)
 
@@ -686,7 +713,8 @@ L'app è **già funzionante** con:
 
 - **Riconoscimento foto pesce** con AI
 - Versione **PRO per guide professionali**
-- **Espansione internazionale** (Spagna, Francia)
+- **Espansione internazionale** (✅ traduzioni già pronte per Spagna, Francia)
+- Marketing localizzato per mercati EU
 - Marketplace attrezzatura usata
 
 ## Terzo Anno (2028)
@@ -711,8 +739,10 @@ L'app è **già funzionante** con:
 
 ## Perché Questa Valutazione?
 
-- App già sviluppata (€30K di lavoro fatto)
+- App già sviluppata (€40K di lavoro fatto)
 - Tecnologia unica (assistente vocale)
+- **4 lingue già integrate** (pronto per Europa)
+- **App nativa iOS/Android** già funzionante
 - Mercato da €10M in Italia non servito
 - Proiezione €130K incassi anno 3
 - Comparable: altre app simili valuate €200-300K in fase seed
@@ -926,15 +956,16 @@ L'app è **già funzionante** con:
 
 # 🎣 In Conclusione
 
-**Fish File** ha tutto per diventare l'app di riferimento per i pescatori italiani:
+**Fish File** ha tutto per diventare l'app di riferimento per i pescatori italiani ed europei:
 
 ✅ **Tecnologia Unica** - Nessuno ha voce AI in italiano
-✅ **Mercato Grande** - 2M pescatori, €10M/anno
-✅ **Prodotto Pronto** - App già funzionante
-✅ **Business Model Provato** - Freemium funziona (Fishbrain fa $14M/anno)
+✅ **Mercato Grande** - 2M pescatori Italia, 25M Europa
+✅ **Prodotto Pronto** - App nativa iOS/Android già funzionante
+✅ **Multilingua** - IT/EN/ES/FR già integrati, pronto per Europa
+✅ **Business Model Provato** - Freemium + AdMob (Fishbrain fa $14M/anno)
 ✅ **Competitor Deboli** - In italiano non c'è nessuno forte
 ✅ **Margini Alti** - Software costa poco, profitto 85%+
-✅ **Scalabile** - Da Italia a Europa (25M pescatori)
+✅ **Scalabile** - Da Italia a Europa immediato
 
 **€50.000 oggi possono diventare €600.000-1.000.000 in 3-5 anni.**
 

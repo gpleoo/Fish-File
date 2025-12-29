@@ -1,9 +1,9 @@
-# 📱 FishAI - Manuale Utente
+# 📱 Fish File - Manuale Utente
 ### Il tuo diario di pesca intelligente
 
 ---
 
-## 🎯 Perché usare FishAI?
+## 🎯 Perché usare Fish File?
 
 Ogni pescatore sa che **il successo non è questione di fortuna, ma di esperienza e dati**.
 
@@ -13,7 +13,7 @@ Quante volte ti sei chiesto:
 - *"Quale esca funziona meglio con mare mosso?"*
 - *"In che fase lunare ho fatto più catture?"*
 
-**FishAI trasforma la tua esperienza in conoscenza.**
+**Fish File trasforma la tua esperienza in conoscenza.**
 
 Registrando ogni uscita con condizioni meteo, posizione GPS e risultati, costruisci un **database personale** che ti dirà esattamente:
 ✅ Dove andare in base alle previsioni meteo di oggi
@@ -34,7 +34,7 @@ Registrando ogni uscita con condizioni meteo, posizione GPS e risultati, costrui
 5. [Usare l'Assistente Vocale](#5-usare-lassistente-vocale)
 6. [Analizzare i Dati](#6-analizzare-i-dati)
 7. [Gestire Attrezzature e Liste](#7-gestire-attrezzature-e-liste)
-8. [Esportare i Dati](#8-esportare-i-dati)
+8. [Backup e Ripristino Dati](#8-backup-e-ripristino-dati)
 9. [Domande Frequenti](#9-domande-frequenti)
 
 ---
@@ -278,7 +278,7 @@ Scorri in basso e premi il pulsante cyan **"registra cattura"**.
 
 ## 6. Analizzare i Dati
 
-Qui sta la **magia di FishAI**: trasformare i dati in conoscenza.
+Qui sta la **magia di Fish File**: trasformare i dati in conoscenza.
 
 ### Passo 1: Apri la Sezione "Analizza Dati"
 
@@ -416,9 +416,9 @@ Tutte le liste sono ordinate alfabeticamente in automatico.
 
 ---
 
-## 8. Esportare i Dati
+## 8. Backup e Ripristino Dati
 
-### Perché Esportare?
+### Perché fare Backup?
 
 - **Backup di sicurezza** (LocalStorage può essere cancellato)
 - Trasferire dati su altro dispositivo
@@ -427,29 +427,63 @@ Tutte le liste sono ordinate alfabeticamente in automatico.
 
 ---
 
+### Dove trovo le funzioni di Backup?
+
+Vai su **Impostazioni** (icona ingranaggio ⚙️) → sezione **"Backup"**.
+
+Qui troverai:
+- **Esporta dati** - Scarica un backup completo
+- **Importa dati** - Ripristina da un backup precedente
+- **Elimina tutti i dati** - Cancella tutti i dati dell'app
+
+---
+
 ### Come Esportare
 
-1. Scorri in fondo alla pagina
-2. Premi il pulsante viola **"esporta dati"**
+1. Vai su **Impostazioni** → **Backup**
+2. Premi il pulsante **"Esporta dati"**
 
 ![Esporta](./immagini/24-esporta-dati.png)
-*Immagine da inserire: Pulsante "esporta dati" con numero catture*
+*Immagine da inserire: Sezione Backup con pulsanti esporta/importa*
 
 3. Verrà scaricato un file JSON:
    ```
-   diario-pesca-2025-01-15.json
+   fishfile-backup-2025-01-15.json
    ```
 
 ---
 
-### Cosa Contiene il File?
+### Come Importare
+
+1. Vai su **Impostazioni** → **Backup**
+2. Premi il pulsante **"Importa dati"**
+3. Seleziona il file JSON di backup precedentemente esportato
+4. Conferma l'importazione
+
+**⚠️ Attenzione:** L'importazione sovrascriverà tutti i dati esistenti!
+
+---
+
+### Cosa Contiene il File di Backup?
 
 - ✅ Tutte le catture con dati meteo
 - ✅ Tutte le sessioni completate
 - ✅ Liste attrezzature (canne, ami, travi, piombi)
 - ✅ Liste località, specie, esche
+- ✅ Impostazioni lingua
 
 **💡 Consiglio:** Esporta i dati regolarmente (es: una volta al mese) e conserva il file in cloud (Google Drive, Dropbox).
+
+---
+
+### Eliminare tutti i dati
+
+Se vuoi ricominciare da zero:
+1. Vai su **Impostazioni** → **Backup**
+2. Premi **"Elimina tutti i dati"**
+3. Conferma l'eliminazione
+
+**⚠️ Questa operazione è irreversibile!** Assicurati di aver esportato un backup prima.
 
 ---
 
@@ -469,7 +503,7 @@ No, attualmente non c'è la funzione di modifica. Puoi solo eliminare e ricreare
 
 ### ❓ I dati sono sincronizzati tra dispositivi?
 
-No, FishAI usa LocalStorage del browser. I dati restano solo sul tuo dispositivo. Usa la funzione **"esporta dati"** per backup e trasferimento.
+No, Fish File usa LocalStorage del browser. I dati restano solo sul tuo dispositivo. Usa la funzione di **Backup** nelle Impostazioni per esportare e trasferire i dati.
 
 ---
 
@@ -479,9 +513,9 @@ No, FishAI usa LocalStorage del browser. I dati restano solo sul tuo dispositivo
 
 ---
 
-### ❓ Posso usare FishAI offline?
+### ❓ Posso usare Fish File offline?
 
-Sì per registrare catture, NO per la mappa (serve connessione per scaricare le tile di OpenStreetMap).
+Sì, puoi registrare catture offline. La mappa richiede connessione per scaricare le tile di OpenStreetMap.
 
 ---
 
@@ -491,7 +525,7 @@ Sì per registrare catture, NO per la mappa (serve connessione per scaricare le 
 2. Assicurati di essere all'aperto con GPS attivo
 3. In alternativa, usa Google Maps per trovare le coordinate manualmente:
    - Tocca a lungo sul punto → Appariranno le coordinate
-   - Copia e incolla in FishAI
+   - Copia e incolla in Fish File
 
 ---
 
@@ -530,7 +564,7 @@ Dopo 6 mesi di utilizzo scoprirai pattern come:
 
 ### ❓ Posso importare dati da un file JSON precedente?
 
-Attualmente no, la funzione non è implementata. I dati esportati sono solo per backup esterno.
+Sì! Vai su **Impostazioni** → **Backup** → **Importa dati**. Seleziona il file JSON esportato in precedenza e i tuoi dati verranno ripristinati.
 
 ---
 
@@ -544,14 +578,14 @@ Attualmente no, la funzione non è implementata. I dati esportati sono solo per 
 
 4. **Esporta regolarmente:** Una volta al mese, esporta i dati e salvali in cloud.
 
-5. **Condividi:** Se hai amici pescatori che usano FishAI, confrontate i dati! Potreste scoprire pattern regionali.
+5. **Condividi:** Se hai amici pescatori che usano Fish File, confrontate i dati! Potreste scoprire pattern regionali.
 
 ---
 
 ## 📧 Supporto
 
 Per problemi, suggerimenti o domande:
-- GitHub Issues: [https://github.com/gpleoo/FishAI/issues](https://github.com/gpleoo/FishAI/issues)
+- GitHub Issues: [https://github.com/gpleoo/Fish-File/issues](https://github.com/gpleoo/Fish-File/issues)
 
 ---
 
@@ -561,4 +595,4 @@ Per problemi, suggerimenti o domande:
 
 ---
 
-© 2025 Giampietro Leonoro - FishAI
+© 2025 Giampietro Leonoro - Fish File

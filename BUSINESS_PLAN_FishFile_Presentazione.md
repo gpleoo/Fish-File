@@ -10,14 +10,15 @@
 
 # 🎣 Fish File in Breve
 
-**La prima app italiana per pescatori con assistente vocale intelligente.**
+**La prima app multilingua per pescatori con assistente vocale intelligente.**
 
 Registra le catture parlando (mani libere), traccia attrezzatura e meteo, suggerisce i momenti migliori per pescare.
 
-**Mercato:** 2 milioni di pescatori italiani, nessun competitor forte
-**Tecnologia:** Unica al mondo - voce AI in italiano con riconoscimento dialetti
-**Prodotto:** Già funzionante e pronto per il lancio
-**Potenziale:** Diventare l'app di riferimento in Italia, poi espansione Europa
+**Mercato:** 2 milioni di pescatori italiani, 25+ milioni in Europa
+**Tecnologia:** Unica al mondo - voce AI con riconoscimento dialetti in 4 lingue
+**Prodotto:** Già funzionante con app nativa iOS/Android (Capacitor)
+**Multilingua:** Italiano, English, Español, Français - già integrato
+**Potenziale:** App di riferimento in Italia e pronta per espansione Europa immediata
 
 ---
 
@@ -94,15 +95,32 @@ I pescatori italiani (2 milioni di persone) oggi:
 
 ### 💾 Backup e Sincronizzazione
 - Salvataggio automatico locale
-- Export dati completi
+- **Export dati completo** (JSON)
+- **Import dati** da backup precedenti
+- **Eliminazione dati** con conferma
 - Nessuna perdita dati (offline-first)
 - Sync cloud (roadmap)
 
-### 🇮🇹 100% Italiano
+### 🌍 Multilingua Nativo
+- **4 lingue già integrate:** Italiano, English, Español, Français
+- Cambio lingua immediato nelle impostazioni
+- Interfaccia completamente tradotta
+- Assistente vocale funziona in tutte le lingue
+- Pronto per espansione mercati europei
+
+### 🇮🇹 Made in Italy
 - Sviluppato da pescatori italiani
 - Nomi pesci corretti (non traduzioni Google)
 - Supporto in italiano
 - Conoscenza spots e culture locale
+
+### 📱 App Nativa iOS/Android
+- **Capacitor** per performance native
+- Accesso a GPS, fotocamera, microfono
+- Push notifications
+- Widget mobile
+- Offline-first architecture
+- **AdMob** integrato per monetizzazione
 
 ### 🎨 Esperienza Utente
 - Interfaccia moderna dark mode (azzurro cyan)
@@ -157,6 +175,9 @@ I pescatori italiani (2 milioni di persone) oggi:
 | **🤖 AI Riconoscimento Foto** | 🔜 Roadmap | ✅ | ❌ | ❌ | ✅✅ |
 | **🔮 Previsioni AI** | 🔜 Roadmap | ⚠️ Base | ❌ | ❌ | ❌ |
 | **🇮🇹 Lingua Italiana Nativa** | ✅✅ | ⚠️ Tradotta | ⚠️ Tradotta | ⚠️ Tradotta | ❌ |
+| **🌍 Multilingua (4+ lingue)** | ✅✅ IT/EN/ES/FR | ✅ | ✅ | ⚠️ 2 lingue | ❌ |
+| **📱 App Nativa iOS/Android** | ✅✅ Capacitor | ✅ | ✅ | ✅ | ⚠️ Solo web |
+| **📥 Import/Export Backup** | ✅✅ | ⚠️ Premium | ⚠️ Premium | ❌ | ❌ |
 | **💰 Prezzo Mensile** | €4.99 | $7.00 | $7.00 | €3.99 | Gratis+ads |
 | **💰 Prezzo Annuale** | €39.99 | $60 | $50 | €19.99 | N/A |
 
@@ -702,19 +723,22 @@ Competitor hanno 3-4 di queste, noi tutte.
 
 # 🛣️ Roadmap Prodotto
 
-## ✅ Già Fatto (Gennaio 2026)
+## ✅ Già Fatto (Dicembre 2025)
 
 **L'app è funzionante al 100% con:**
-- Assistente vocale completo
+- Assistente vocale completo (riconoscimento fuzzy + dialetti)
 - Gestione catture e sessioni
-- GPS e mappe
-- Meteo avanzato
-- Attrezzatura completa
-- Analytics e filtri
-- Export dati
-- UI ottimizzata
+- GPS e mappe interattive
+- Meteo avanzato (maree, luna, onde, vento)
+- Attrezzatura completa (canne, ami, piombi, lenze, esche)
+- Analytics e filtri multipli
+- **Export/Import dati completo**
+- **Multilingua: Italiano, English, Español, Français**
+- **App nativa iOS/Android** (Capacitor)
+- **AdMob integrato** per monetizzazione
+- UI ottimizzata dark mode
 
-**Valore sviluppo già fatto:** ~€30.000
+**Valore sviluppo già fatto:** ~€40.000
 
 ## 2026 - Anno 1
 
@@ -755,11 +779,11 @@ Competitor hanno 3-4 di queste, noi tutte.
 - White-label reports
 - Multi-user accounts
 
-**Q3:** International
-- English version
-- Spanish, French translations
+**Q3:** International Expansion
+- ✅ English, Spanish, French già pronti
+- Marketing localizzato per mercati EU
 - Global species database
-- Multi-currency
+- Multi-currency payments
 
 **Q4:** Marketplace
 - Buy/sell used gear
@@ -858,12 +882,13 @@ Private Equity specializzati in:
 - Competizione friendly
 - Switching cost alto
 
-## 4. Local Expertise 🇮🇹
-**Impossibile replicare dall'estero**
-- Cultura pesca italiana
-- Nomi specie regionali
-- Dialetti e modi di dire
-- Partnership locali
+## 4. Local Expertise + Multilingua 🌍
+**Radicati in Italia, pronti per l'Europa**
+- Cultura pesca italiana + database specie regionali
+- Nomi specie e dialetti locali
+- **4 lingue già integrate** (IT/EN/ES/FR)
+- Partnership locali estendibili a mercati EU
+- Vantaggio first-mover in ogni mercato
 
 ## 5. Cost Leadership 💰
 **Margini migliori = più investimento**
@@ -910,9 +935,10 @@ Siamo alla ricerca di un **partner strategico** che condivida la nostra visione 
 
 ✅ **Tecnologia Unica** - Voce AI che nessuno ha
 ✅ **Mercato Grande** - 2M pescatori in Italia, 25M in Europa
-✅ **Prodotto Pronto** - App funzionante, non solo idea
+✅ **Prodotto Pronto** - App nativa iOS/Android funzionante
+✅ **Multilingua** - IT/EN/ES/FR già integrati, pronto per Europa
 ✅ **Competitor Deboli** - Nessuno forte in italiano
-✅ **Business Scalabile** - Margini 80%+, espandibile in Europa
+✅ **Business Scalabile** - Margini 80%+, AdMob + Premium
 ✅ **Team Appassionato** - Fondatore pescatore che capisce il problema
 ✅ **Exit Chiare** - Multiple buyer già identificati
 
