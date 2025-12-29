@@ -1,6 +1,6 @@
 # Immagini per il Manuale Utente
 
-Questa cartella contiene le immagini screenshot dell'app FishAI per il manuale utente.
+Questa cartella contiene le immagini screenshot dell'app Fish File per il manuale utente.
 
 ## Lista Immagini da Creare
 
@@ -31,7 +31,7 @@ Questa cartella contiene le immagini screenshot dell'app FishAI per il manuale u
 
 ## Come Creare gli Screenshot
 
-1. Apri l'app FishAI in un browser (preferibilmente Chrome/Safari mobile)
+1. Apri l'app Fish File in un browser (preferibilmente Chrome/Safari mobile)
 2. Usa il dispositivo mobile o modalità responsive del browser (F12 → Toggle Device Toolbar)
 3. Compila l'app con dati esempio realistici
 4. Fai screenshot di ogni schermata seguendo la lista sopra
