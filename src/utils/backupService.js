@@ -56,19 +56,19 @@ export const createBackupData = () => {
         data: {}
     }
 
-    // Raccogli tutti i dati da localStorage
+    // Raccogli tutti i dati da localStorage (chiavi corrette usate dall'app)
     const keysToBackup = [
-        'catture',
-        'sessioni_completate',
-        'specie_memorizzate',
-        'localita_memorizzate',
-        'esche_memorizzate',
-        'canne_memorizzate',
-        'travi_memorizzate',
-        'ami_memorizzati',
-        'piombi_memorizzati',
-        'note_memorizzate',
-        'fishfile_language'
+        'diarioPesca_catture',
+        'diarioPesca_sessioniCompletate',
+        'diarioPesca_specie',
+        'diarioPesca_localita',
+        'diarioPesca_esche',
+        'diarioPesca_canne',
+        'diarioPesca_travi',
+        'diarioPesca_ami',
+        'diarioPesca_piombi',
+        'diarioPesca_note',
+        'fishFileLanguage'
     ]
 
     keysToBackup.forEach(key => {
@@ -127,8 +127,8 @@ export const exportBackupToFile = () => {
         id: generateBackupId(),
         date: new Date().toISOString(),
         type: 'file',
-        catture: backupData.data.catture?.length || 0,
-        sessioni: backupData.data.sessioni_completate?.length || 0
+        catture: backupData.data.diarioPesca_catture?.length || 0,
+        sessioni: backupData.data.diarioPesca_sessioniCompletate?.length || 0
     }
     saveBackupToHistory(backupInfo)
 
@@ -137,6 +137,10 @@ export const exportBackupToFile = () => {
 
 /**
  * Importa backup da file JSON
+ * Supporta:
+ * - Nuovo formato con chiavi diarioPesca_*
+ * - Vecchio formato con chiavi semplici (catture, sessioni, etc.)
+ * - Formato export GDPR con wrapper data.*
  */
 export const importBackupFromFile = (file) => {
     return new Promise((resolve, reject) => {
@@ -146,44 +150,71 @@ export const importBackupFromFile = (file) => {
             try {
                 const backupData = JSON.parse(e.target.result)
 
-                // Valida struttura backup
-                if (!backupData.data) {
-                    // Potrebbe essere un vecchio formato di export
-                    if (backupData.catture) {
-                        // Converti vecchio formato
-                        const convertedData = {
-                            version: '1.0',
-                            timestamp: new Date().toISOString(),
-                            data: {
-                                catture: backupData.catture,
-                                sessioni_completate: backupData.sessioni || [],
-                                specie_memorizzate: backupData.specie || [],
-                                localita_memorizzate: backupData.localita || [],
-                                esche_memorizzate: backupData.esche || [],
-                                canne_memorizzate: backupData.attrezzature?.canne || [],
-                                travi_memorizzate: backupData.attrezzature?.travi || [],
-                                ami_memorizzati: backupData.attrezzature?.ami || [],
-                                piombi_memorizzati: backupData.attrezzature?.piombi || []
-                            }
-                        }
-                        restoreFromBackup(convertedData)
-                        resolve({
-                            catture: convertedData.data.catture?.length || 0,
-                            sessioni: convertedData.data.sessioni_completate?.length || 0,
-                            converted: true
-                        })
-                        return
-                    }
-                    reject(new Error('Invalid backup format'))
+                // Caso 1: Nuovo formato con data.diarioPesca_*
+                if (backupData.data && backupData.data.diarioPesca_catture) {
+                    restoreFromBackup(backupData)
+                    resolve({
+                        catture: backupData.data.diarioPesca_catture?.length || 0,
+                        sessioni: backupData.data.diarioPesca_sessioniCompletate?.length || 0,
+                        date: backupData.timestamp
+                    })
                     return
                 }
 
-                restoreFromBackup(backupData)
-                resolve({
-                    catture: backupData.data.catture?.length || 0,
-                    sessioni: backupData.data.sessioni_completate?.length || 0,
-                    date: backupData.timestamp
-                })
+                // Caso 2: Formato con data.* ma vecchie chiavi
+                if (backupData.data) {
+                    // Converti a nuovo formato
+                    const convertedData = {
+                        version: '1.0',
+                        timestamp: backupData.timestamp || new Date().toISOString(),
+                        data: {
+                            diarioPesca_catture: backupData.data.catture || backupData.data.diarioPesca_catture || [],
+                            diarioPesca_sessioniCompletate: backupData.data.sessioni_completate || backupData.data.sessioni || backupData.data.diarioPesca_sessioniCompletate || [],
+                            diarioPesca_specie: backupData.data.specie_memorizzate || backupData.data.specieMemorizzate || backupData.data.diarioPesca_specie || [],
+                            diarioPesca_localita: backupData.data.localita_memorizzate || backupData.data.localitaMemorizzate || backupData.data.diarioPesca_localita || [],
+                            diarioPesca_esche: backupData.data.esche_memorizzate || backupData.data.escheMemorizzate || backupData.data.diarioPesca_esche || [],
+                            diarioPesca_canne: backupData.data.canne_memorizzate || backupData.data.canneMemorizzate || backupData.data.diarioPesca_canne || [],
+                            diarioPesca_travi: backupData.data.travi_memorizzate || backupData.data.traviMemorizzate || backupData.data.diarioPesca_travi || [],
+                            diarioPesca_ami: backupData.data.ami_memorizzati || backupData.data.amiMemorizzati || backupData.data.diarioPesca_ami || [],
+                            diarioPesca_piombi: backupData.data.piombi_memorizzati || backupData.data.piombiMemorizzati || backupData.data.diarioPesca_piombi || []
+                        }
+                    }
+                    restoreFromBackup(convertedData)
+                    resolve({
+                        catture: convertedData.data.diarioPesca_catture?.length || 0,
+                        sessioni: convertedData.data.diarioPesca_sessioniCompletate?.length || 0,
+                        converted: true
+                    })
+                    return
+                }
+
+                // Caso 3: Vecchio formato senza wrapper data
+                if (backupData.catture) {
+                    const convertedData = {
+                        version: '1.0',
+                        timestamp: new Date().toISOString(),
+                        data: {
+                            diarioPesca_catture: backupData.catture || [],
+                            diarioPesca_sessioniCompletate: backupData.sessioni || [],
+                            diarioPesca_specie: backupData.specie || [],
+                            diarioPesca_localita: backupData.localita || [],
+                            diarioPesca_esche: backupData.esche || [],
+                            diarioPesca_canne: backupData.attrezzature?.canne || [],
+                            diarioPesca_travi: backupData.attrezzature?.travi || [],
+                            diarioPesca_ami: backupData.attrezzature?.ami || [],
+                            diarioPesca_piombi: backupData.attrezzature?.piombi || []
+                        }
+                    }
+                    restoreFromBackup(convertedData)
+                    resolve({
+                        catture: convertedData.data.diarioPesca_catture?.length || 0,
+                        sessioni: convertedData.data.diarioPesca_sessioniCompletate?.length || 0,
+                        converted: true
+                    })
+                    return
+                }
+
+                reject(new Error('Invalid backup format'))
             } catch (err) {
                 reject(new Error('Error parsing backup file'))
             }
@@ -212,8 +243,8 @@ export const saveAutoBackup = () => {
             id: generateBackupId(),
             date: new Date().toISOString(),
             type: 'auto',
-            catture: backupData.data.catture?.length || 0,
-            sessioni: backupData.data.sessioni_completate?.length || 0
+            catture: backupData.data.diarioPesca_catture?.length || 0,
+            sessioni: backupData.data.diarioPesca_sessioniCompletate?.length || 0
         }
         saveBackupToHistory(backupInfo)
 
@@ -306,8 +337,8 @@ export const saveToGoogleDrive = () => {
         id: generateBackupId(),
         date: new Date().toISOString(),
         type: 'google_drive',
-        catture: backupData.data.catture?.length || 0,
-        sessioni: backupData.data.sessioni_completate?.length || 0
+        catture: backupData.data.diarioPesca_catture?.length || 0,
+        sessioni: backupData.data.diarioPesca_sessioniCompletate?.length || 0
     }
     saveBackupToHistory(backupInfo)
 
@@ -343,8 +374,8 @@ export const saveToDropbox = () => {
         id: generateBackupId(),
         date: new Date().toISOString(),
         type: 'dropbox',
-        catture: backupData.data.catture?.length || 0,
-        sessioni: backupData.data.sessioni_completate?.length || 0
+        catture: backupData.data.diarioPesca_catture?.length || 0,
+        sessioni: backupData.data.diarioPesca_sessioniCompletate?.length || 0
     }
     saveBackupToHistory(backupInfo)
 
