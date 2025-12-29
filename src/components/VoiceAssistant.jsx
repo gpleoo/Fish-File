@@ -59,6 +59,7 @@ const VoiceAssistant = ({
     const restartTimeoutRef = useRef(null)
     const catchDataRef = useRef(catchData)
     const attemptsRef = useRef(attempts)
+    const isListeningRef = useRef(false)
 
     // Keep refs in sync with state
     useEffect(() => {
@@ -182,14 +183,16 @@ const VoiceAssistant = ({
 
     /**
      * Start listening for voice input
+     * Uses ref to check listening state to avoid dependency issues
      */
     const startListening = useCallback(async () => {
-        // Prevent starting if already listening
-        if (isListening) {
+        // Prevent starting if already listening (use ref to avoid stale closure)
+        if (isListeningRef.current) {
             return
         }
 
         try {
+            isListeningRef.current = true
             setIsListening(true)
             setTranscript('')
 
@@ -213,9 +216,10 @@ const VoiceAssistant = ({
             if (!error.message?.includes('already started')) {
                 console.error('Recognition start error:', error)
             }
+            isListeningRef.current = false
             setIsListening(false)
         }
-    }, [useNativeRecognition, isListening])
+    }, [useNativeRecognition])
 
     /**
      * Stop listening
@@ -231,6 +235,7 @@ const VoiceAssistant = ({
                 // Ignore errors when stopping
             }
         }
+        isListeningRef.current = false
         setIsListening(false)
     }, [useNativeRecognition])
 
@@ -421,6 +426,7 @@ const VoiceAssistant = ({
                 const errorListener = await SpeechRecognition.addListener('error', (event) => {
                     if (!isMountedRef.current) return
                     console.error('Native recognition error:', event.message)
+                    isListeningRef.current = false
                     setIsListening(false)
                 })
 
@@ -433,6 +439,7 @@ const VoiceAssistant = ({
                 const stateListener = await SpeechRecognition.addListener('listeningState', (event) => {
                     if (!isMountedRef.current) return
                     if (event.status === 'stopped') {
+                        isListeningRef.current = false
                         setIsListening(false)
                         safeRestartListening()
                     }
@@ -468,11 +475,13 @@ const VoiceAssistant = ({
                     if (event.error !== 'no-speech' && event.error !== 'aborted') {
                         console.error('Web recognition error:', event.error)
                     }
+                    isListeningRef.current = false
                     setIsListening(false)
                 }
 
                 recognition.onend = () => {
                     if (!isMountedRef.current) return
+                    isListeningRef.current = false
                     setIsListening(false)
                     safeRestartListening()
                 }
