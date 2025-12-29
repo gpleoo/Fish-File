@@ -325,51 +325,6 @@ const SettingsPanel = ({ onDataRestored }) => {
         }
     }
 
-    const handleExportUserData = () => {
-        try {
-            // Collect all user data from localStorage
-            const userData = {
-                exportDate: new Date().toISOString(),
-                appVersion: '1.0',
-                data: {
-                    catture: JSON.parse(localStorage.getItem('catture') || '[]'),
-                    sessioni: JSON.parse(localStorage.getItem('sessioni') || '[]'),
-                    specieMemorizzate: JSON.parse(localStorage.getItem('specieMemorizzate') || '[]'),
-                    escheMemorizzate: JSON.parse(localStorage.getItem('escheMemorizzate') || '[]'),
-                    localitaMemorizzate: JSON.parse(localStorage.getItem('localitaMemorizzate') || '[]'),
-                    canneMemorizzate: JSON.parse(localStorage.getItem('canneMemorizzate') || '[]'),
-                    traviMemorizzate: JSON.parse(localStorage.getItem('traviMemorizzate') || '[]'),
-                    amiMemorizzati: JSON.parse(localStorage.getItem('amiMemorizzati') || '[]'),
-                    piombiMemorizzati: JSON.parse(localStorage.getItem('piombiMemorizzati') || '[]'),
-                    noteMemorizzate: JSON.parse(localStorage.getItem('noteMemorizzate') || '[]')
-                },
-                consents: {
-                    location: localStorage.getItem('consent_location') === 'true',
-                    microphone: localStorage.getItem('consent_microphone') === 'true'
-                },
-                settings: {
-                    language: localStorage.getItem('fishFileLanguage') || 'it'
-                }
-            }
-
-            // Create and download file
-            const blob = new Blob([JSON.stringify(userData, null, 2)], { type: 'application/json' })
-            const url = URL.createObjectURL(blob)
-            const a = document.createElement('a')
-            a.href = url
-            a.download = `fish-file-my-data-${new Date().toISOString().split('T')[0]}.json`
-            document.body.appendChild(a)
-            a.click()
-            document.body.removeChild(a)
-            URL.revokeObjectURL(url)
-
-            toast.success(t('privacy.exportSuccess'))
-        } catch (error) {
-            console.error('Export error:', error)
-            toast.error('Errore durante l\'esportazione')
-        }
-    }
-
     const handleDeleteAllData = () => {
         // First confirmation
         if (!window.confirm(t('privacy.deleteConfirm'))) {
@@ -789,6 +744,22 @@ const SettingsPanel = ({ onDataRestored }) => {
                                             )}
                                         </div>
                                     )}
+
+                                    {/* Delete All Data */}
+                                    <div className="border-t border-gray-700 pt-4 mt-4">
+                                        <button
+                                            onClick={handleDeleteAllData}
+                                            className="w-full flex items-center justify-between bg-red-900/30 border border-red-500/30 rounded-lg p-3 active:bg-red-900/50"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <Trash2 className="w-5 h-5 text-red-400" />
+                                                <div className="text-left">
+                                                    <p className="text-red-400 text-sm font-semibold">{t('privacy.deleteData')}</p>
+                                                    <p className="text-red-300/60 text-xs">{t('privacy.deleteDataDescription')}</p>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </div>
                                     </div>
                                 )}
                             </div>
@@ -922,36 +893,6 @@ const SettingsPanel = ({ onDataRestored }) => {
                                                     }`} />
                                                 </button>
                                             </div>
-                                        </div>
-
-                                        {/* Data Management */}
-                                        <div className="border-t border-gray-700 pt-4 space-y-2">
-                                            <button
-                                                onClick={handleExportUserData}
-                                                className="w-full flex items-center justify-between bg-gray-900 rounded-lg p-3 active:bg-gray-700"
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <Download className="w-5 h-5 text-blue-400" />
-                                                    <div className="text-left">
-                                                        <p className="text-white text-sm">{t('privacy.exportData')}</p>
-                                                        <p className="text-gray-500 text-xs">{t('privacy.exportDataDescription')}</p>
-                                                    </div>
-                                                </div>
-                                                <ChevronDown className="w-4 h-4 text-gray-400 -rotate-90" />
-                                            </button>
-
-                                            <button
-                                                onClick={handleDeleteAllData}
-                                                className="w-full flex items-center justify-between bg-red-900/30 border border-red-500/30 rounded-lg p-3 active:bg-red-900/50"
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <Trash2 className="w-5 h-5 text-red-400" />
-                                                    <div className="text-left">
-                                                        <p className="text-red-400 text-sm font-semibold">{t('privacy.deleteData')}</p>
-                                                        <p className="text-red-300/60 text-xs">{t('privacy.deleteDataDescription')}</p>
-                                                    </div>
-                                                </div>
-                                            </button>
                                         </div>
                                     </div>
                                 )}

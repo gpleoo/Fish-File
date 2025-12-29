@@ -645,14 +645,8 @@ function App() {
                         setCatture={setCatture}
                         sessioniCompletate={sessioniCompletate}
                         onDeleteSessione={eliminaSessione}
-                        canneMemorizzate={canneMemorizzate}
-                        traviMemorizzate={traviMemorizzate}
-                        amiMemorizzati={amiMemorizzati}
-                        piombiMemorizzati={piombiMemorizzati}
                         localitaMemorizzate={localitaMemorizzate}
                         specieMemorizzate={specieMemorizzate}
-                        escheMemorizzate={escheMemorizzate}
-                        onImportaDati={importaDati}
                     />
 
                     {/* Sezione Sponsor */}
