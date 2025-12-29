@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react'
+import React, { useState, useMemo } from 'react'
 import { BarChart3 } from './Icons'
 import Section from './Section'
 import StatisticheBox from './StatisticheBox'
@@ -7,7 +7,6 @@ import RegistroCatture from './RegistroCatture'
 import MapCatture from './MapCatture'
 import SessioniRegistrate from './SessioniRegistrate'
 import { ventiRosaDeiVenti, moonPhaseKeys, weatherConditionKeys } from './MeteoForm'
-import { useToast } from './Toast'
 import { useTranslation } from '../locales/LanguageContext'
 
 const AnalisiDati = ({
@@ -17,18 +16,10 @@ const AnalisiDati = ({
     setCatture,
     sessioniCompletate,
     onDeleteSessione,
-    canneMemorizzate,
-    traviMemorizzate,
-    amiMemorizzati,
-    piombiMemorizzati,
     localitaMemorizzate,
-    specieMemorizzate,
-    escheMemorizzate,
-    onImportaDati
+    specieMemorizzate
 }) => {
     const { t, language } = useTranslation()
-    const toast = useToast()
-    const fileInputRef = useRef(null)
 
     // Filtri
     const [filtri, setFiltri] = useState({
@@ -74,76 +65,6 @@ const AnalisiDati = ({
     }
 
     const stats = calcolaStatistiche()
-
-    // Esporta dati
-    const esportaDati = () => {
-        if (catture.length === 0) {
-            toast.warning(t('analysis.noCatches'))
-            return
-        }
-        const data = JSON.stringify({
-            catture,
-            sessioni: sessioniCompletate,
-            attrezzature: {
-                canne: canneMemorizzate,
-                travi: traviMemorizzate,
-                ami: amiMemorizzati,
-                piombi: piombiMemorizzati
-            },
-            localita: localitaMemorizzate,
-            specie: specieMemorizzate,
-            esche: escheMemorizzate
-        }, null, 2)
-        const blob = new Blob([data], { type: 'application/json' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `diario-pesca-${new Date().toISOString().split('T')[0]}.json`
-        a.click()
-        toast.success(t('analysis.exportSuccess'))
-    }
-
-    // Importa dati da file JSON
-    const handleImportFile = (event) => {
-        const file = event.target.files?.[0]
-        if (!file) return
-
-        const reader = new FileReader()
-        reader.onload = (e) => {
-            try {
-                const data = JSON.parse(e.target.result)
-
-                // Valida struttura base
-                if (!data.catture || !Array.isArray(data.catture)) {
-                    toast.error(t('analysis.invalidFile'))
-                    return
-                }
-
-                // Conferma import
-                const conferma = window.confirm(
-                    `${t('analysis.importConfirm', { count: data.catture.length })}`
-                )
-
-                if (conferma && onImportaDati) {
-                    onImportaDati(data)
-                    toast.success(t('analysis.importSuccess', { count: data.catture.length }))
-                }
-            } catch (err) {
-                toast.error(t('analysis.importError'))
-                console.error('Import error:', err)
-            }
-        }
-        reader.readAsText(file)
-
-        // Reset input per permettere reimport stesso file
-        try {
-            event.target.value = ''
-        } catch (e) {
-            // Fallback for browsers that don't allow direct value reset
-            event.target.type = 'text'
-            event.target.type = 'file'
-        }
-    }
 
     // Reset filtri
     const resetFiltri = () => {
@@ -301,32 +222,6 @@ const AnalisiDati = ({
                         setCatture={setCatture}
                         filtri={filtri}
                     />
-
-                    {/* Esporta / Importa */}
-                    <div className="flex gap-2 sm:gap-3">
-                        <button
-                            onClick={esportaDati}
-                            className="flex-1 bg-purple-600 text-white py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base active:bg-purple-700 transition-colors"
-                            aria-label={t('analysis.export')}
-                        >
-                            {t('analysis.export')}
-                        </button>
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="flex-1 bg-green-600 text-white py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base active:bg-green-700 transition-colors"
-                            aria-label={t('analysis.import')}
-                        >
-                            {t('analysis.import')}
-                        </button>
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept=".json"
-                            onChange={handleImportFile}
-                            className="hidden"
-                            aria-hidden="true"
-                        />
-                    </div>
                 </>
             )}
         </Section>
