@@ -15,14 +15,51 @@ const RegistroCatture = ({ catture, setCatture, filtri }) => {
     // Filtra catture
     const getCattureFiltrate = () => catture.filter(c => {
         const [anno, mese] = (c.data || '').split('-')
+        // Confronto direzione vento solo per sigla
+        const filtroVentoMatch = filtri.direzioneVento === 'tutte' ||
+            filtri.direzioneVento.split(' ')[0] === c.meteo?.direzioneVento?.split(' ')[0]
+        // Confronto velocità vento
+        const filtroVelocitaMatch = !filtri.velocitaVento || filtri.velocitaVento === 'tutte' ||
+            matchVelocitaVento(c.meteo?.vento, filtri.velocitaVento)
+        // Confronto pressione
+        const filtroPressioneMatch = !filtri.pressione || filtri.pressione === 'tutte' ||
+            matchPressione(c.meteo?.pressione, filtri.pressione)
+
         return (filtri.anno === 'tutti' || anno === filtri.anno) &&
                (filtri.mese === 'tutti' || mese === filtri.mese) &&
                (filtri.specie === 'tutte' || c.specie === filtri.specie) &&
-               (filtri.direzioneVento === 'tutte' || c.meteo?.direzioneVento === filtri.direzioneVento) &&
+               filtroVentoMatch &&
+               filtroVelocitaMatch &&
+               filtroPressioneMatch &&
                (filtri.condizioni === 'tutte' || c.meteo?.condizioni === filtri.condizioni) &&
                (filtri.localita === 'tutte' || c.localita === filtri.localita) &&
                (filtri.faseLunare === 'tutte' || c.meteo?.faseLunare === filtri.faseLunare)
     })
+
+    // Helper per matchare velocità vento
+    const matchVelocitaVento = (vento, filtro) => {
+        const v = parseFloat(vento)
+        if (isNaN(v)) return false
+        switch(filtro) {
+            case 'calmo': return v <= 5
+            case 'leggero': return v > 5 && v <= 15
+            case 'moderato': return v > 15 && v <= 25
+            case 'forte': return v > 25
+            default: return true
+        }
+    }
+
+    // Helper per matchare pressione
+    const matchPressione = (pressione, filtro) => {
+        const p = parseFloat(pressione)
+        if (isNaN(p)) return false
+        switch(filtro) {
+            case 'bassa': return p < 1010
+            case 'normale': return p >= 1010 && p <= 1020
+            case 'alta': return p > 1020
+            default: return true
+        }
+    }
 
     const cattureFiltrate = getCattureFiltrate()
     const totalePagine = Math.max(1, Math.ceil(cattureFiltrate.length / ITEMS_PER_PAGE))
