@@ -1,8 +1,8 @@
 /**
  * Fish File - Demo Data Generator
- * Genera 50 sessioni di pesca simulate per la costa laziale
+ * Genera 135 sessioni di pesca simulate per la costa laziale (3 anni: 2026-2028)
  *
- * Uso: node scripts/generateDemoData.js
+ * Uso: node scripts/generateDemoData.cjs
  * Output: demo-backup.json (importabile nell'app)
  */
 
@@ -20,19 +20,79 @@ const CONFIG = {
     piombi: ['Ogiva 125 gr', 'Ogiva 100 gr', 'Idropiramide 100 gr', 'Idropiramide 125 gr', 'Sporten 100 gr', 'Sporten 125 gr'],
     ami: ['n.2', 'n.4', 'n.6', 'n.8', 'n.10', 'n.12'],
 
-    // Località costa laziale con coordinate GPS reali
+    // Località costa laziale con coordinate GPS PRECISE sulle spiagge
+    // Ogni località ha più punti lungo la spiaggia per variazione realistica
     localita: [
-        { nome: 'Ostia', lat: 41.7325, lon: 12.2819 },
-        { nome: 'Fiumicino', lat: 41.7647, lon: 12.2314 },
-        { nome: 'Anzio', lat: 41.4475, lon: 12.6275 },
-        { nome: 'Nettuno', lat: 41.4578, lon: 12.6656 },
-        { nome: 'San Felice Circeo', lat: 41.2297, lon: 13.0881 },
-        { nome: 'Terracina', lat: 41.2917, lon: 13.2486 },
-        { nome: 'Latina', lat: 41.3833, lon: 12.9167 }
+        {
+            nome: 'Ostia',
+            punti: [
+                { lat: 41.7285, lon: 12.2750, desc: 'Pontile' },
+                { lat: 41.7310, lon: 12.2680, desc: 'Stabilimenti' },
+                { lat: 41.7350, lon: 12.2600, desc: 'Castel Fusano' },
+                { lat: 41.7250, lon: 12.2820, desc: 'Canale dei Pescatori' }
+            ]
+        },
+        {
+            nome: 'Fiumicino',
+            punti: [
+                { lat: 41.7680, lon: 12.2180, desc: 'Foce Tevere Nord' },
+                { lat: 41.7620, lon: 12.2250, desc: 'Faro' },
+                { lat: 41.7550, lon: 12.2350, desc: 'Spiaggia libera' },
+                { lat: 41.7700, lon: 12.2100, desc: 'Porto canale' }
+            ]
+        },
+        {
+            nome: 'Anzio',
+            punti: [
+                { lat: 41.4470, lon: 12.6180, desc: 'Riviera Mallozzi' },
+                { lat: 41.4510, lon: 12.6250, desc: 'Porto' },
+                { lat: 41.4430, lon: 12.6100, desc: 'Tor Caldara' },
+                { lat: 41.4490, lon: 12.6320, desc: 'Grotte di Nerone' }
+            ]
+        },
+        {
+            nome: 'Nettuno',
+            punti: [
+                { lat: 41.4590, lon: 12.6550, desc: 'Torre Astura' },
+                { lat: 41.4620, lon: 12.6680, desc: 'Cimitero Americano' },
+                { lat: 41.4560, lon: 12.6450, desc: 'Scogliera' },
+                { lat: 41.4650, lon: 12.6750, desc: 'Spiaggia libera' }
+            ]
+        },
+        {
+            nome: 'San Felice Circeo',
+            punti: [
+                { lat: 41.2320, lon: 13.0750, desc: 'Quarto Caldo' },
+                { lat: 41.2280, lon: 13.0680, desc: 'Punta Rossa' },
+                { lat: 41.2380, lon: 13.0850, desc: 'Porto' },
+                { lat: 41.2250, lon: 13.0600, desc: 'Grotta delle Capre' }
+            ]
+        },
+        {
+            nome: 'Terracina',
+            punti: [
+                { lat: 41.2850, lon: 13.2380, desc: 'Spiaggia di Levante' },
+                { lat: 41.2880, lon: 13.2480, desc: 'Porto Badino' },
+                { lat: 41.2820, lon: 13.2280, desc: 'Spiaggia di Ponente' },
+                { lat: 41.2900, lon: 13.2550, desc: 'Foce Portatore' }
+            ]
+        },
+        {
+            nome: 'Latina',
+            punti: [
+                { lat: 41.4050, lon: 12.8750, desc: 'Foce Sisto' },
+                { lat: 41.4100, lon: 12.8850, desc: 'Lido di Latina' },
+                { lat: 41.4000, lon: 12.8650, desc: 'Capoportiere' },
+                { lat: 41.4150, lon: 12.8950, desc: 'Rio Martino' }
+            ]
+        }
     ],
 
-    // Numero sessioni
-    numSessioni: 50
+    // Numero sessioni totali (3 anni)
+    numSessioni: 135,
+
+    // Anni di simulazione
+    anniSimulazione: [2026, 2027, 2028]
 };
 
 // ==================== DATI METEO STAGIONALI ====================
@@ -88,11 +148,6 @@ function randomElement(array) {
     return array[Math.floor(Math.random() * array.length)];
 }
 
-function randomElements(array, count) {
-    const shuffled = [...array].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
-}
-
 function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
 }
@@ -104,7 +159,8 @@ function getStagione(mese) {
     return 'inverno';
 }
 
-function addVariation(coord, maxDelta = 0.01) {
+// Aggiunge piccola variazione alle coordinate (max 200m lungo la spiaggia)
+function addVariation(coord, maxDelta = 0.002) {
     return coord + (Math.random() - 0.5) * 2 * maxDelta;
 }
 
@@ -141,7 +197,6 @@ function calcolaPeso(specie, lunghezza) {
         'Vopa': 0.008
     };
     const fattore = fattori[specie] || 0.012;
-    // Peso = fattore * lunghezza^3 (approssimazione)
     const peso = fattore * Math.pow(lunghezza, 2.8);
     return Math.round(peso);
 }
@@ -163,21 +218,35 @@ function getLunghezzaSpecie(specie) {
     return randomInt(r.min, r.max);
 }
 
+// Seleziona un punto GPS casuale dalla località (sempre sulla spiaggia)
+function getPuntoSpiaggia(localitaObj) {
+    const punto = randomElement(localitaObj.punti);
+    return {
+        lat: addVariation(punto.lat),
+        lon: addVariation(punto.lon),
+        desc: punto.desc
+    };
+}
+
 // ==================== PATTERN RIPETUTI PER TEST FILTRI ====================
 
 const PATTERN_SESSIONI = [
-    // Pattern 1: Orata + Luna Piena + Ostia (5 sessioni)
-    { localita: 'Ostia', specie: 'Orata', luna: 'Luna Piena', count: 5 },
-    // Pattern 2: Spigola + Scirocco + Anzio (4 sessioni)
-    { localita: 'Anzio', specie: 'Spigola', vento: 'Scirocco', count: 4 },
-    // Pattern 3: Sarago + Tramontana + Fiumicino (4 sessioni)
-    { localita: 'Fiumicino', specie: 'Sarago', vento: 'Tramontana', count: 4 },
-    // Pattern 4: Cefalo + Estate + Nettuno (3 sessioni)
-    { localita: 'Nettuno', specie: 'Cefalo', stagione: 'estate', count: 3 },
-    // Pattern 5: Mormora + Arenicola (4 sessioni)
-    { specie: 'Mormora', esca: 'Arenicola', count: 4 },
-    // Pattern 6: Leccia Stella + San Felice Circeo (3 sessioni)
-    { localita: 'San Felice Circeo', specie: 'Leccia Stella', count: 3 }
+    // Pattern 1: Orata + Luna Piena + Ostia (8 sessioni distribuite nei 3 anni)
+    { localita: 'Ostia', specie: 'Orata', luna: 'Luna Piena', count: 8 },
+    // Pattern 2: Spigola + Scirocco + Anzio (7 sessioni)
+    { localita: 'Anzio', specie: 'Spigola', vento: 'Scirocco', count: 7 },
+    // Pattern 3: Sarago + Tramontana + Fiumicino (7 sessioni)
+    { localita: 'Fiumicino', specie: 'Sarago', vento: 'Tramontana', count: 7 },
+    // Pattern 4: Cefalo + Estate + Nettuno (6 sessioni)
+    { localita: 'Nettuno', specie: 'Cefalo', stagione: 'estate', count: 6 },
+    // Pattern 5: Mormora + Arenicola (8 sessioni)
+    { specie: 'Mormora', esca: 'Arenicola', count: 8 },
+    // Pattern 6: Leccia Stella + San Felice Circeo (6 sessioni)
+    { localita: 'San Felice Circeo', specie: 'Leccia Stella', count: 6 },
+    // Pattern 7: Vopa + Terracina + Primavera (5 sessioni)
+    { localita: 'Terracina', specie: 'Vopa', stagione: 'primavera', count: 5 },
+    // Pattern 8: Occhiata + Latina + Maestrale (5 sessioni)
+    { localita: 'Latina', specie: 'Occhiata', vento: 'Maestrale', count: 5 }
 ];
 
 // ==================== GENERAZIONE DATI ====================
@@ -192,42 +261,53 @@ function generaSessioni() {
         for (let i = 0; i < pattern.count; i++) {
             if (sessioneIndex >= CONFIG.numSessioni) break;
 
-            const sessione = generaSessioneConPattern(pattern, sessioneIndex);
+            // Distribuisci i pattern nei 3 anni
+            const annoIndex = i % CONFIG.anniSimulazione.length;
+            const anno = CONFIG.anniSimulazione[annoIndex];
+
+            const sessione = generaSessioneConPattern(pattern, sessioneIndex, anno);
             sessioni.push(sessione.sessione);
             catture.push(...sessione.catture);
             sessioneIndex++;
         }
     });
 
-    // Poi genera sessioni casuali per il resto
+    // Poi genera sessioni casuali per il resto, distribuite uniformemente nei 3 anni
     while (sessioneIndex < CONFIG.numSessioni) {
-        const sessione = generaSessioneCasuale(sessioneIndex);
+        const annoIndex = sessioneIndex % CONFIG.anniSimulazione.length;
+        const anno = CONFIG.anniSimulazione[annoIndex];
+
+        const sessione = generaSessioneCasuale(sessioneIndex, anno);
         sessioni.push(sessione.sessione);
         catture.push(...sessione.catture);
         sessioneIndex++;
     }
 
-    // Mescola per distribuzione realistica
+    // Ordina per data
     sessioni.sort((a, b) => new Date(a.dataInizio) - new Date(b.dataInizio));
 
     return { sessioni, catture };
 }
 
-function generaSessioneConPattern(pattern, index) {
-    // Determina la data (distribuita nel 2026)
-    const mese = pattern.stagione === 'estate' ? randomInt(6, 8) :
-                 pattern.stagione === 'inverno' ? randomInt(0, 2) :
-                 pattern.stagione === 'primavera' ? randomInt(3, 5) :
-                 pattern.stagione === 'autunno' ? randomInt(9, 11) :
-                 randomInt(0, 11);
+function generaSessioneConPattern(pattern, index, anno) {
+    // Determina il mese in base alla stagione richiesta o casuale
+    let mese;
+    if (pattern.stagione === 'estate') mese = randomInt(6, 8);
+    else if (pattern.stagione === 'inverno') mese = randomElement([0, 1, 11]);
+    else if (pattern.stagione === 'primavera') mese = randomInt(3, 5);
+    else if (pattern.stagione === 'autunno') mese = randomInt(9, 11);
+    else mese = randomInt(0, 11);
 
     const giorno = randomInt(1, 28);
-    const data = new Date(2026, mese, giorno);
+    const data = new Date(anno, mese, giorno);
 
     // Località
     const locObj = pattern.localita ?
         CONFIG.localita.find(l => l.nome === pattern.localita) :
         randomElement(CONFIG.localita);
+
+    // Punto preciso sulla spiaggia
+    const punto = getPuntoSpiaggia(locObj);
 
     const stagione = getStagione(mese);
     const meteo = METEO_STAGIONALE[stagione];
@@ -245,8 +325,8 @@ function generaSessioneConPattern(pattern, index) {
     const sessione = {
         id: generateId(),
         localita: locObj.nome,
-        latitudine: addVariation(locObj.lat),
-        longitudine: addVariation(locObj.lon),
+        latitudine: punto.lat,
+        longitudine: punto.lon,
         dataInizio: dataInizio.toISOString(),
         dataFine: dataFine.toISOString(),
         meteo: {
@@ -285,13 +365,15 @@ function generaSessioneConPattern(pattern, index) {
     return { sessione, catture };
 }
 
-function generaSessioneCasuale(index) {
-    // Data casuale nel 2026
+function generaSessioneCasuale(index, anno) {
+    // Mese casuale
     const mese = randomInt(0, 11);
     const giorno = randomInt(1, 28);
-    const data = new Date(2026, mese, giorno);
+    const data = new Date(anno, mese, giorno);
 
     const locObj = randomElement(CONFIG.localita);
+    const punto = getPuntoSpiaggia(locObj);
+
     const stagione = getStagione(mese);
     const meteo = METEO_STAGIONALE[stagione];
 
@@ -307,8 +389,8 @@ function generaSessioneCasuale(index) {
     const sessione = {
         id: generateId(),
         localita: locObj.nome,
-        latitudine: addVariation(locObj.lat),
-        longitudine: addVariation(locObj.lon),
+        latitudine: punto.lat,
+        longitudine: punto.lon,
         dataInizio: dataInizio.toISOString(),
         dataFine: dataFine.toISOString(),
         meteo: {
@@ -373,7 +455,6 @@ function generaCattura(sessione, specieForced = null, escaForced = null, index) 
         latitudine: sessione.latitudine,
         longitudine: sessione.longitudine,
         note: generaNota(specie, lunghezza),
-        // Copia dati meteo dalla sessione
         meteo: { ...sessione.meteo }
     };
 }
@@ -399,6 +480,8 @@ function generaNota(specie, lunghezza) {
 function generaBackup() {
     console.log('🎣 Fish File - Demo Data Generator');
     console.log('===================================\n');
+    console.log(`📅 Periodo: ${CONFIG.anniSimulazione[0]} - ${CONFIG.anniSimulazione[CONFIG.anniSimulazione.length - 1]}`);
+    console.log(`🎯 Sessioni da generare: ${CONFIG.numSessioni}\n`);
 
     const { sessioni, catture } = generaSessioni();
 
@@ -427,6 +510,17 @@ function generaBackup() {
     console.log(`   • Catture totali: ${catture.length}`);
     console.log(`   • Media catture/sessione: ${(catture.length / sessioni.length).toFixed(1)}`);
 
+    // Distribuzione per anno
+    console.log('\n📅 Sessioni per anno:');
+    const perAnno = {};
+    sessioni.forEach(s => {
+        const anno = new Date(s.dataInizio).getFullYear();
+        perAnno[anno] = (perAnno[anno] || 0) + 1;
+    });
+    Object.entries(perAnno).sort((a, b) => a[0] - b[0]).forEach(([anno, count]) => {
+        console.log(`   • ${anno}: ${count} sessioni`);
+    });
+
     // Distribuzione per località
     console.log('\n📍 Catture per località:');
     const perLocalita = {};
@@ -447,8 +541,8 @@ function generaBackup() {
         console.log(`   • ${sp}: ${count}`);
     });
 
-    // Distribuzione per mese
-    console.log('\n📅 Sessioni per mese:');
+    // Distribuzione per mese (aggregata)
+    console.log('\n📅 Sessioni per mese (tutti gli anni):');
     const perMese = {};
     const mesiNomi = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
     sessioni.forEach(s => {
