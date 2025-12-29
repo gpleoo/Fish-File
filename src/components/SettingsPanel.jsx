@@ -24,7 +24,6 @@ const SettingsPanel = ({ onDataRestored }) => {
     const toast = useToast()
     const [isOpen, setIsOpen] = useState(false)
     const fileInputRef = useRef(null)
-    const importDataRef = useRef(null)
     const panelRef = useRef(null)
 
     // Backup state
@@ -323,129 +322,6 @@ const SettingsPanel = ({ onDataRestored }) => {
             setMicrophoneConsent(false)
             localStorage.setItem('consent_microphone', 'false')
             toast.info(t('privacy.consentRevoked'))
-        }
-    }
-
-    const handleExportUserData = () => {
-        try {
-            // Collect all user data from localStorage
-            const userData = {
-                exportDate: new Date().toISOString(),
-                appVersion: '1.0',
-                data: {
-                    catture: JSON.parse(localStorage.getItem('diarioPesca_catture') || '[]'),
-                    sessioni: JSON.parse(localStorage.getItem('diarioPesca_sessioniCompletate') || '[]'),
-                    specieMemorizzate: JSON.parse(localStorage.getItem('diarioPesca_specie') || '[]'),
-                    escheMemorizzate: JSON.parse(localStorage.getItem('diarioPesca_esche') || '[]'),
-                    localitaMemorizzate: JSON.parse(localStorage.getItem('diarioPesca_localita') || '[]'),
-                    canneMemorizzate: JSON.parse(localStorage.getItem('diarioPesca_canne') || '[]'),
-                    traviMemorizzate: JSON.parse(localStorage.getItem('diarioPesca_travi') || '[]'),
-                    amiMemorizzati: JSON.parse(localStorage.getItem('diarioPesca_ami') || '[]'),
-                    piombiMemorizzati: JSON.parse(localStorage.getItem('diarioPesca_piombi') || '[]'),
-                    noteMemorizzate: JSON.parse(localStorage.getItem('diarioPesca_note') || '[]')
-                },
-                consents: {
-                    location: localStorage.getItem('consent_location') === 'true',
-                    microphone: localStorage.getItem('consent_microphone') === 'true'
-                },
-                settings: {
-                    language: localStorage.getItem('fishFileLanguage') || 'it'
-                }
-            }
-
-            // Create and download file
-            const blob = new Blob([JSON.stringify(userData, null, 2)], { type: 'application/json' })
-            const url = URL.createObjectURL(blob)
-            const a = document.createElement('a')
-            a.href = url
-            a.download = `fish-file-my-data-${new Date().toISOString().split('T')[0]}.json`
-            document.body.appendChild(a)
-            a.click()
-            document.body.removeChild(a)
-            URL.revokeObjectURL(url)
-
-            toast.success(t('privacy.exportSuccess'))
-        } catch (error) {
-            console.error('Export error:', error)
-            toast.error('Errore durante l\'esportazione')
-        }
-    }
-
-    const handleImportUserData = (event) => {
-        const file = event.target.files?.[0]
-        if (!file) return
-
-        const reader = new FileReader()
-        reader.onload = (e) => {
-            try {
-                const importedData = JSON.parse(e.target.result)
-
-                // Check if it's our format or the old analysis format
-                let dataToImport = importedData.data || importedData
-
-                // Validate that we have at least catture
-                if (!dataToImport.catture || !Array.isArray(dataToImport.catture)) {
-                    toast.error(t('privacy.invalidFile'))
-                    return
-                }
-
-                // Confirm import
-                const conferma = window.confirm(
-                    t('privacy.importConfirm', { count: dataToImport.catture.length })
-                )
-
-                if (!conferma) return
-
-                // Import data into localStorage with correct keys
-                if (dataToImport.catture) {
-                    localStorage.setItem('diarioPesca_catture', JSON.stringify(dataToImport.catture))
-                }
-                if (dataToImport.sessioni) {
-                    localStorage.setItem('diarioPesca_sessioniCompletate', JSON.stringify(dataToImport.sessioni))
-                }
-                if (dataToImport.specieMemorizzate || dataToImport.specie) {
-                    localStorage.setItem('diarioPesca_specie', JSON.stringify(dataToImport.specieMemorizzate || dataToImport.specie))
-                }
-                if (dataToImport.escheMemorizzate || dataToImport.esche) {
-                    localStorage.setItem('diarioPesca_esche', JSON.stringify(dataToImport.escheMemorizzate || dataToImport.esche))
-                }
-                if (dataToImport.localitaMemorizzate || dataToImport.localita) {
-                    localStorage.setItem('diarioPesca_localita', JSON.stringify(dataToImport.localitaMemorizzate || dataToImport.localita))
-                }
-                if (dataToImport.canneMemorizzate || dataToImport.attrezzature?.canne) {
-                    localStorage.setItem('diarioPesca_canne', JSON.stringify(dataToImport.canneMemorizzate || dataToImport.attrezzature?.canne))
-                }
-                if (dataToImport.traviMemorizzate || dataToImport.attrezzature?.travi) {
-                    localStorage.setItem('diarioPesca_travi', JSON.stringify(dataToImport.traviMemorizzate || dataToImport.attrezzature?.travi))
-                }
-                if (dataToImport.amiMemorizzati || dataToImport.attrezzature?.ami) {
-                    localStorage.setItem('diarioPesca_ami', JSON.stringify(dataToImport.amiMemorizzati || dataToImport.attrezzature?.ami))
-                }
-                if (dataToImport.piombiMemorizzati || dataToImport.attrezzature?.piombi) {
-                    localStorage.setItem('diarioPesca_piombi', JSON.stringify(dataToImport.piombiMemorizzati || dataToImport.attrezzature?.piombi))
-                }
-
-                toast.success(t('privacy.importSuccess', { count: dataToImport.catture.length }))
-
-                // Reload app to reflect changes
-                if (onDataRestored) {
-                    onDataRestored()
-                }
-
-                setDataSize(getDataSize())
-            } catch (err) {
-                console.error('Import error:', err)
-                toast.error(t('privacy.importError'))
-            }
-        }
-        reader.readAsText(file)
-
-        // Reset input
-        try {
-            event.target.value = ''
-        } catch (e) {
-            event.target.type = 'text'
-            event.target.type = 'file'
         }
     }
 
@@ -868,6 +744,22 @@ const SettingsPanel = ({ onDataRestored }) => {
                                             )}
                                         </div>
                                     )}
+
+                                    {/* Delete All Data */}
+                                    <div className="border-t border-gray-700 pt-4 mt-4">
+                                        <button
+                                            onClick={handleDeleteAllData}
+                                            className="w-full flex items-center justify-between bg-red-900/30 border border-red-500/30 rounded-lg p-3 active:bg-red-900/50"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <Trash2 className="w-5 h-5 text-red-400" />
+                                                <div className="text-left">
+                                                    <p className="text-red-400 text-sm font-semibold">{t('privacy.deleteData')}</p>
+                                                    <p className="text-red-300/60 text-xs">{t('privacy.deleteDataDescription')}</p>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </div>
                                     </div>
                                 )}
                             </div>
@@ -1001,57 +893,6 @@ const SettingsPanel = ({ onDataRestored }) => {
                                                     }`} />
                                                 </button>
                                             </div>
-                                        </div>
-
-                                        {/* Data Management */}
-                                        <div className="border-t border-gray-700 pt-4 space-y-2">
-                                            <button
-                                                onClick={handleExportUserData}
-                                                className="w-full flex items-center justify-between bg-gray-900 rounded-lg p-3 active:bg-gray-700"
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <Download className="w-5 h-5 text-blue-400" />
-                                                    <div className="text-left">
-                                                        <p className="text-white text-sm">{t('privacy.exportData')}</p>
-                                                        <p className="text-gray-500 text-xs">{t('privacy.exportDataDescription')}</p>
-                                                    </div>
-                                                </div>
-                                                <ChevronDown className="w-4 h-4 text-gray-400 -rotate-90" />
-                                            </button>
-
-                                            <button
-                                                onClick={() => importDataRef.current?.click()}
-                                                className="w-full flex items-center justify-between bg-gray-900 rounded-lg p-3 active:bg-gray-700"
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <Upload className="w-5 h-5 text-green-400" />
-                                                    <div className="text-left">
-                                                        <p className="text-white text-sm">{t('privacy.importData')}</p>
-                                                        <p className="text-gray-500 text-xs">{t('privacy.importDataDescription')}</p>
-                                                    </div>
-                                                </div>
-                                                <ChevronDown className="w-4 h-4 text-gray-400 -rotate-90" />
-                                            </button>
-                                            <input
-                                                ref={importDataRef}
-                                                type="file"
-                                                accept=".json"
-                                                onChange={handleImportUserData}
-                                                className="hidden"
-                                            />
-
-                                            <button
-                                                onClick={handleDeleteAllData}
-                                                className="w-full flex items-center justify-between bg-red-900/30 border border-red-500/30 rounded-lg p-3 active:bg-red-900/50"
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <Trash2 className="w-5 h-5 text-red-400" />
-                                                    <div className="text-left">
-                                                        <p className="text-red-400 text-sm font-semibold">{t('privacy.deleteData')}</p>
-                                                        <p className="text-red-300/60 text-xs">{t('privacy.deleteDataDescription')}</p>
-                                                    </div>
-                                                </div>
-                                            </button>
                                         </div>
                                     </div>
                                 )}
