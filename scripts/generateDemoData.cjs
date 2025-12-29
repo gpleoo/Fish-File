@@ -102,34 +102,34 @@ const METEO_STAGIONALE = {
         tempAriaMin: 8, tempAriaMax: 14,
         tempAcquaMin: 13, tempAcquaMax: 15,
         venti: ['Tramontana', 'Grecale', 'Maestrale'],
-        condizioni: ['Sereno', 'Nuvoloso', 'Coperto', 'Pioggia'],
+        condizioni: ['clear', 'cloudy', 'overcast', 'rain'],
         pressioneMin: 1005, pressioneMax: 1030
     },
     primavera: { // Mar, Apr, Mag
         tempAriaMin: 15, tempAriaMax: 24,
         tempAcquaMin: 15, tempAcquaMax: 20,
         venti: ['Maestrale', 'Ponente', 'Libeccio', 'Scirocco'],
-        condizioni: ['Sereno', 'Poco nuvoloso', 'Nuvoloso', 'Variabile'],
+        condizioni: ['clear', 'cloudy', 'overcast'],
         pressioneMin: 1010, pressioneMax: 1025
     },
     estate: { // Giu, Lug, Ago
         tempAriaMin: 25, tempAriaMax: 34,
         tempAcquaMin: 22, tempAcquaMax: 27,
         venti: ['Libeccio', 'Scirocco', 'Ponente', 'Maestrale'],
-        condizioni: ['Sereno', 'Poco nuvoloso', 'Sereno'],
+        condizioni: ['clear', 'clear', 'cloudy'],
         pressioneMin: 1012, pressioneMax: 1022
     },
     autunno: { // Set, Ott, Nov
         tempAriaMin: 14, tempAriaMax: 24,
         tempAcquaMin: 18, tempAcquaMax: 23,
         venti: ['Scirocco', 'Maestrale', 'Libeccio', 'Grecale'],
-        condizioni: ['Sereno', 'Nuvoloso', 'Variabile', 'Pioggia'],
+        condizioni: ['clear', 'cloudy', 'overcast', 'rain'],
         pressioneMin: 1008, pressioneMax: 1028
     }
 };
 
-// Fasi lunari
-const FASI_LUNARI = ['Luna Nuova', 'Primo Quarto', 'Luna Piena', 'Ultimo Quarto'];
+// Fasi lunari (chiavi inglesi per compatibilità con i filtri)
+const FASI_LUNARI = ['newMoon', 'firstQuarter', 'fullMoon', 'lastQuarter', 'waxingCrescent', 'waxingGibbous', 'waningGibbous', 'waningCrescent'];
 
 // Direzioni vento complete
 const DIREZIONI_VENTO = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
@@ -232,7 +232,7 @@ function getPuntoSpiaggia(localitaObj) {
 
 const PATTERN_SESSIONI = [
     // Pattern 1: Orata + Luna Piena + Ostia (8 sessioni distribuite nei 3 anni)
-    { localita: 'Ostia', specie: 'Orata', luna: 'Luna Piena', count: 8 },
+    { localita: 'Ostia', specie: 'Orata', luna: 'fullMoon', count: 8 },
     // Pattern 2: Spigola + Scirocco + Anzio (7 sessioni)
     { localita: 'Anzio', specie: 'Spigola', vento: 'Scirocco', count: 7 },
     // Pattern 3: Sarago + Tramontana + Fiumicino (7 sessioni)

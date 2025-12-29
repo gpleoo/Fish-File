@@ -27,6 +27,8 @@ const AnalisiDati = ({
         mese: 'tutti',
         specie: 'tutte',
         direzioneVento: 'tutte',
+        velocitaVento: 'tutte',
+        pressione: 'tutte',
         condizioni: 'tutte',
         localita: 'tutte',
         faseLunare: 'tutte'
@@ -73,6 +75,8 @@ const AnalisiDati = ({
             mese: 'tutti',
             specie: 'tutte',
             direzioneVento: 'tutte',
+            velocitaVento: 'tutte',
+            pressione: 'tutte',
             condizioni: 'tutte',
             localita: 'tutte',
             faseLunare: 'tutte'
@@ -167,12 +171,37 @@ const AnalisiDati = ({
                             <select
                                 value={filtri.direzioneVento}
                                 onChange={(e) => setFiltri(p => ({ ...p, direzioneVento: e.target.value }))}
-                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm sm:col-span-2"
+                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
                             >
                                 <option value="tutte">{t('analysis.allWindDirections')}</option>
                                 {ventiRosaDeiVenti.map(v => (
                                     <option key={v} value={v}>{v.split(' ')[0]}</option>
                                 ))}
+                            </select>
+
+                            {/* Velocità vento */}
+                            <select
+                                value={filtri.velocitaVento}
+                                onChange={(e) => setFiltri(p => ({ ...p, velocitaVento: e.target.value }))}
+                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
+                            >
+                                <option value="tutte">{t('analysis.allWindSpeeds')}</option>
+                                <option value="calmo">{t('analysis.windCalm')}</option>
+                                <option value="leggero">{t('analysis.windLight')}</option>
+                                <option value="moderato">{t('analysis.windModerate')}</option>
+                                <option value="forte">{t('analysis.windStrong')}</option>
+                            </select>
+
+                            {/* Pressione atmosferica */}
+                            <select
+                                value={filtri.pressione}
+                                onChange={(e) => setFiltri(p => ({ ...p, pressione: e.target.value }))}
+                                className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm"
+                            >
+                                <option value="tutte">{t('analysis.allPressures')}</option>
+                                <option value="bassa">{t('analysis.pressureLow')}</option>
+                                <option value="normale">{t('analysis.pressureNormal')}</option>
+                                <option value="alta">{t('analysis.pressureHigh')}</option>
                             </select>
 
                             {/* Condizioni */}

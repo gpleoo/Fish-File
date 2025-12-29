@@ -10,6 +10,31 @@ const SessioniRegistrate = ({ sessioni, catture, onDeleteSessione, filtri }) => 
     const [sessioneEspansa, setSessioneEspansa] = useState(null)
     const [pagina, setPagina] = useState(0)
 
+    // Helper per matchare velocità vento
+    const matchVelocitaVento = (vento, filtro) => {
+        const v = parseFloat(vento)
+        if (isNaN(v)) return false
+        switch(filtro) {
+            case 'calmo': return v <= 5
+            case 'leggero': return v > 5 && v <= 15
+            case 'moderato': return v > 15 && v <= 25
+            case 'forte': return v > 25
+            default: return true
+        }
+    }
+
+    // Helper per matchare pressione
+    const matchPressione = (pressione, filtro) => {
+        const p = parseFloat(pressione)
+        if (isNaN(p)) return false
+        switch(filtro) {
+            case 'bassa': return p < 1010
+            case 'normale': return p >= 1010 && p <= 1020
+            case 'alta': return p > 1020
+            default: return true
+        }
+    }
+
     // Funzione per filtrare catture
     const filtraCatture = (cattureSessione) => {
         if (!filtri) return cattureSessione
@@ -30,8 +55,22 @@ const SessioniRegistrate = ({ sessioni, catture, onDeleteSessione, filtri }) => 
             // Filtro località
             if (filtri.localita !== 'tutte' && c.localita !== filtri.localita) return false
 
-            // Filtro direzione vento
-            if (filtri.direzioneVento !== 'tutte' && c.meteo?.direzioneVento !== filtri.direzioneVento) return false
+            // Filtro direzione vento (confronta solo la sigla)
+            if (filtri.direzioneVento !== 'tutte') {
+                const filtroSigla = filtri.direzioneVento.split(' ')[0]
+                const catturaSigla = c.meteo?.direzioneVento?.split(' ')[0]
+                if (filtroSigla !== catturaSigla) return false
+            }
+
+            // Filtro velocità vento
+            if (filtri.velocitaVento && filtri.velocitaVento !== 'tutte') {
+                if (!matchVelocitaVento(c.meteo?.vento, filtri.velocitaVento)) return false
+            }
+
+            // Filtro pressione
+            if (filtri.pressione && filtri.pressione !== 'tutte') {
+                if (!matchPressione(c.meteo?.pressione, filtri.pressione)) return false
+            }
 
             // Filtro condizioni meteo
             if (filtri.condizioni !== 'tutte' && c.meteo?.condizioni !== filtri.condizioni) return false
