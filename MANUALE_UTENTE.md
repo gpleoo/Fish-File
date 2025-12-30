@@ -310,9 +310,10 @@ Tocca la sezione **"analizza dati"** (icona grafico 📊).
 
 Vedrai una **mappa** con tutti i tuoi spot di pesca:
 
-- **🔴 Marker rossi** = 0-1 catture (spot poco produttivo)
-- **🟡 Marker gialli** = 2-4 catture (spot discreto)
-- **🟢 Marker verdi** = 5+ catture (spot eccellente!)
+- **🔴 Marker rossi** = 0 catture (spot poco produttivo)
+- **🟡 Marker gialli** = 1-4 catture (spot discreto)
+- **🟢 Marker verdi** = 5-9 catture (spot buono)
+- **🔵 Marker blu** = 9+ catture (spot eccellente!)
 
 ![Mappa Sessioni](./immagini/18-mappa-sessioni.png)
 *Immagine da inserire: Mappa con marker colorati e popup con dettagli sessione*
@@ -486,7 +487,7 @@ Premi **"reset filtri"** per tornare a vedere tutto.
 
 ### 📋 Registro Catture Dettagliato
 
-Premi **"mostra registro"** per vedere la lista completa.
+Premi **"registro catture"** per vedere la lista completa.
 
 Ogni cattura mostra:
 - Specie, data, ora
@@ -503,7 +504,7 @@ Puoi eliminare catture singole con l'icona cestino 🗑️.
 
 ### 🗂️ Gestione Sessioni Registrate
 
-Tocca **"gestione sessioni registrate"** per vedere tutte le sessioni completate.
+Tocca **"sessioni registrate"** per vedere tutte le sessioni completate.
 
 ![Gestione Sessioni](./immagini/22-gestione-sessioni.png)
 *Immagine da inserire: Lista sessioni con coordinate, alcune evidenziate in verde (valide) e rosso (errate)*
@@ -557,13 +558,13 @@ Si aprirà un pannello laterale con tutte le opzioni di configurazione.
 
 ---
 
-### 🌍 Cambio Lingua
+### 🌍 Lingua
 
 Fish File supporta **4 lingue**:
 - 🇮🇹 **Italiano**
-- 🇬🇧 **English**
-- 🇪🇸 **Español**
-- 🇫🇷 **Français**
+- 🇬🇧 **Inglese**
+- 🇪🇸 **Spagnolo**
+- 🇫🇷 **Francese**
 
 **Come cambiare lingua:**
 
@@ -612,7 +613,7 @@ Fish File richiede alcuni permessi per funzionare correttamente.
 **Come gestirlo:**
 
 1. Apri **Impostazioni** ⚙️
-2. Cerca la sezione **"Permessi / Permissions"**
+2. Cerca la sezione **"Privacy e Dati"**
 3. Troverai lo stato del permesso GPS:
    - ✅ **Consentito** (verde) → tutto ok!
    - ❌ **Negato** (rosso) → devi abilitarlo dal browser
@@ -635,7 +636,7 @@ Fish File richiede alcuni permessi per funzionare correttamente.
 **Come gestirlo:**
 
 1. Apri **Impostazioni** ⚙️
-2. Nella sezione **"Permessi"** troverai lo stato del microfono
+2. Nella sezione **"Privacy e Dati"** troverai lo stato del microfono
 3. Se negato, tocca **"Richiedi Permesso Microfono"**
 
 **⚠️ Nota:** Se hai bloccato il microfono nelle impostazioni del browser, dovrai sbloccarlo manualmente:
@@ -697,7 +698,7 @@ Puoi installarla come app nativa sul tuo dispositivo:
 
 ### Dove trovo le funzioni di Backup?
 
-Vai su **Impostazioni** (icona ingranaggio ⚙️) → sezione **"Backup"**.
+Vai su **Impostazioni** (icona ingranaggio ⚙️) → sezione **"Backup & Claude"**.
 
 Qui troverai:
 - **Esporta dati** - Scarica un backup completo
@@ -708,7 +709,7 @@ Qui troverai:
 
 ### Come Esportare
 
-1. Vai su **Impostazioni** → **Backup**
+1. Vai su **Impostazioni** → **Backup & Claude**
 2. Premi il pulsante **"Esporta dati"**
 
 ![Esporta](./immagini/24-esporta-dati.png)
@@ -723,7 +724,7 @@ Qui troverai:
 
 ### Come Importare
 
-1. Vai su **Impostazioni** → **Backup**
+1. Vai su **Impostazioni** → **Backup & Claude**
 2. Premi il pulsante **"Importa dati"**
 3. Seleziona il file JSON di backup precedentemente esportato
 4. Conferma l'importazione
@@ -747,9 +748,10 @@ Qui troverai:
 ### Eliminare tutti i dati
 
 Se vuoi ricominciare da zero:
-1. Vai su **Impostazioni** → **Backup**
+1. Vai su **Impostazioni** → **Backup & Claude**
 2. Premi **"Elimina tutti i dati"**
 3. Conferma l'eliminazione
+4. A questo punti ti apparirà una richiesta di digitare tutto in maiustolo la parola ELIMINA per eliminare tutti i dati (questo avviso serve per evitare una eliminazione accidentale dei dati)
 
 **⚠️ Questa operazione è irreversibile!** Assicurati di aver esportato un backup prima.
 
@@ -838,9 +840,8 @@ Sì! Vai su **Impostazioni** → **Backup** → **Importa dati**. Seleziona il f
 
 ### ❓ Come funziona il recupero automatico dei dati meteo?
 
-Fish File si collega all'API gratuita **Open-Meteo** per recuperare:
-- Temperatura, pressione, vento, condizioni meteo, fase lunare
-- Dati onde (altezza, frequenza) da Marine API
+Fish File si collega a delle API di siti meteo per recuperare:
+- Temperatura, pressione, vento, condizioni meteo, fase lunare, dati onde (altezza, frequenza)
 
 Richiede GPS attivo e connessione internet. La temperatura dell'acqua e le maree vanno inserite manualmente.
 
@@ -856,9 +857,9 @@ I grafici si aggiornano in base ai **filtri attivi**. Se hai filtri molto restri
 
 Sì! Vai su **Impostazioni** ⚙️ → **Lingua** e seleziona tra:
 - 🇮🇹 Italiano
-- 🇬🇧 English
-- 🇪🇸 Español
-- 🇫🇷 Français
+- 🇬🇧 Inglese 
+- 🇪🇸 Spagnolo
+- 🇫🇷 Francese
 
 L'interfaccia si tradurrà immediatamente, inclusi grafici e statistiche.
 
@@ -896,30 +897,32 @@ Funzionerà come app nativa con icona sulla home screen!
 
 1. **Sii costante:** Registra OGNI cattura, anche quelle piccole. Più dati = analisi più accurate.
 
-2. **Usa il recupero automatico meteo:** Non perdere tempo a compilare manualmente! Premi "Recupera Meteo Automatico" e i campi si riempiranno da soli. Aggiungi solo temperatura acqua e maree.
+2. **Cappotto:** In caso che durante una sessione non si effettuano catture, al termine della stessa la sessione registrerà 0 catture visibili anche in mappa. Questi dati sono importanti per capire nel tempo quali spot evitare in determinate condizioni meteo.
 
-3. **Studia i grafici:** Dedica 5 minuti a fine mese per analizzare i grafici (mensile, specie, vento). Scoprirai pattern che non immaginavi!
+3. **Usa il recupero automatico meteo:** Non perdere tempo a compilare manualmente! Premi "Recupera Meteo Automatico" e i campi si riempiranno da soli. Aggiungi solo temperatura acqua e maree o eventualmente modifica manualmente quei dati che non corrispondono alla situazione reale di quello specifico spot.
 
-4. **Combina filtri avanzati:** Non limitarti a un solo filtro. Prova "Spigola + Maestrale moderato + pressione alta" per trovare la combo perfetta.
+4. **Studia i grafici:** Dedica 5 minuti a fine mese per analizzare i grafici (mensile, specie, vento, ...). Scoprirai pattern che non immaginavi!
 
-5. **Usa i filtri strategicamente:** Prima di ogni uscita, controlla le previsioni e filtra per quelle condizioni. Scoprirai dove andare e cosa portare.
+5. **Combina filtri avanzati:** Non limitarti a un solo filtro. Prova "Spigola + Maestrale moderato + pressione alta" per trovare la combo perfetta.
 
-6. **Esporta regolarmente:** Una volta al mese, esporta i dati e salvali in cloud (Google Drive, Dropbox). LocalStorage può essere cancellato!
+6. **Usa i filtri strategicamente:** Prima di ogni uscita, controlla le previsioni e filtra per quelle condizioni. Scoprirai dove andare e cosa portare.
 
-7. **Installa come PWA:** Installa Fish File come app sul telefono per accesso rapido e utilizzo offline.
+7. **Esporta regolarmente:** Una volta al mese, esporta i dati e salvali in cloud (Google Drive, Dropbox). LocalStorage può essere cancellato!
 
-8. **Condividi:** Se hai amici pescatori che usano Fish File, confrontate i dati! Potreste scoprire pattern regionali.
+8. **Installa come PWA:** Installa Fish File come app sul telefono per accesso rapido e utilizzo offline.
+
+9. **Condividi:** Se hai amici pescatori che usano Fish File, confrontate i dati! Potreste scoprire pattern regionali.
 
 ---
 
 ## 📧 Supporto
 
 Per problemi, suggerimenti o domande:
-- GitHub Issues: [https://github.com/gpleoo/Fish-File/issues](https://github.com/gpleoo/Fish-File/issues)
+- giampietro.leonoro@gmail.com
 
 ---
 
-**Buona pesca e tight lines! 🎣**
+**🎣**
 
 *Ricorda: il miglior pescatore non è quello che ha più fortuna, ma quello che ha più dati.*
 
