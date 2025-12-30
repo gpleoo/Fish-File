@@ -49,7 +49,7 @@ Registrando ogni uscita con condizioni meteo, posizione GPS e risultati, costrui
 
 ## 1. Prima Configurazione
 
-Prima di iniziare a pescare, dedica qualche minuto alla configurazione delle tue liste personalizzate. Questa fase preliminare è essenziale per ottimizzare il tuo flusso di lavoro: potrai richiamare istantaneamente tutti i dati salvati senza doverli digitare nuovamente.
+Prima di iniziare a pescare, dedica qualche minuto alla configurazione delle tue liste personalizzate. Questa fase preliminare è essenziale per ottimizzare il tuo flusso di registrazione delle tue catture: potrai richiamare istantaneamente tutti i dati salvati senza doverli digitare nuovamente.
 
 ### Passo 1: Accedi alla sezione "Gestione"
 
@@ -146,7 +146,7 @@ Premi il pulsante verde **"avvia sessione"**.
 ✅ La sessione è ora attiva! Vedrai un riquadro verde con:
 - Nome località
 - Coordinate GPS
-- Pulsante rosso "termina sessione" (da usare quando finisci di pescare)
+- Pulsante rosso "termina sessione" (da usare quando finisci la sessione di pesca)
 
 ---
 
@@ -160,14 +160,14 @@ Premi il pulsante verde **"avvia sessione"**.
 
 1. Assicurati di aver **avviato una sessione con GPS attivo** (vedi sezione 2)
 2. Nella sezione "Dati Meteo", vedrai i dati compilati automaticamente, il pulsante **"Aggiorna Meteo da GPS"** in alto ti permette di aggiornali in ogni momento della tua sessione di pesca.
-3. Il pulsante **"Aggiorna Meteo da GPS"** in alto ti permette di aggiornali in ogni momento della tua sessione di pesca → l'app contatterà Open-Meteo API
+3. Il pulsante **"Aggiorna Meteo da GPS"** in alto ti permette di aggiornali in ogni momento della tua sessione di pesca → l'app contatterà diversi siti meteo con API
 4. Dopo pochi secondi, i campi si compileranno automaticamente:
    - ✅ Temperatura aria
    - ✅ Pressione atmosferica
    - ✅ Velocità e direzione vento
    - ✅ Condizioni meteo (sereno, nuvoloso, pioggia...)
    - ✅ Fase lunare
-   - ✅ Altezza e frequenza onde (da Marine API)
+   - ✅ Altezza e frequenza onde
 
 ![Recupero Automatico Meteo](./immagini/08b-recupero-auto-meteo.png)
 *Immagine da inserire: Pulsante "Recupera Meteo Automatico" e campi compilati automaticamente*
@@ -180,11 +180,9 @@ Premi il pulsante verde **"avvia sessione"**.
 - Coordinate GPS valide (all'interno dell'Italia)
 
 **⚠️ Nota importante:**
-- La temperatura dell'acqua NON viene recuperata automaticamente (sensori marini limitati)
-- Gli orari di marea NON sono recuperati automaticamente (devi consultare tabelle maree locali)
+- La temperatura dell'acqua NON viene recuperata automaticamente 
+- Gli orari di marea NON sono recuperati automaticamente (devi consultare tabelle maree locali e inserirli manualmente)
 - Puoi comunque modificare manualmente i valori dopo il recupero automatico
-
-**💡 Consiglio:** Usa il recupero automatico come punto di partenza, poi affina manualmente temperatura acqua e maree se disponibili!
 
 ---
 
@@ -235,13 +233,13 @@ Tocca la sezione **"aggiungi cattura"** (icona pesce 🐟).
 ![Compila Cattura](./immagini/12-compila-cattura.png)
 *Immagine da inserire: Form cattura compilato con dati esempio (specie: spigola, lunghezza: 42cm, esca: verme)*
 
-**💡 Nota:** Data, ora, località e coordinate GPS sono già pre-compilate dalla sessione!
+**💡 Nota:** Durante la sessione di pesca, data, ora, località, coordinate GPS e meteo vengono pre-compilati automaticamente per ogni cattura. Al termine della sessione, i dati vengono resettati!
 
 ---
 
 ### Passo 3: Registra la Cattura
 
-Scorri in basso e premi il pulsante cyan **"registra cattura"**.
+Scorri in basso e premi il pulsante **"aggiungi cattura"**.
 
 ![Registra Cattura](./immagini/13-registra-cattura.png)
 *Immagine da inserire: Pulsante "registra cattura" e messaggio di conferma "Cattura registrata con successo!"*
@@ -256,7 +254,7 @@ Scorri in basso e premi il pulsante cyan **"registra cattura"**.
 
 ### Come Funziona
 
-1. Nella sezione **"aggiungi cattura"**, premi il pulsante viola **"🎤 Assistente Vocale"**
+1. Nella sezione **"nuova cattura"**, premi il pulsante **"🎤 Assistente Vocale"**
 
 ![Avvia Assistente](./immagini/14-assistente-vocale.png)
 *Immagine da inserire: Pulsante "Assistente Vocale" viola con icona microfono*
@@ -275,7 +273,7 @@ Scorri in basso e premi il pulsante cyan **"registra cattura"**.
 | Domanda | Cosa Rispondere | Esempio |
 |---------|----------------|---------|
 | **"Specie?"** | Nome della specie | "spigola" |
-| **"Lunghezza?"** | Centimetri (numero o parola) | "quaranta" o "40" |
+| **"Lunghezza?"** | Centimetri (numero o parola) | "quaranta" |
 | **"Esca?"** | Nome dell'esca | "verme coreano" |
 | **"Registra cattura?"** | "sì" o "no" | "sì" |
 
