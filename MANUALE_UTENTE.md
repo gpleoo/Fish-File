@@ -30,11 +30,19 @@ Registrando ogni uscita con condizioni meteo, posizione GPS e risultati, costrui
 1. [Prima Configurazione](#1-prima-configurazione)
 2. [Avviare una Sessione di Pesca](#2-avviare-una-sessione-di-pesca)
 3. [Registrare le Condizioni Meteo](#3-registrare-le-condizioni-meteo)
+   - 🚀 Recupero Automatico Dati Meteo (NOVITÀ!)
 4. [Registrare una Cattura](#4-registrare-una-cattura)
 5. [Usare l'Assistente Vocale](#5-usare-lassistente-vocale)
 6. [Analizzare i Dati](#6-analizzare-i-dati)
+   - 📊 Grafici Statistiche Interattivi (NOVITÀ!)
+   - 🔍 Filtri Avanzati (Aggiornato: velocità vento, pressione, fase lunare)
 7. [Gestire Attrezzature e Liste](#7-gestire-attrezzature-e-liste)
-8. [Backup e Ripristino Dati](#8-backup-e-ripristino-dati)
+8. [Impostazioni e Personalizzazione](#8-impostazioni-e-personalizzazione)
+   - 🌍 Cambio Lingua (4 lingue disponibili)
+   - 📏 Sistema di Unità di Misura
+   - 🔒 Gestione Permessi (GPS, Microfono)
+   - 📱 Installazione PWA
+   - 💾 Backup e Ripristino Dati
 9. [Domande Frequenti](#9-domande-frequenti)
 
 ---
@@ -152,9 +160,43 @@ Tocca la sezione **"dati meteo"** (icona nuvola ☁️).
 
 ---
 
-### Passo 2: Compila le Condizioni
+### 🚀 Passo 1b: Recupera Dati Meteo Automaticamente (Consigliato!)
 
-Registra le condizioni attuali:
+**⚡ NOVITÀ:** Fish File può recuperare automaticamente i dati meteo dalla tua posizione GPS!
+
+**Come funziona:**
+
+1. Assicurati di aver **avviato una sessione con GPS attivo** (vedi sezione 2)
+2. Nella sezione "Dati Meteo", cerca il pulsante **"🌤️ Recupera Meteo Automatico"** in alto
+3. Premi il pulsante → l'app contatterà Open-Meteo API
+4. Dopo pochi secondi, i campi si compileranno automaticamente:
+   - ✅ Temperatura aria
+   - ✅ Pressione atmosferica
+   - ✅ Velocità e direzione vento
+   - ✅ Condizioni meteo (sereno, nuvoloso, pioggia...)
+   - ✅ Fase lunare
+   - ✅ Altezza e frequenza onde (da Marine API)
+
+![Recupero Automatico Meteo](./immagini/08b-recupero-auto-meteo.png)
+*Immagine da inserire: Pulsante "Recupera Meteo Automatico" e campi compilati automaticamente*
+
+**📡 Requisiti:**
+- GPS attivo e sessione avviata
+- Connessione internet attiva
+- Coordinate GPS valide (all'interno dell'Italia)
+
+**⚠️ Nota importante:**
+- La temperatura dell'acqua NON viene recuperata automaticamente (sensori marini limitati)
+- Gli orari di marea NON sono recuperati automaticamente (devi consultare tabelle maree locali)
+- Puoi comunque modificare manualmente i valori dopo il recupero automatico
+
+**💡 Consiglio:** Usa il recupero automatico come punto di partenza, poi affina manualmente temperatura acqua e maree se disponibili!
+
+---
+
+### Passo 2: Compila Manualmente (Alternativa)
+
+Se preferisci o se non hai connessione, registra le condizioni manualmente:
 
 **Dati essenziali:**
 - Temperatura aria (°C)
@@ -322,6 +364,86 @@ Tre box ti mostrano:
 
 ---
 
+### 📊 Grafici Statistiche Interattivi
+
+**Analizza visivamente i tuoi dati di pesca!**
+
+Sotto le statistiche generali troverai una sezione **"Grafici e Statistiche"** con tre grafici interattivi:
+
+![Grafici](./immagini/19b-grafici.png)
+*Immagine da inserire: Sezione grafici con i tre tab*
+
+#### 1️⃣ **Distribuzione Mensile**
+
+Mostra quante catture hai fatto in ogni mese dell'anno.
+
+- **Barre colorate** per ogni mese (Gen, Feb, Mar...)
+- **Vista mobile**: barre orizzontali
+- **Vista desktop**: barre verticali
+- Identifica i **mesi più produttivi**
+
+**💡 Utilità:**
+> *"Scopri quando peschi meglio durante l'anno. Se noti che a settembre hai sempre più catture, significa che in quel periodo le condizioni sono ideali!"*
+
+![Grafico Mensile](./immagini/19c-grafico-mensile.png)
+*Immagine da inserire: Grafico mensile con barre colorate*
+
+---
+
+#### 2️⃣ **Top Specie Catturate**
+
+Mostra le **8 specie più catturate** in ordine decrescente.
+
+- Barre proporzionali al numero di catture
+- **Percentuali** in fondo (top 4 specie)
+- Colori diversi per ogni specie
+
+**💡 Utilità:**
+> *"Capisci cosa peschi di più nei tuoi spot. Se le spigole dominano, significa che i tuoi spot e tecniche sono ottimizzati per loro!"*
+
+![Grafico Specie](./immagini/19d-grafico-specie.png)
+*Immagine da inserire: Grafico top specie con percentuali*
+
+---
+
+#### 3️⃣ **Pattern Direzione Vento**
+
+Mostra con quale **direzione del vento** hai fatto più catture.
+
+- Direzioni ordinate per numero catture (N, NE, S, SW...)
+- **Percentuali** delle direzioni più produttive
+
+**💡 Utilità:**
+> *"Questa è ORO! Scopri con quale vento peschi meglio. Se noti che con Maestrale (NW) hai il 40% delle catture, sai già dove andare quando lo annunciano!"*
+
+**Esempio pratico:**
+
+Se il grafico mostra:
+- **NW (Maestrale)**: 25 catture (35%)
+- **SE (Scirocco)**: 18 catture (25%)
+- **N (Tramontana)**: 15 catture (20%)
+
+Significa che i tuoi spot funzionano meglio con Maestrale e Scirocco!
+
+![Grafico Vento](./immagini/19e-grafico-vento.png)
+*Immagine da inserire: Grafico pattern vento con direzioni*
+
+---
+
+**🔄 Come usare i grafici:**
+
+1. Tocca **"Grafici e Statistiche"** per aprire/chiudere
+2. Usa i **3 tab** in alto per cambiare grafico:
+   - 📅 **Per Mese**
+   - 🐟 **Per Specie**
+   - 🌬️ **Per Vento**
+3. I grafici si aggiornano automaticamente in base ai **filtri attivi**
+
+**⚡ Trucco PRO:**
+> Combina grafici + filtri! Esempio: filtra solo "Spigola" e guarda il grafico vento → scopri con quale vento prendi più spigole!
+
+---
+
 ### 🔍 Filtri Avanzati
 
 **Questa è la funzione più potente!**
@@ -341,16 +463,47 @@ Esempio pratico:
 ![Filtri](./immagini/20-filtri.png)
 *Immagine da inserire: Pannello filtri con alcune voci selezionate*
 
-**Altri filtri disponibili:**
-- Anno e mese
-- Località
-- Direzione vento (16 direzioni rosa dei venti)
-- Condizioni meteo
+**📋 Lista completa filtri disponibili:**
 
-**💡 Combinazioni utili:**
-- *"Spigole + luna piena"* → quando è più produttiva
-- *"Orate + estate + Tramontana"* → migliori condizioni
-- *"Località X + ottobre"* → cosa pescare dove e quando
+| Filtro | Opzioni | Utilità |
+|--------|---------|---------|
+| **Anno** | Tutti / 2024 / 2023... | Confronta anni diversi |
+| **Mese** | Tutti / Gen / Feb... | Trova stagionalità |
+| **Specie** | Tutte / Spigola / Orata... | Focus su un pesce |
+| **Località** | Tutte / Molo Ostia... | Analizza uno spot |
+| **Direzione Vento** | Tutte / N, NE, E, SE, S, SW, W, NW... (16 direzioni) | Trova vento ideale |
+| **Velocità Vento** | Tutte / Calmo (≤5 nodi) / Leggero (5-15) / Moderato (15-25) / Forte (>25) | Scopri intensità ottimale |
+| **Pressione** | Tutte / Bassa (<1010 hPa) / Normale (1010-1020) / Alta (>1020) | Identifica pressione ideale |
+| **Condizioni Meteo** | Tutte / Sereno / Nuvoloso / Pioggia / Temporale / Nebbia | Meteo favorevole |
+| **Fase Lunare** | Tutte / Luna nuova / Crescente / Primo quarto / Gibbosa crescente / Piena / Gibbosa calante / Ultimo quarto / Calante | Influenza lunare |
+
+---
+
+**💡 Combinazioni utili avanzate:**
+
+1. **"Spigole + Maestrale moderato + pressione alta"**
+   → Scopri se le spigole abboccano meglio con alta pressione e vento moderato
+
+2. **"Orate + luna piena + estate"**
+   → Verifica se la luna piena aumenta le catture estive di orate
+
+3. **"Località X + ottobre + Scirocco leggero"**
+   → Cosa pescare in un posto specifico con condizioni precise
+
+4. **"Saraghi + pressione bassa + mare mosso"**
+   → I saraghi spesso mangiano meglio con pressione in calo
+
+5. **"Tutte specie + vento calmo + alba/tramonto"**
+   → Identifica quali specie sono attive in bonaccia
+
+---
+
+**🎯 Come usare i filtri strategicamente:**
+
+1. **Prima di uscire**: Controlla le previsioni meteo di domani
+2. **Imposta i filtri**: Seleziona le condizioni previste (vento, pressione, meteo)
+3. **Analizza**: Guarda il registro → dove hai pescato bene con quelle condizioni?
+4. **Decidi**: Vai nello spot che ha dato più risultati in quelle condizioni!
 
 Premi **"reset filtri"** per tornare a vedere tutto.
 
@@ -416,7 +569,147 @@ Tutte le liste sono ordinate alfabeticamente in automatico.
 
 ---
 
-## 8. Backup e Ripristino Dati
+## 8. Impostazioni e Personalizzazione
+
+### ⚙️ Accesso alle Impostazioni
+
+Per accedere alle impostazioni, tocca l'icona **ingranaggio ⚙️** nell'angolo in alto a destra dell'app.
+
+Si aprirà un pannello laterale con tutte le opzioni di configurazione.
+
+![Pannello Impostazioni](./immagini/24-pannello-impostazioni.png)
+*Immagine da inserire: Pannello impostazioni aperto*
+
+---
+
+### 🌍 Cambio Lingua
+
+Fish File supporta **4 lingue**:
+- 🇮🇹 **Italiano**
+- 🇬🇧 **English**
+- 🇪🇸 **Español**
+- 🇫🇷 **Français**
+
+**Come cambiare lingua:**
+
+1. Apri **Impostazioni** ⚙️
+2. Cerca la sezione **"Lingua / Language"**
+3. Tocca il dropdown e seleziona la lingua desiderata
+4. L'interfaccia si aggiornerà immediatamente!
+
+![Cambio Lingua](./immagini/24b-cambio-lingua.png)
+*Immagine da inserire: Dropdown lingua con le 4 opzioni*
+
+**💡 Nota:** La lingua viene salvata localmente. Se esporti un backup, la lingua selezionata sarà inclusa.
+
+---
+
+### 📏 Sistema di Unità di Misura
+
+Puoi scegliere tra due sistemi di unità:
+
+- **Metrico** (predefinito): kg, cm, °C, km/h
+- **Imperiale**: lb, inches, °F, mph
+
+**Come cambiare:**
+
+1. Apri **Impostazioni** ⚙️
+2. Cerca la sezione **"Unità di Misura / Units"**
+3. Seleziona il sistema preferito
+
+**💡 Utilità:** Utile se condividi dati con pescatori internazionali o se usi strumenti con unità diverse.
+
+![Sistema Unità](./immagini/24c-unita-misura.png)
+*Immagine da inserire: Toggle metrico/imperiale*
+
+---
+
+### 🔒 Gestione Permessi
+
+Fish File richiede alcuni permessi per funzionare correttamente.
+
+#### 📍 **Permesso GPS / Geolocalizzazione**
+
+**Perché serve:**
+- Catturare coordinate automatiche delle sessioni di pesca
+- Recuperare dati meteo dalla tua posizione
+
+**Come gestirlo:**
+
+1. Apri **Impostazioni** ⚙️
+2. Cerca la sezione **"Permessi / Permissions"**
+3. Troverai lo stato del permesso GPS:
+   - ✅ **Consentito** (verde) → tutto ok!
+   - ❌ **Negato** (rosso) → devi abilitarlo dal browser
+
+**Se il permesso è negato:**
+- Tocca il pulsante **"Richiedi Permesso GPS"**
+- Il browser ti chiederà conferma → Accetta
+- Se hai negato in passato, vai nelle impostazioni del browser e riabilita manualmente
+
+![Permesso GPS](./immagini/24d-permesso-gps.png)
+*Immagine da inserire: Sezione permessi con stato GPS*
+
+---
+
+#### 🎤 **Permesso Microfono**
+
+**Perché serve:**
+- Usare l'Assistente Vocale per registrare catture a voce
+
+**Come gestirlo:**
+
+1. Apri **Impostazioni** ⚙️
+2. Nella sezione **"Permessi"** troverai lo stato del microfono
+3. Se negato, tocca **"Richiedi Permesso Microfono"**
+
+**⚠️ Nota:** Se hai bloccato il microfono nelle impostazioni del browser, dovrai sbloccarlo manualmente:
+- **Chrome/Edge**: Impostazioni sito → Permessi → Microfono
+- **Safari**: Impostazioni → Safari → Microfono
+
+![Permesso Microfono](./immagini/24e-permesso-microfono.png)
+*Immagine da inserire: Stato permesso microfono*
+
+---
+
+### 📱 Installazione come App (PWA)
+
+**Fish File è una Progressive Web App (PWA)!**
+
+Puoi installarla come app nativa sul tuo dispositivo:
+
+**Vantaggi:**
+- ✅ Icona sulla home screen
+- ✅ Funziona a schermo intero (senza barra browser)
+- ✅ Avvio più rapido
+- ✅ Funziona offline (dopo prima apertura)
+
+**Come installare:**
+
+**Su Android/Chrome:**
+1. Apri Fish File nel browser
+2. Tocca i **3 puntini** in alto a destra
+3. Seleziona **"Aggiungi a schermata Home"** o **"Installa app"**
+4. Conferma l'installazione
+
+**Su iPhone/iPad (Safari):**
+1. Apri Fish File in Safari
+2. Tocca l'icona **Condividi** (quadrato con freccia)
+3. Scorri e seleziona **"Aggiungi a Home"**
+4. Conferma
+
+**Su Desktop (Chrome/Edge):**
+1. Cerca l'icona **"+"** o **"Installa"** nella barra degli indirizzi
+2. Clicca e conferma l'installazione
+
+![Installazione PWA](./immagini/24f-installa-pwa.png)
+*Immagine da inserire: Prompt installazione PWA*
+
+**💡 Dopo l'installazione:** Fish File apparirà come app indipendente nel drawer/dock, senza l'interfaccia del browser!
+
+---
+
+### 💾 Backup e Ripristino Dati
 
 ### Perché fare Backup?
 
@@ -568,17 +861,79 @@ Sì! Vai su **Impostazioni** → **Backup** → **Importa dati**. Seleziona il f
 
 ---
 
+### ❓ Come funziona il recupero automatico dei dati meteo?
+
+Fish File si collega all'API gratuita **Open-Meteo** per recuperare:
+- Temperatura, pressione, vento, condizioni meteo, fase lunare
+- Dati onde (altezza, frequenza) da Marine API
+
+Richiede GPS attivo e connessione internet. La temperatura dell'acqua e le maree vanno inserite manualmente.
+
+---
+
+### ❓ I grafici non mostrano dati, perché?
+
+I grafici si aggiornano in base ai **filtri attivi**. Se hai filtri molto restrittivi (es: solo una specie in un mese specifico), potresti non avere dati sufficienti. Premi **"Reset Filtri"** per vedere tutti i dati.
+
+---
+
+### ❓ Posso usare Fish File in inglese/spagnolo/francese?
+
+Sì! Vai su **Impostazioni** ⚙️ → **Lingua** e seleziona tra:
+- 🇮🇹 Italiano
+- 🇬🇧 English
+- 🇪🇸 Español
+- 🇫🇷 Français
+
+L'interfaccia si tradurrà immediatamente, inclusi grafici e statistiche.
+
+---
+
+### ❓ Devo reinstallare l'app per gli aggiornamenti?
+
+No! Fish File è una web app. Ogni volta che la apri, si aggiorna automaticamente alla versione più recente. Se l'hai installata come PWA, chiudi e riapri per caricare gli aggiornamenti.
+
+---
+
+### ❓ Il filtro "Velocità Vento" a cosa serve?
+
+Ti permette di trovare pattern in base all'**intensità** del vento:
+- **Calmo** (≤5 nodi): bonaccia
+- **Leggero** (5-15 nodi): brezza
+- **Moderato** (15-25 nodi): vento fresco
+- **Forte** (>25 nodi): mare agitato
+
+Combinalo con "Direzione Vento" per scoprire condizioni ottimali!
+
+---
+
+### ❓ Come installo Fish File come app sul telefono?
+
+Fish File è una **Progressive Web App (PWA)**:
+- **Android**: Menu browser → "Aggiungi a Home"
+- **iPhone**: Safari → Condividi → "Aggiungi a Home"
+
+Funzionerà come app nativa con icona sulla home screen!
+
+---
+
 ## 🎣 Consigli Finali
 
 1. **Sii costante:** Registra OGNI cattura, anche quelle piccole. Più dati = analisi più accurate.
 
-2. **Non trascurare il meteo:** Compilare i dati meteo è noioso ma fondamentale. È qui che risiede il vero valore.
+2. **Usa il recupero automatico meteo:** Non perdere tempo a compilare manualmente! Premi "Recupera Meteo Automatico" e i campi si riempiranno da soli. Aggiungi solo temperatura acqua e maree.
 
-3. **Usa i filtri:** Prima di ogni uscita, controlla le previsioni e filtra per quelle condizioni. Scoprirai dove andare.
+3. **Studia i grafici:** Dedica 5 minuti a fine mese per analizzare i grafici (mensile, specie, vento). Scoprirai pattern che non immaginavi!
 
-4. **Esporta regolarmente:** Una volta al mese, esporta i dati e salvali in cloud.
+4. **Combina filtri avanzati:** Non limitarti a un solo filtro. Prova "Spigola + Maestrale moderato + pressione alta" per trovare la combo perfetta.
 
-5. **Condividi:** Se hai amici pescatori che usano Fish File, confrontate i dati! Potreste scoprire pattern regionali.
+5. **Usa i filtri strategicamente:** Prima di ogni uscita, controlla le previsioni e filtra per quelle condizioni. Scoprirai dove andare e cosa portare.
+
+6. **Esporta regolarmente:** Una volta al mese, esporta i dati e salvali in cloud (Google Drive, Dropbox). LocalStorage può essere cancellato!
+
+7. **Installa come PWA:** Installa Fish File come app sul telefono per accesso rapido e utilizzo offline.
+
+8. **Condividi:** Se hai amici pescatori che usano Fish File, confrontate i dati! Potreste scoprire pattern regionali.
 
 ---
 
