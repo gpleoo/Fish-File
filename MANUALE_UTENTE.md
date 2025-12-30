@@ -149,7 +149,7 @@ Premi il pulsante verde **"avvia sessione"**.
 
 ## 3. Registrare le Condizioni Meteo
 
-**⚠️ OBBLIGATORIO:** Prima di registrare catture devi confermare i dati meteo.
+**⚠️ OBBLIGATORIO:** Prima di registrare catture devi compilare i dati meteo.
 
 ### Passo 1: Apri la Sezione "Dati Meteo"
 
@@ -167,7 +167,7 @@ Tocca la sezione **"dati meteo"** (icona nuvola ☁️).
 **Come funziona:**
 
 1. Assicurati di aver **avviato una sessione con GPS attivo** (vedi sezione 2)
-2. Nella sezione "Dati Meteo", cerca il pulsante **"🌤️ Recupera Meteo Automatico"** in alto
+2. Nella sezione "Dati Meteo", cerca il pulsante **"Aggiorna Meteo da GPS"** in alto
 3. Premi il pulsante → l'app contatterà Open-Meteo API
 4. Dopo pochi secondi, i campi si compileranno automaticamente:
    - ✅ Temperatura aria
@@ -179,6 +179,8 @@ Tocca la sezione **"dati meteo"** (icona nuvola ☁️).
 
 ![Recupero Automatico Meteo](./immagini/08b-recupero-auto-meteo.png)
 *Immagine da inserire: Pulsante "Recupera Meteo Automatico" e campi compilati automaticamente*
+
+**💡 Nota:** Gli orari di alta e bassa marea vanno compilati manualmente.
 
 **📡 Requisiti:**
 - GPS attivo e sessione avviata
