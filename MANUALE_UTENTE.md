@@ -124,7 +124,7 @@ Configura anche:
 
 Quando arrivi al tuo spot di pesca:
 
-1. Seleziona o scrivi la **località** (es: "Molo di Fiumicino")
+1. Seleziona o scrivi la **località** (es: "Sabaudia - Sacramento", "Latina - Rio Martino")
 2. Premi il pulsante **"📡 Usa GPS Dispositivo"** per ottenere coordinate automatiche
    - Il telefono ti chiederà il permesso di usare la posizione → Accetta
    - Dopo pochi secondi vedrai latitudine e longitudine compilate automaticamente
