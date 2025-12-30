@@ -19,7 +19,7 @@ Registrando ogni uscita con condizioni meteo, posizione GPS e risultati, costrui
 ✅ Dove andare in base alle previsioni meteo di oggi
 ✅ Quale attrezzatura usare
 ✅ Quali esche funzionano meglio in determinate condizioni
-✅ Quando i pesci sono più attivi (maree, luna, temperatura)
+✅ Quando i pesci sono più attivi (maree, luna, temperatura, direzione del vento, periodo)
 
 **Non pescare più al buio. Pesca con i dati.**
 
@@ -30,11 +30,11 @@ Registrando ogni uscita con condizioni meteo, posizione GPS e risultati, costrui
 1. [Prima Configurazione](#1-prima-configurazione)
 2. [Avviare una Sessione di Pesca](#2-avviare-una-sessione-di-pesca)
 3. [Registrare le Condizioni Meteo](#3-registrare-le-condizioni-meteo)
-   - 🚀 Recupero Automatico Dati Meteo (NOVITÀ!)
+   - 🚀 Recupero Automatico Dati Meteo
 4. [Registrare una Cattura](#4-registrare-una-cattura)
 5. [Usare l'Assistente Vocale](#5-usare-lassistente-vocale)
 6. [Analizzare i Dati](#6-analizzare-i-dati)
-   - 📊 Grafici Statistiche Interattivi (NOVITÀ!)
+   - 📊 Grafici Statistiche Interattivi
    - 🔍 Filtri Avanzati (Aggiornato: velocità vento, pressione, fase lunare)
 7. [Gestire Attrezzature e Liste](#7-gestire-attrezzature-e-liste)
 8. [Impostazioni e Personalizzazione](#8-impostazioni-e-personalizzazione)
@@ -49,7 +49,7 @@ Registrando ogni uscita con condizioni meteo, posizione GPS e risultati, costrui
 
 ## 1. Prima Configurazione
 
-Prima di iniziare a pescare, configura le tue liste personalizzate.
+Prima di iniziare a pescare, dedica qualche minuto alla configurazione delle tue liste personalizzate. Questa fase preliminare è essenziale per ottimizzare il tuo flusso di lavoro: potrai richiamare istantaneamente tutti i dati salvati senza doverli digitare nuovamente.
 
 ### Passo 1: Accedi alla sezione "Gestione"
 
@@ -71,12 +71,11 @@ Tocca la sezione **"gestione"** (icona chiave inglese 🔧).
 *Immagine da inserire: Campo input "specie" con esempio "spigola" e pulsante "+ aggiungi"*
 
 **💡 Consiglio:** Aggiungi tutte le specie comuni della tua zona (spigola, orata, sarago, mormora, ombrina, etc.)
+**💡 Nota:** Puoi anche modificare (icona matita ✏️) o eliminare (icona cestino 🗑️) voci esistenti.
 
 ---
 
 ### Passo 3: Aggiungi le tue Esche
-
-Stessa procedura per le esche:
 
 1. Scorri fino alla sezione **"esche"**
 2. Scrivi il nome dell'esca (es: "verme coreano")
@@ -84,6 +83,8 @@ Stessa procedura per le esche:
 
 ![Aggiungere Esche](./immagini/03-aggiungi-esche.png)
 *Immagine da inserire: Lista esche con esempi come "verme coreano", "gamberetto", "sardina", "artificiale minnow"*
+
+**💡 Nota:** Puoi anche modificare (icona matita ✏️) o eliminare (icona cestino 🗑️) voci esistenti.
 
 ---
 
@@ -103,13 +104,15 @@ Stessa procedura per le esche:
 ### Passo 5: Aggiungi la tua Attrezzatura
 
 Configura anche:
-- **Canne** (es: "Bolognese 6m", "Spinning 2.70m")
-- **Travi** (es: "0.20mm fluorocarbon")
-- **Ami** (es: "n.8 Aberdeen")
-- **Piombi** (es: "50g piramide")
+- **Canne** (es: "Kali Kunnan Jaw", "Italcanna FSH")
+- **Travi** (es: "Pater Noster 2x200", "Long Arm 1x300")
+- **Ami** (es: "n.8 Aberdeen", "n.6 Cristal", "n.2 Beck")
+- **Piombi** (es: "150 gr Idropiramide", "100 gr Ogiva", "125 gr Sporten")
 
 ![Attrezzatura](./immagini/05-attrezzatura.png)
 *Immagine da inserire: Sezioni canne, travi, ami, piombi compilate*
+
+**💡 Nota:** Puoi anche modificare (icona matita ✏️) o eliminare (icona cestino 🗑️) voci esistenti.
 
 ---
 
@@ -147,28 +150,17 @@ Premi il pulsante verde **"avvia sessione"**.
 
 ---
 
-## 3. Registrare le Condizioni Meteo
+## 3. Registrare le Condizioni Meteo (icona nuvola ☁️).
 
-**⚠️ OBBLIGATORIO:** Prima di registrare catture devi compilare i dati meteo.
-
-### Passo 1: Apri la Sezione "Dati Meteo"
-
-Tocca la sezione **"dati meteo"** (icona nuvola ☁️).
-
-![Sezione Meteo](./immagini/08-sezione-meteo.png)
-*Immagine da inserire: Sezione "dati meteo" aperta con tutti i campi*
-
----
-
-### 🚀 Passo 1b: Recupera Dati Meteo Automaticamente (Consigliato!)
+### 🚀 Passo 1: Dati Meteo Automatici
 
 **⚡ NOVITÀ:** Fish File può recuperare automaticamente i dati meteo dalla tua posizione GPS!
 
 **Come funziona:**
 
 1. Assicurati di aver **avviato una sessione con GPS attivo** (vedi sezione 2)
-2. Nella sezione "Dati Meteo", cerca il pulsante **"Aggiorna Meteo da GPS"** in alto
-3. Premi il pulsante → l'app contatterà Open-Meteo API
+2. Nella sezione "Dati Meteo", vedrai i dati compilati automaticamente, il pulsante **"Aggiorna Meteo da GPS"** in alto ti permette di aggiornali in ogni momento della tua sessione di pesca.
+3. Il pulsante **"Aggiorna Meteo da GPS"** in alto ti permette di aggiornali in ogni momento della tua sessione di pesca → l'app contatterà Open-Meteo API
 4. Dopo pochi secondi, i campi si compileranno automaticamente:
    - ✅ Temperatura aria
    - ✅ Pressione atmosferica
@@ -215,25 +207,9 @@ Se preferisci o se non hai connessione, registra le condizioni manualmente:
 ![Compila Meteo](./immagini/09-compila-meteo.png)
 *Immagine da inserire: Campi meteo compilati con dati esempio*
 
-**💡 Dove trovare i dati meteo:**
-- App meteo del telefono
-- Siti come WindFinder, Windy, iLMeteo
-- Tabelle maree online (es: maregrafico.it)
-
 ---
 
-### Passo 3: Conferma i Dati Meteo
-
-Vai alla sezione **"aggiungi cattura"** e premi il pulsante blu **"conferma dati meteo (obbligatorio)"**.
-
-![Conferma Meteo](./immagini/10-conferma-meteo.png)
-*Immagine da inserire: Pulsante "conferma dati meteo" e riquadro verde "dati meteo confermati"*
-
-✅ Apparirà un riquadro verde di conferma. Ora puoi registrare catture!
-
----
-
-## 4. Registrare una Cattura
+## 3. Registrare una Cattura
 
 ### Passo 1: Apri la Sezione "Aggiungi Cattura"
 
@@ -270,11 +246,11 @@ Scorri in basso e premi il pulsante cyan **"registra cattura"**.
 ![Registra Cattura](./immagini/13-registra-cattura.png)
 *Immagine da inserire: Pulsante "registra cattura" e messaggio di conferma "Cattura registrata con successo!"*
 
-✅ Vedrai un messaggio di conferma e la sezione **"analizza dati"** si aprirà automaticamente mostrando il registro aggiornato.
+✅ Vedrai un messaggio di conferma di registrazione della cattura.
 
 ---
 
-## 5. Usare l'Assistente Vocale
+## 4. Usare l'Assistente Vocale
 
 **🎤 Novità:** Registra catture a voce senza toccare il telefono (perfetto con mani bagnate!)
 
@@ -301,7 +277,6 @@ Scorri in basso e premi il pulsante cyan **"registra cattura"**.
 | **"Specie?"** | Nome della specie | "spigola" |
 | **"Lunghezza?"** | Centimetri (numero o parola) | "quaranta" o "40" |
 | **"Esca?"** | Nome dell'esca | "verme coreano" |
-| **"Confermi dati meteo?"** | "sì" o "no" | "sì" |
 | **"Registra cattura?"** | "sì" o "no" | "sì" |
 
 ![Assistente Attivo](./immagini/16-assistente-attivo.png)
@@ -312,7 +287,7 @@ Scorri in basso e premi il pulsante cyan **"registra cattura"**.
 4. Dopo la registrazione, puoi dire **"nuova cattura"** per continuare
 
 **⚠️ Limitazioni:**
-- Funziona solo con specie/esche già memorizzate nella tua lista
+- Funziona solo con specie/esche già memorizzate nelle tue liste presenti nella sezione **"gestione"** (icona chiave inglese 🔧)
 - Hai 3 tentativi per farsi capire
 - Se non riconosce, compila manualmente
 
