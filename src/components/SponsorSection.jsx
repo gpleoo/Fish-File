@@ -15,25 +15,25 @@ const SPONSORS_DATA = {
             name: 'Amo La Pesca',
             description: 'Il tuo negozio di fiducia per attrezzatura da surfcasting, bolentino, spinning, traina, bolognese. Ampia selezione di canne, mulinelli e accessori delle migliori marche.',
             website: 'https://www.amolapesca.it',
-            phone: '+39 06 5555 1234',
-            email: 'info@amolapesca.it'
+            phone: '+39  389 108 8655',
+            email: '......'
         }
     ],
     associations: [
         {
             name: 'LR Surfcasting Academy',
             description: 'Accademia dedicata alla formazione e promozione del surfcasting sportivo. Corsi per principianti intermedi e avanzati, eventi e raduni lungo le coste italiane.',
-            website: 'https://www.lrsurfcasting.it',
-            email: 'academy@lrsurfcasting.it',
-            phone: '+39 333 9876 543'
+            website: 'https://www.lrsurfcastingacademy.it/',
+            email: 'info@lrsurfcastingacademy.it',
+            phone: '+39 344 69 14 969'
         }
     ],
     masters: [
         {
             name: 'Lorenzo Rossi',
             description: 'Surfcaster da oltre 30 anni di esperienza nelle tecniche di pesca dalla spiaggia, il cui motto è "Pesci nel secchio". Disponibile per lezioni private e corsi di gruppo.',
-            phone: '+39 347 1234 567',
-            email: 'lorenzo.rossi.pesca@gmail.com',
+            phone: '......',
+            email: '......',
             specialties: ['Surfcasting']
         }
     ]
