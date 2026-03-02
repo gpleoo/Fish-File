@@ -36,7 +36,7 @@ const config: CapacitorConfig = {
     scheme: 'Fish File'
   },
   android: {
-    allowMixedContent: true,
+    allowMixedContent: false,
     captureInput: true,
     webContentsDebuggingEnabled: false
   }
