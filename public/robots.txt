@@ -1,0 +1,30 @@
+# Fish File - Robots.txt
+# Ottimizzato per massima visibilità sui motori di ricerca
+
+User-agent: *
+Allow: /
+Disallow: /sw.js
+Disallow: /src/
+
+# Sitemap location
+Sitemap: https://gpleoo.github.io/Fish-File/sitemap.xml
+
+# Search Engine Specific
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# Block AI Scrapers (optional - uncomment if you don't want AI training on your app)
+# User-agent: GPTBot
+# Disallow: /
+
+# User-agent: ChatGPT-User
+# Disallow: /
+
+# User-agent: CCBot
+# Disallow: /
