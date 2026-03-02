@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Main App (Italian - Default) -->
+  <url>
+    <loc>https://gpleoo.github.io/Fish-File/</loc>
+    <lastmod>2026-03-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://gpleoo.github.io/Fish-File/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://gpleoo.github.io/Fish-File/en/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://gpleoo.github.io/Fish-File/es/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://gpleoo.github.io/Fish-File/fr/" />
+  </url>
+
+  <!-- Privacy Policy -->
+  <url>
+    <loc>https://gpleoo.github.io/Fish-File/privacy-policy.html</loc>
+    <lastmod>2025-12-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Terms of Service -->
+  <url>
+    <loc>https://gpleoo.github.io/Fish-File/terms-of-service.html</loc>
+    <lastmod>2025-12-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- User Manual -->
+  <url>
+    <loc>https://gpleoo.github.io/Fish-File/MANUALE_UTENTE.html</loc>
+    <lastmod>2025-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+</urlset>
