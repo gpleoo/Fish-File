@@ -482,6 +482,7 @@ const it = {
             fiume: 'Fiume'
         },
         results: {
+            fewDataGroup: 'Spot con pochi dati simili (solo indicativo, punteggio poco affidabile):',
             back: 'Modifica meteo',
             basedOn: 'Calcolato su {count} sessioni registrate nella zona.',
             modified: 'Valori corretti a mano: {fields}.',

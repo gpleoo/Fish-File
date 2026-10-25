@@ -463,6 +463,7 @@ const fr = {
             fiume: 'Rivière'
         },
         results: {
+            fewDataGroup: 'Spots avec peu de données similaires (indicatif, score peu fiable) :',
             back: 'Modifier la météo',
             basedOn: 'Calculé sur {count} sessions enregistrées dans la zone.',
             modified: 'Valeurs corrigées à la main : {fields}.',

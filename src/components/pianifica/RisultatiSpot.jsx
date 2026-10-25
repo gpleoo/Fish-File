@@ -61,11 +61,16 @@ export const ClassificaSpot = ({ classifica, onApri, onIndietro, nSessioni, modi
             </p>
             {classifica.map((r, i) => {
                 const insufficiente = r.affidabilita === 'bassa'
+                const primoInsufficiente = insufficiente && (i === 0 || classifica[i - 1].affidabilita !== 'bassa')
                 return (
-                    <Card key={r.spot} onClick={() => onApri(r.spot)}>
+                    <React.Fragment key={r.spot}>
+                    {primoInsufficiente && (
+                        <p className="text-gray-400 text-xs mt-3 mb-2">{t('planner.results.fewDataGroup')}</p>
+                    )}
+                    <Card onClick={() => onApri(r.spot)}>
                         <div className="flex items-start gap-3">
                             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 ${insufficiente ? 'bg-gray-600' : 'bg-cyan-600'}`}>
-                                {i + 1}
+                                {insufficiente ? '-' : i + 1}
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className="text-white font-semibold text-sm">{r.spot}</div>
@@ -83,6 +88,7 @@ export const ClassificaSpot = ({ classifica, onApri, onIndietro, nSessioni, modi
                             </div>
                         </div>
                     </Card>
+                    </React.Fragment>
                 )
             })}
             {avvisoLontano && (

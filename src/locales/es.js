@@ -463,6 +463,7 @@ const es = {
             fiume: 'Río'
         },
         results: {
+            fewDataGroup: 'Lugares con pocos datos similares (solo orientativo, puntuación poco fiable):',
             back: 'Modificar tiempo',
             basedOn: 'Calculado sobre {count} sesiones registradas en la zona.',
             modified: 'Valores corregidos a mano: {fields}.',

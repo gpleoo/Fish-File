@@ -483,6 +483,7 @@ const en = {
             fiume: 'River'
         },
         results: {
+            fewDataGroup: 'Spots with little similar data (indicative only, score not reliable):',
             back: 'Edit weather',
             basedOn: 'Based on {count} sessions recorded in the zone.',
             modified: 'Manually corrected: {fields}.',
