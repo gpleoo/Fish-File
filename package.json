@@ -14,7 +14,7 @@
     "cap:android": "cap open android",
     "cap:run:ios": "cap run ios",
     "cap:run:android": "cap run android",
-    "test": "node --test src/utils/pianifica/pianifica.test.js"
+    "test": "node --test src/utils/pianifica/pianifica.test.js src/utils/condivisione/condivisione.test.js"
   },
   "dependencies": {
     "@capacitor-community/admob": "^7.2.0",

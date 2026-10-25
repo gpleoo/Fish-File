@@ -10,7 +10,7 @@ const selectClass = 'bg-gray-900 border border-gray-600 rounded-lg px-2 py-2 tex
  * Creazione delle zone e assegnazione degli spot (ricavati dalle sessioni
  * registrate). Salva solo nella configurazione di Pianifica uscita.
  */
-const GestioneZone = ({ config, onChange, spotDisponibili, onChiudi }) => {
+const GestioneZone = ({ config, onChange, spotDisponibili, zoneAuto = {}, spotSoloCondivisi = new Set(), onChiudi }) => {
     const { t } = useTranslation()
     const [nuovaZona, setNuovaZona] = useState('')
 
@@ -29,7 +29,7 @@ const GestioneZone = ({ config, onChange, spotDisponibili, onChiudi }) => {
     }
 
     const aggiornaSpot = (nome, campi) => {
-        const attuale = config.spot[nome] || { zonaId: null, tipo: 'mare' }
+        const attuale = config.spot[nome] || { zonaId: zoneAuto[nome] || null, tipo: 'mare' }
         onChange({ ...config, spot: { ...config.spot, [nome]: { ...attuale, ...campi } } })
     }
 
@@ -83,12 +83,15 @@ const GestioneZone = ({ config, onChange, spotDisponibili, onChiudi }) => {
                 ) : (
                     <ul className="space-y-2">
                         {spotDisponibili.map(sp => {
-                            const conf = config.spot[sp.nome] || { zonaId: null, tipo: 'mare' }
+                            const conf = config.spot[sp.nome] || { zonaId: zoneAuto[sp.nome] || null, tipo: 'mare' }
                             return (
                                 <li key={sp.nome} className="bg-gray-900 rounded-lg p-2">
                                     <div className="text-white text-sm mb-1.5">
                                         {sp.nome}
                                         <span className="text-gray-500 text-xs ml-2">{t('planner.zones.outings', { count: sp.uscite })}</span>
+                                        {spotSoloCondivisi.has(sp.nome) && (
+                                            <span className="text-amber-400 text-xs ml-2">{t('sharing.sharedSpot')}</span>
+                                        )}
                                     </div>
                                     <div className="flex gap-2">
                                         <select

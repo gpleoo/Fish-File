@@ -26,7 +26,7 @@ const CatturaForm = ({
 }) => {
     const { t } = useTranslation()
     const toast = useToast()
-    const { getWeightSymbol, getLengthSymbol } = useUnits()
+    const { getLengthSymbol } = useUnits()
     const [showVoiceAssistant, setShowVoiceAssistant] = useState(false)
 
     // Handler per cattura completata dall'assistente vocale
@@ -94,9 +94,9 @@ const CatturaForm = ({
                 placeholder={t('catch.speciesPlaceholder')}
             />
 
-            {/* Peso e lunghezza */}
+            {/* Peso (sempre in grammi) e lunghezza */}
             <InputField
-                label={`${t('catch.weightLabel')} (${getWeightSymbol()})`}
+                label={`${t('catch.weightLabel')} (g)`}
                 type="number"
                 value={nuovaCattura.peso}
                 onChange={(e) => setNuovaCattura(p => ({ ...p, peso: e.target.value }))}

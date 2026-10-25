@@ -512,6 +512,46 @@ const fr = {
             noZone: 'Aucune zone',
             done: 'Terminé'
         }
+    },
+
+    // Condivisione dati tra utenti
+    sharing: {
+        title: 'Partage de données',
+        description: 'Échangez sessions et prises avec d\'autres pêcheurs. Les données reçues restent séparées des vôtres : elles apparaissent sur la carte (triangles) et dans les sessions enregistrées et comptent dans la planification, mais pas dans vos statistiques ni dans votre sauvegarde.',
+        yourName: 'Votre nom (visible par ceux qui reçoivent vos données)',
+        namePlaceholder: 'ex : Marc',
+        nameRequired: 'Saisissez votre nom avant de partager.',
+        nothingToShare: 'Vous n\'avez pas encore de sessions à partager.',
+        export: 'Partager mes données',
+        exportHelp: 'Crée un fichier avec toutes vos sessions et prises, coordonnées GPS comprises. Envoyez-le comme vous voulez (WhatsApp, e-mail, AirDrop).',
+        exported: 'Fichier créé : {sessions} sessions, {catches} prises.',
+        'import': 'Importer des données partagées',
+        importHelp: 'Ajoute les données d\'un autre utilisateur sans toucher aux vôtres. Un fichier mis à jour de la même personne remplace ses données précédentes.',
+        imported: 'Données de {name} importées : {sessions} sessions, {catches} prises.',
+        updated: 'Données de {name} mises à jour : {sessions} sessions, {catches} prises.',
+        receivedTitle: 'Données reçues',
+        noneReceived: 'Aucune donnée reçue.',
+        counts: '{sessions} sessions, {catches} prises',
+        confirmDelete: 'Supprimer toutes les données reçues de {name} ?',
+        deleted: 'Données de {name} supprimées.',
+        errors: {
+            formato: 'Fichier non valide : ce n\'est pas un fichier de partage Fish File.',
+            backup: 'C\'est une sauvegarde complète : pour la restaurer utilisez "Importer" dans Backup & cloud.',
+            proprio: 'Ce fichier contient vos propres données.',
+            vuoto: 'Le fichier ne contient aucune session.',
+            storage: 'Mémoire pleine : supprimez des données reçues et réessayez.'
+        },
+        mapLegend: 'données partagées',
+        sharedBy: 'Partagée par {name}',
+        originFilter: 'Origine des données',
+        originAll: 'Toutes les données (miennes et partagées)',
+        originMine: 'Seulement mes données',
+        originShared: 'Seulement données partagées',
+        originPerson: 'Partagées par {name}',
+        weightsConverted: '{count} poids saisis en kg ont été convertis en grammes.',
+        sharedSpot: '(données partagées)',
+        basedOnShared: 'Calculé sur {count} sessions de la zone, dont {shared} partagées par d\'autres utilisateurs.',
+        sharedTag: '(partagée)'
     }
 }
 

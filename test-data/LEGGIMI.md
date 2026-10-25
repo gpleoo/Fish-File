@@ -49,3 +49,29 @@ tempo il risultato riflette i dati generati, non sempre la preferenza teorica.
 4. Apri il dettaglio di uno spot e correggi il vento solo lì: cambia solo quello spot.
 5. Apri la mappa delle catture: le sessioni di ogni località devono comparire sparse lungo la costa.
 6. Disattiva la funzione in Impostazioni: la sezione deve sparire e il resto dell'app restare uguale.
+
+## Condivisione dati tra utenti
+
+- `fishfile-condivisione-marco.json` (30 sessioni) e `fishfile-condivisione-luca.json` (20 sessioni):
+  file come quelli che manderebbero due amici. Si importano da
+  Impostazioni > Condivisione dati > **Importa dati condivisi** e **non** sostituiscono i tuoi dati.
+- Gli spot hanno nomi diversi dai tuoi (es. "Foce Verde" invece di "Latina - Foce Verde"):
+  in pianificazione prendono il nome del tuo spot più vicino entro 3 km.
+- Marco ha uno spot in più, "Circeo - Quarto Caldo": diventa uno spot nuovo, assegnato in
+  automatico alla zona "Latina - Circeo - Terracina".
+- Circa una cattura su sei ha il peso scritto in kg (es. "1.25"): all'import diventa grammi.
+
+Rigenerabili con `node scripts/generaDatiTestPianifica.mjs <numeroSessioni> <seme> --condivisione <Nome>`.
+
+### Prove suggerite
+
+1. Importa il file da 50 sessioni come backup, poi i file di Marco e Luca come dati condivisi:
+   le tue sessioni restano 50, le statistiche restano sulle tue 80 catture.
+2. Mappa: le tue sessioni sono cerchi, quelle di Marco triangoli con la punta in su,
+   quelle di Luca con la punta in giù. Colori come i tuoi (rosso 0, rosa 1-4, verde 5-8, blu 9+).
+3. Sessioni registrate: quelle condivise mostrano "Condivisa da Marco/Luca" e non hanno il pulsante elimina.
+4. Filtro "Origine dati": tutti, solo miei, solo condivisi, solo Marco, solo Luca.
+5. Pianifica uscita: l'intestazione indica quante sessioni sono condivise; nel dettaglio sono segnate "(condivisa)".
+6. Reimporta il file di Marco: i suoi dati vengono aggiornati, non duplicati.
+7. Importa per errore il backup da 50 nel pulsante della condivisione: compare un messaggio che rimanda a "Importa".
+8. Condividi i tuoi dati e prova a reimportare il file creato: viene rifiutato perché è tuo.

@@ -2,9 +2,10 @@ import React, { useEffect, useRef, useMemo, useState } from 'react'
 import L from 'leaflet'
 import { useTranslation } from '../locales/LanguageContext'
 import { Map, Maximize, X } from './Icons'
+import TriangoloCondiviso, { svgTriangolo } from './condivisione/TriangoloCondiviso'
 
 // Colori in base al numero di catture
-const getColorByCount = (count) => {
+export const getColorByCount = (count) => {
     if (count === 0) return '#ef4444'      // rosso
     if (count <= 4) return '#ec4899'       // magenta/pink
     if (count <= 8) return '#22c55e'       // verde
@@ -36,6 +37,18 @@ const createMarkerIcon = (count, color) => {
                 ${count}
             </div>
         `,
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2],
+        popupAnchor: [0, -size / 2]
+    })
+}
+
+// Icona a triangolo per le sessioni ricevute da altri utenti (stessi colori)
+const createSharedMarkerIcon = (count, color, variante) => {
+    const size = count === 0 ? 40 : Math.min(40 + count * 2, 54)
+    return L.divIcon({
+        className: 'custom-marker-session',
+        html: svgTriangolo({ variante, colore: color, testo: count, size }),
         iconSize: [size, size],
         iconAnchor: [size / 2, size / 2],
         popupAnchor: [0, -size / 2]
@@ -265,7 +278,9 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
             const lng = sessione.lngOffset
             const count = sessione.numeroCatture
             const color = getColorByCount(count)
-            const icon = createMarkerIcon(count, color)
+            const icon = sessione.condivisa
+                ? createSharedMarkerIcon(count, color, sessione.condivisa.variante)
+                : createMarkerIcon(count, color)
 
             const marker = L.marker([lat, lng], { icon })
 
@@ -441,6 +456,11 @@ const MapCatture = ({ sessioni, catture, filtri }) => {
                         <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
                             <span className="w-3 h-3 rounded-full bg-blue-500 flex-shrink-0" /> 9+
                         </span>
+                        {sessioniConOffset.some(s => s.condivisa) && (
+                            <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
+                                <TriangoloCondiviso variante={0} colore="#9ca3af" size={12} /> {t('sharing.mapLegend')}
+                            </span>
+                        )}
                     </div>
                 </div>
             )}

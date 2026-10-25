@@ -76,13 +76,15 @@ const Motivazione = ({ r }) => {
     )
 }
 
-export const ClassificaSpot = ({ classifica, onApri, onIndietro, nSessioni, modificati, avvisoLontano }) => {
+export const ClassificaSpot = ({ classifica, onApri, onIndietro, nSessioni, nCondivise = 0, modificati, avvisoLontano }) => {
     const { t } = useTranslation()
     return (
         <div>
             <button onClick={onIndietro} className="text-cyan-400 text-sm mb-3">&lt; {t('planner.results.back')}</button>
             <p className="text-gray-400 text-xs mb-3">
-                {t('planner.results.basedOn', { count: nSessioni })}
+                {nCondivise > 0
+                    ? t('sharing.basedOnShared', { count: nSessioni, shared: nCondivise })
+                    : t('planner.results.basedOn', { count: nSessioni })}
                 {modificati.length > 0 && ` ${t('planner.results.modified', { fields: modificati.join(', ') })}`}
             </p>
             {classifica.map((r, i) => {
@@ -217,7 +219,10 @@ export const DettaglioSpot = ({ risultato: r, correzioni, onCorreggi, onRipristi
                     <ul className="text-xs text-gray-200 space-y-0.5">
                         {r.sessioniSimili.map(s => (
                             <li key={s.id} className="flex justify-between">
-                                <span>{s.data}</span>
+                                <span>
+                                    {s.data}
+                                    {s.condivisa && <span className="text-amber-400"> {t('sharing.sharedTag')}</span>}
+                                </span>
                                 <span>{t('planner.detail.catches', { count: s.catture })}</span>
                                 <span className="text-gray-400">{Math.round(s.somiglianza * 100)}%</span>
                             </li>
