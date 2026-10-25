@@ -53,6 +53,14 @@ const PianificaUscita = ({ catture, sessioniCompletate, activeSection, setActive
     const [spotAperto, setSpotAperto] = useState(null)
     const richiestaRef = useRef(0)
 
+    // Rilegge zone e archivio quando la sezione si apre o i dati cambiano
+    // (es. ripristino di un backup), per non lavorare su una copia superata
+    useEffect(() => {
+        if (!aperta) return
+        setConfig(caricaConfig())
+        setArchivio(caricaArchivio())
+    }, [aperta, sessioniCompletate, catture])
+
     const aggiornaConfig = useCallback((nuova) => {
         setConfig(nuova)
         salvaConfig(nuova)
