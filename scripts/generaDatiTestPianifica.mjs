@@ -59,15 +59,27 @@ const TEMP_ARIA = [11, 12, 14, 17, 21, 26, 29, 29, 25, 20, 16, 12]
 const TEMP_ACQUA = [14, 13, 14, 15, 18, 22, 25, 26, 24, 21, 18, 15]
 
 // --- Spot e condizioni preferite (verita' nota per verificare i risultati) ---
+// Ogni spot e' un tratto di costa (da -> a): ogni sessione cade in un punto
+// diverso del tratto, come quando ci si sposta di 1-2 km lungo la spiaggia.
 const SPOT = [
-    { nome: 'Anzio - Molo Innocenziano', zona: 'nord', lat: 41.4440, lng: 12.6302, pref: { maestrale: 1, calma: 0.6, tramontana: 0.3, scirocco: 0.2, libeccio: 0.1 }, specie: ['Orata', 'Sarago', 'Leccia stella'] },
-    { nome: 'Nettuno - Tre Cancelli', zona: 'nord', lat: 41.4415, lng: 12.7120, pref: { scirocco: 1, libeccio: 0.7, maestrale: 0.3, tramontana: 0.1, calma: 0.1 }, specie: ['Mormora', 'Ombrina', 'Spigola'] },
-    { nome: 'Latina - Foce Verde', zona: 'sud', lat: 41.4140, lng: 12.8150, pref: { libeccio: 1, scirocco: 0.7, maestrale: 0.3, tramontana: 0.2, calma: 0.1 }, specie: ['Spigola', 'Cefalo', 'Pesce serra'] },
-    { nome: 'Latina - Rio Martino', zona: 'sud', lat: 41.3655, lng: 12.9230, pref: { scirocco: 0.8, calma: 0.5, libeccio: 0.4, maestrale: 0.3, tramontana: 0.2 }, specie: ['Spigola', 'Orata', 'Cefalo'] },
-    { nome: 'San Felice Circeo - Torre Paola', zona: 'sud', lat: 41.2405, lng: 13.0300, pref: { calma: 1, tramontana: 0.8, maestrale: 0.3, scirocco: 0.1, libeccio: 0.1 }, specie: ['Orata', 'Sarago', 'Occhiata'] },
-    { nome: 'Terracina - Molo', zona: 'sud', lat: 41.2845, lng: 13.2510, pref: { scirocco: 1, libeccio: 0.5, calma: 0.3, maestrale: 0.2, tramontana: 0.2 }, specie: ['Spigola', 'Orata', 'Sarago'] },
-    { nome: 'Terracina - Spiaggia di Levante', zona: 'sud', lat: 41.2900, lng: 13.2800, pref: { libeccio: 0.9, scirocco: 0.8, maestrale: 0.3, tramontana: 0.1, calma: 0.1 }, specie: ['Spigola', 'Ombrina', 'Mormora'] }
+    { nome: 'Anzio - Riviera di Ponente', zona: 'nord', tratto: [[41.4870, 12.5860], [41.4520, 12.6100]], pref: { maestrale: 1, calma: 0.6, tramontana: 0.3, scirocco: 0.2, libeccio: 0.1 }, specie: ['Orata', 'Sarago', 'Leccia stella'] },
+    { nome: 'Nettuno - Litorale di Levante', zona: 'nord', tratto: [[41.4555, 12.6700], [41.4420, 12.7250]], pref: { scirocco: 1, libeccio: 0.7, maestrale: 0.3, tramontana: 0.1, calma: 0.1 }, specie: ['Mormora', 'Ombrina', 'Spigola'] },
+    { nome: 'Latina - Foce Verde', zona: 'sud', tratto: [[41.4120, 12.7900], [41.3940, 12.8450]], pref: { libeccio: 1, scirocco: 0.7, maestrale: 0.3, tramontana: 0.2, calma: 0.1 }, specie: ['Spigola', 'Cefalo', 'Pesce serra'] },
+    { nome: 'Latina - Rio Martino', zona: 'sud', tratto: [[41.3800, 12.8850], [41.3600, 12.9300]], pref: { scirocco: 0.8, calma: 0.5, libeccio: 0.4, maestrale: 0.3, tramontana: 0.2 }, specie: ['Spigola', 'Orata', 'Cefalo'] },
+    { nome: 'Sabaudia - Lungomare', zona: 'sud', tratto: [[41.3400, 12.9550], [41.2600, 13.0200]], pref: { scirocco: 0.9, libeccio: 0.8, maestrale: 0.4, calma: 0.2, tramontana: 0.1 }, specie: ['Spigola', 'Ombrina', 'Mormora', 'Pesce serra'] },
+    { nome: 'San Felice Circeo - Torre Paola', zona: 'sud', tratto: [[41.2560, 13.0250], [41.2420, 13.0340]], pref: { calma: 1, tramontana: 0.8, maestrale: 0.3, scirocco: 0.1, libeccio: 0.1 }, specie: ['Orata', 'Sarago', 'Occhiata'] },
+    { nome: 'Terracina - Ponente e Molo', zona: 'sud', tratto: [[41.2935, 13.2050], [41.2830, 13.2470]], pref: { scirocco: 1, libeccio: 0.5, calma: 0.3, maestrale: 0.2, tramontana: 0.2 }, specie: ['Spigola', 'Orata', 'Sarago'] },
+    { nome: 'Terracina - Spiaggia di Levante', zona: 'sud', tratto: [[41.2850, 13.2560], [41.2900, 13.2950]], pref: { libeccio: 0.9, scirocco: 0.8, maestrale: 0.3, tramontana: 0.1, calma: 0.1 }, specie: ['Spigola', 'Ombrina', 'Mormora'] }
 ]
+
+/** Punto casuale lungo il tratto di costa, con uno scarto di qualche decina di metri */
+const puntoNelTratto = ([[lat1, lng1], [lat2, lng2]]) => {
+    const t = rnd()
+    return {
+        lat: Number((lat1 + (lat2 - lat1) * t + tra(-0.0003, 0.0003)).toFixed(6)),
+        lng: Number((lng1 + (lng2 - lng1) * t + tra(-0.0003, 0.0003)).toFixed(6))
+    }
+}
 const PESO_SPECIE = {
     Spigola: [400, 3500], Orata: [300, 1800], Sarago: [150, 900], Mormora: [100, 450], Ombrina: [500, 3000],
     Cefalo: [300, 1500], 'Pesce serra': [800, 4000], 'Leccia stella': [200, 900], Occhiata: [100, 400]
@@ -138,6 +150,7 @@ for (let i = 0; i < NUMERO_SESSIONI; i++) {
         : data
 
     const meteo = generaMeteo(tipo, data, mese, spot.nome)
+    const punto = puntoNelTratto(spot.tratto)
 
     // Catture attese: preferenza dello spot x fascia (alba e tramonto rendono di piu')
     const bonusFascia = { alba: 1.3, tramonto: 1.2, notte: 1, giorno: 0.6 }[fascia]
@@ -159,8 +172,8 @@ for (let i = 0; i < NUMERO_SESSIONI; i++) {
             peso: String(peso),
             lunghezza: String(Math.round(Math.cbrt(peso) * 4.2)),
             localita: spot.nome,
-            latitudine: String(spot.lat),
-            longitudine: String(spot.lng),
+            latitudine: String(punto.lat),
+            longitudine: String(punto.lng),
             esca: scegli(ESCHE_SPECIE[specie]),
             canna: scegli(CANNE),
             trave: scegli(TRAVI),
@@ -174,8 +187,8 @@ for (let i = 0; i < NUMERO_SESSIONI; i++) {
     const sessione = {
         id,
         localita: spot.nome,
-        latitudine: spot.lat,
-        longitudine: spot.lng,
+        latitudine: punto.lat,
+        longitudine: punto.lng,
         dataInizio: data,
         oraInizio: hhmm(inizio),
         dataFine,
