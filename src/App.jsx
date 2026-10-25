@@ -29,6 +29,9 @@ import { fetchWeatherData } from './utils/weatherService'
 
 // Pianifica uscita (modulo isolato, caricato solo se attivo)
 import { usePianificaAttiva } from './utils/pianifica/storage'
+
+// Pesi: sempre in grammi
+import { convertiPesiKg } from './utils/condivisione/condivisione'
 const PianificaUscita = lazy(() => import('./components/pianifica/PianificaUscita'))
 
 // Ads
@@ -190,6 +193,21 @@ function App() {
 
     // Effects - Salvataggio localStorage
     useEffect(() => { localStorage.setItem('diarioPesca_catture', JSON.stringify(catture)) }, [catture])
+
+    // Pesi inseriti in kg (valori sotto 20) convertiti in grammi; copia degli originali salvata una volta
+    useEffect(() => {
+        const { catture: convertite, convertite: numero } = convertiPesiKg(catture)
+        if (numero === 0) return
+        try {
+            if (!localStorage.getItem('diarioPesca_catture_primaConversionePeso')) {
+                localStorage.setItem('diarioPesca_catture_primaConversionePeso', JSON.stringify(catture))
+            }
+        } catch (e) {
+            console.error('Copia catture prima della conversione pesi non salvata', e)
+        }
+        setCatture(convertite)
+        toast.info(t('sharing.weightsConverted', { count: numero }))
+    }, [catture])
     useEffect(() => { localStorage.setItem('diarioPesca_specie', JSON.stringify(specieMemorizzate)) }, [specieMemorizzate])
     useEffect(() => { localStorage.setItem('diarioPesca_esche', JSON.stringify(escheMemorizzate)) }, [escheMemorizzate])
     useEffect(() => { localStorage.setItem('diarioPesca_localita', JSON.stringify(localitaMemorizzate)) }, [localitaMemorizzate])

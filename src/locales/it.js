@@ -531,6 +531,46 @@ const it = {
             noZone: 'Nessuna zona',
             done: 'Fatto'
         }
+    },
+
+    // Condivisione dati tra utenti
+    sharing: {
+        title: 'Condivisione dati',
+        description: 'Scambia sessioni e catture con altri pescatori. I dati ricevuti restano separati dai tuoi: compaiono in mappa (triangoli) e nelle sessioni registrate e contano nella pianificazione, ma non nelle tue statistiche e non nel tuo backup.',
+        yourName: 'Il tuo nome (visibile a chi riceve i tuoi dati)',
+        namePlaceholder: 'es: Marco',
+        nameRequired: 'Inserisci il tuo nome prima di condividere.',
+        nothingToShare: 'Non hai ancora sessioni da condividere.',
+        export: 'Condividi i miei dati',
+        exportHelp: 'Crea un file con tutte le tue sessioni e catture, coordinate GPS comprese. Invialo come preferisci (WhatsApp, email, AirDrop).',
+        exported: 'File creato: {sessions} sessioni, {catches} catture.',
+        'import': 'Importa dati condivisi',
+        importHelp: 'Aggiunge i dati di un altro utente senza toccare i tuoi. Un file aggiornato della stessa persona sostituisce i suoi dati precedenti.',
+        imported: 'Dati di {name} importati: {sessions} sessioni, {catches} catture.',
+        updated: 'Dati di {name} aggiornati: {sessions} sessioni, {catches} catture.',
+        receivedTitle: 'Dati ricevuti',
+        noneReceived: 'Nessun dato ricevuto.',
+        counts: '{sessions} sessioni, {catches} catture',
+        confirmDelete: 'Eliminare tutti i dati ricevuti da {name}?',
+        deleted: 'Dati di {name} eliminati.',
+        errors: {
+            formato: 'File non valido: non è un file di condivisione di Fish File.',
+            backup: 'Questo è un backup completo: per ripristinarlo usa "Importa" in Backup & cloud.',
+            proprio: 'Questo file contiene i tuoi stessi dati.',
+            vuoto: 'Il file non contiene sessioni.',
+            storage: 'Spazio di memoria esaurito: elimina dei dati ricevuti e riprova.'
+        },
+        mapLegend: 'dati condivisi',
+        sharedBy: 'Condivisa da {name}',
+        originFilter: 'Origine dati',
+        originAll: 'Tutti i dati (miei e condivisi)',
+        originMine: 'Solo i miei dati',
+        originShared: 'Solo dati condivisi',
+        originPerson: 'Condivisi da {name}',
+        weightsConverted: '{count} pesi inseriti in kg sono stati convertiti in grammi.',
+        sharedSpot: '(da dati condivisi)',
+        basedOnShared: 'Calcolato su {count} sessioni nella zona, di cui {shared} condivise da altri utenti.',
+        sharedTag: '(condivisa)'
     }
 }
 

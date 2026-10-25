@@ -14,6 +14,7 @@ import {
     saveToDropbox
 } from '../utils/backupService'
 import { usePianificaAttiva } from '../utils/pianifica/storage'
+import CondivisioneDati from './condivisione/CondivisioneDati'
 
 // Privacy Policy URL - Replace with your actual URL when available
 const PRIVACY_POLICY_URL = 'https://gpleoo.github.io/Fish-File/privacy-policy.html'
@@ -358,6 +359,11 @@ const SettingsPanel = ({ onDataRestored }) => {
             'diarioPesca_datiSessione',
             'diarioPesca_sessioneCorrente',
             'diarioPesca_sessioniCompletate',
+            'diarioPesca_catture_primaConversionePeso',
+            'diarioPesca_condivisi',
+            'diarioPesca_profiloCondivisione',
+            'diarioPesca_pianifica_config',
+            'diarioPesca_pianifica_archivio',
             'backupHistory',
             'consent_location',
             'consent_microphone'
@@ -780,6 +786,9 @@ const SettingsPanel = ({ onDataRestored }) => {
                                     <p className="text-gray-500 text-xs mt-2 text-center">{t('settings.installHint')}</p>
                                 </div>
                             )}
+
+                            {/* Condivisione dati con altri utenti */}
+                            <CondivisioneDati />
 
                             {/* Pianifica Uscita */}
                             <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">

@@ -8,6 +8,11 @@
  * Uso:   node scripts/generaDatiTestPianifica.mjs [numeroSessioni] [seme]
  * Output: test-data/fishfile-test-pianifica-<numeroSessioni>.json
  *
+ * Con --condivisione <Nome> crea invece il file che un altro utente
+ * condividerebbe (formato "Condivisione dati"): nomi degli spot diversi,
+ * uno spot in piu' e alcuni pesi inseriti in kg, per provare l'import.
+ * Output: test-data/fishfile-condivisione-<nome>.json
+ *
  * ATTENZIONE: importare il file nell'app SOSTITUISCE i dati presenti.
  * Esportare prima un backup dei propri dati reali.
  */
@@ -17,6 +22,8 @@ import { faseLunare, direzioneToLabel } from '../src/utils/pianifica/spotAdvisor
 
 const NUMERO_SESSIONI = Number(process.argv[2]) || 50
 const SEME = Number(process.argv[3]) || 42
+const idxCondivisione = process.argv.indexOf('--condivisione')
+const NOME_CONDIVISIONE = idxCondivisione > 0 ? (process.argv[idxCondivisione + 1] || 'Amico') : null
 
 // Generatore pseudo-casuale con seme: stesso seme = stessi dati
 let stato = SEME
@@ -71,6 +78,21 @@ const SPOT = [
     { nome: 'Terracina - Ponente e Molo', zona: 'sud', tratto: [[41.2935, 13.2050], [41.2830, 13.2470]], pref: { scirocco: 1, libeccio: 0.5, calma: 0.3, maestrale: 0.2, tramontana: 0.2 }, specie: ['Spigola', 'Orata', 'Sarago'] },
     { nome: 'Terracina - Spiaggia di Levante', zona: 'sud', tratto: [[41.2850, 13.2560], [41.2900, 13.2950]], pref: { libeccio: 0.9, scirocco: 0.8, maestrale: 0.3, tramontana: 0.1, calma: 0.1 }, specie: ['Spigola', 'Ombrina', 'Mormora'] }
 ]
+
+// Solo nel file condiviso: l'altro utente chiama gli spot a modo suo e ne ha uno in piu'
+const NOMI_ALTRO_UTENTE = {
+    'Anzio - Riviera di Ponente': 'Anzio spiaggia ponente',
+    'Nettuno - Litorale di Levante': 'Nettuno levante',
+    'Latina - Foce Verde': 'Foce Verde',
+    'Latina - Rio Martino': 'Rio Martino',
+    'Sabaudia - Lungomare': 'Sabaudia dune',
+    'San Felice Circeo - Torre Paola': 'Torre Paola',
+    'Terracina - Ponente e Molo': 'Terracina molo',
+    'Terracina - Spiaggia di Levante': 'Terracina levante'
+}
+if (NOME_CONDIVISIONE) {
+    SPOT.push({ nome: 'Circeo - Quarto Caldo', zona: 'sud', tratto: [[41.2275, 13.0800], [41.2235, 13.0950]], pref: { maestrale: 1, tramontana: 0.7, calma: 0.5, scirocco: 0.2, libeccio: 0.1 }, specie: ['Sarago', 'Occhiata', 'Orata'] })
+}
 
 /** Punto casuale lungo il tratto di costa, con uno scarto di qualche decina di metri */
 const puntoNelTratto = ([[lat1, lng1], [lat2, lng2]]) => {
@@ -243,8 +265,25 @@ const backup = {
 }
 
 mkdirSync('test-data', { recursive: true })
-const file = `test-data/fishfile-test-pianifica-${NUMERO_SESSIONI}.json`
-writeFileSync(file, JSON.stringify(backup, null, 2))
+let file
+if (NOME_CONDIVISIONE) {
+    const rinomina = (x) => ({ ...x, localita: NOMI_ALTRO_UTENTE[x.localita] || x.localita })
+    // Circa una cattura su sei con il peso scritto in kg, come con la vecchia etichetta
+    const catturePeso = catture.map((c, i) => rinomina(i % 6 === 0 ? { ...c, peso: (Number(c.peso) / 1000).toFixed(2) } : c))
+    const condivisione = {
+        tipo: 'fishfile-condivisione',
+        versione: 1,
+        mittente: { id: `u-test-${NOME_CONDIVISIONE.toLowerCase()}`, nome: NOME_CONDIVISIONE },
+        creatoIl: new Date().toISOString(),
+        sessioni: sessioni.map(rinomina),
+        catture: catturePeso
+    }
+    file = `test-data/fishfile-condivisione-${NOME_CONDIVISIONE.toLowerCase()}.json`
+    writeFileSync(file, JSON.stringify(condivisione, null, 2))
+} else {
+    file = `test-data/fishfile-test-pianifica-${NUMERO_SESSIONI}.json`
+    writeFileSync(file, JSON.stringify(backup, null, 2))
+}
 
 console.log(`Creato ${file}`)
 console.log(`Sessioni: ${sessioni.length}, catture: ${catture.length}, uscite a vuoto: ${statistiche.senzaCatture} (di cui ${statistiche.senzaMeteo} senza meteo)`)

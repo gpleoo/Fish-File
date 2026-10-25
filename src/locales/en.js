@@ -532,6 +532,46 @@ const en = {
             noZone: 'No zone',
             done: 'Done'
         }
+    },
+
+    // Condivisione dati tra utenti
+    sharing: {
+        title: 'Data sharing',
+        description: 'Exchange sessions and catches with other anglers. Received data stays separate from yours: it appears on the map (triangles) and in recorded sessions and counts in trip planning, but not in your statistics or your backup.',
+        yourName: 'Your name (visible to people receiving your data)',
+        namePlaceholder: 'e.g. Mark',
+        nameRequired: 'Enter your name before sharing.',
+        nothingToShare: 'You have no sessions to share yet.',
+        export: 'Share my data',
+        exportHelp: 'Creates a file with all your sessions and catches, GPS coordinates included. Send it however you like (WhatsApp, email, AirDrop).',
+        exported: 'File created: {sessions} sessions, {catches} catches.',
+        'import': 'Import shared data',
+        importHelp: 'Adds another user\'s data without touching yours. An updated file from the same person replaces their previous data.',
+        imported: '{name}\'s data imported: {sessions} sessions, {catches} catches.',
+        updated: '{name}\'s data updated: {sessions} sessions, {catches} catches.',
+        receivedTitle: 'Received data',
+        noneReceived: 'No data received.',
+        counts: '{sessions} sessions, {catches} catches',
+        confirmDelete: 'Delete all data received from {name}?',
+        deleted: '{name}\'s data deleted.',
+        errors: {
+            formato: 'Invalid file: not a Fish File sharing file.',
+            backup: 'This is a full backup: to restore it use "Import" in Backup & cloud.',
+            proprio: 'This file contains your own data.',
+            vuoto: 'The file contains no sessions.',
+            storage: 'Storage full: delete some received data and try again.'
+        },
+        mapLegend: 'shared data',
+        sharedBy: 'Shared by {name}',
+        originFilter: 'Data source',
+        originAll: 'All data (mine and shared)',
+        originMine: 'Only my data',
+        originShared: 'Only shared data',
+        originPerson: 'Shared by {name}',
+        weightsConverted: '{count} weights entered in kg were converted to grams.',
+        sharedSpot: '(from shared data)',
+        basedOnShared: 'Based on {count} sessions in the zone, {shared} of them shared by other users.',
+        sharedTag: '(shared)'
     }
 }
 

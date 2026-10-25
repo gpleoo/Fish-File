@@ -304,7 +304,8 @@ export const costruisciUscite = (sessioni = [], catture = [], meteoArchivio = {}
             pesoTotale: catt.reduce((sum, c) => sum + (parseNum(c.peso) || 0), 0),
             meteo,
             fonteMeteo,
-            luna: faseLunare(inizio.data)
+            luna: faseLunare(inizio.data),
+            condivisa: !!s.condivisa
         })
     }
     return uscite
@@ -562,6 +563,7 @@ export const valutaSpot = ({ uscite, spot, previsto, correzioniSpot = {}, finest
             affidabilita,
             pesoDati: sommaPesi,
             nUscite: usciteSpot.length,
+            nUsciteCondivise: usciteSpot.filter(u => u.condivisa).length,
             nSenzaMeteo: senzaMeteo,
             nSimili,
             mediaCatture: nSimili ? simili.reduce((sum, v) => sum + v.uscita.numeroCatture, 0) / nSimili : null,
@@ -579,7 +581,8 @@ export const valutaSpot = ({ uscite, spot, previsto, correzioniSpot = {}, finest
                 id: v.uscita.id,
                 data: v.uscita.data,
                 catture: v.uscita.numeroCatture,
-                somiglianza: v.sim
+                somiglianza: v.sim,
+                condivisa: !!v.uscita.condivisa
             })),
             previsto: previstoSpot
         }

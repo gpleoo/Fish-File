@@ -17,6 +17,9 @@ import { caricaConfig, salvaConfig, caricaArchivio, salvaArchivio } from '../../
 import { CampoMeteo, CAMPI_METEO } from './CampiMeteo'
 import { ClassificaSpot, DettaglioSpot } from './RisultatiSpot'
 import GestioneZone from './GestioneZone'
+import { useDatiCondivisi } from '../../utils/condivisione/storage'
+import { datiCondivisiMarcati } from '../../utils/condivisione/condivisione'
+import { assegnaSpotCondivisi, zoneAutomatiche } from '../../utils/pianifica/condivisi'
 
 const GIORNI_PREVISIONE = 7
 const GIORNI_PREVISIONE_AFFIDABILE = 3
@@ -52,6 +55,7 @@ const PianificaUscita = ({ catture, sessioniCompletate, activeSection, setActive
     const [correzioniSpot, setCorrezioniSpot] = useState({})
     const [spotAperto, setSpotAperto] = useState(null)
     const richiestaRef = useRef(0)
+    const condivisi = useDatiCondivisi()
 
     // Rilegge zone e archivio quando la sezione si apre o i dati cambiano
     // (es. ripristino di un backup), per non lavorare su una copia superata
@@ -67,15 +71,37 @@ const PianificaUscita = ({ catture, sessioniCompletate, activeSection, setActive
     }, [])
 
     // --- Dati derivati (sola lettura dei dati dell'app) ---
-    const uscite = useMemo(
-        () => (aperta ? costruisciUscite(sessioniCompletate, catture, archivio) : []),
-        [aperta, sessioniCompletate, catture, archivio]
-    )
+    // Le sessioni ricevute da altri utenti contano come le proprie: prendono il
+    // nome dello spot della propria sessione piu' vicina (entro 3 km), altrimenti restano spot a se'
+    const uscite = useMemo(() => {
+        if (!aperta) return []
+        const mie = costruisciUscite(sessioniCompletate, catture, archivio)
+        const ricevuti = datiCondivisiMarcati(condivisi)
+        if (ricevuti.sessioni.length === 0) return mie
+        const altrui = costruisciUscite(ricevuti.sessioni, ricevuti.catture, archivio)
+        return [...mie, ...assegnaSpotCondivisi(altrui, mie)]
+    }, [aperta, sessioniCompletate, catture, archivio, condivisi])
     const spotDisponibili = useMemo(() => elencoSpot(uscite), [uscite])
 
+    // Spot presenti solo nei dati condivisi: zona automatica (la piu' vicina entro 25 km)
+    const spotSoloCondivisi = useMemo(() => {
+        const propri = new Set(uscite.filter(u => !u.condivisa).map(u => u.spot))
+        return new Set(spotDisponibili.filter(s => !propri.has(s.nome)).map(s => s.nome))
+    }, [uscite, spotDisponibili])
+
+    const zoneAuto = useMemo(() => {
+        if (spotSoloCondivisi.size === 0) return {}
+        const centri = config.zone.map(z => ({
+            id: z.id,
+            ...(centroZona(spotDisponibili.filter(s => config.spot[s.nome]?.zonaId === z.id)) || { lat: null, lng: null })
+        }))
+        const daAssegnare = spotDisponibili.filter(s => spotSoloCondivisi.has(s.nome) && !config.spot[s.nome]?.zonaId)
+        return zoneAutomatiche(daAssegnare, centri)
+    }, [spotSoloCondivisi, spotDisponibili, config])
+
     const spotDellaZona = useCallback((id) => spotDisponibili
-        .filter(s => config.spot[s.nome]?.zonaId === id)
-        .map(s => ({ ...s, tipo: config.spot[s.nome]?.tipo || 'mare' })), [spotDisponibili, config])
+        .filter(s => (config.spot[s.nome]?.zonaId || zoneAuto[s.nome]) === id)
+        .map(s => ({ ...s, tipo: config.spot[s.nome]?.tipo || 'mare' })), [spotDisponibili, config, zoneAuto])
 
     const zoneUtilizzabili = useMemo(
         () => config.zone.filter(z => spotDellaZona(z.id).length > 0),
@@ -184,7 +210,8 @@ const PianificaUscita = ({ catture, sessioniCompletate, activeSection, setActive
 
     const nSessioniZona = useMemo(() => {
         const nomi = new Set(spotZona.map(s => s.nome))
-        return uscite.filter(u => nomi.has(u.spot)).length
+        const zona = uscite.filter(u => nomi.has(u.spot))
+        return { totale: zona.length, condivise: zona.filter(u => u.condivisa).length }
     }, [uscite, spotZona])
 
     const giorniAvanti = Math.round((Date.parse(data) - Date.parse(dataOggi())) / 86400000)
@@ -197,6 +224,8 @@ const PianificaUscita = ({ catture, sessioniCompletate, activeSection, setActive
                     config={config}
                     onChange={aggiornaConfig}
                     spotDisponibili={spotDisponibili}
+                    zoneAuto={zoneAuto}
+                    spotSoloCondivisi={spotSoloCondivisi}
                     onChiudi={() => setVista('form')}
                 />
             )
@@ -239,7 +268,8 @@ const PianificaUscita = ({ catture, sessioniCompletate, activeSection, setActive
             return (
                 <ClassificaSpot
                     classifica={classifica}
-                    nSessioni={nSessioniZona}
+                    nSessioni={nSessioniZona.totale}
+                    nCondivise={nSessioniZona.condivise}
                     modificati={CAMPI_METEO.filter(c => campi[c].origine === 'mod').map(c => t(`planner.factors.${c}`))}
                     avvisoLontano={giorniAvanti > GIORNI_PREVISIONE_AFFIDABILE}
                     onApri={(nome) => { setSpotAperto(nome); setVista('dettaglio') }}

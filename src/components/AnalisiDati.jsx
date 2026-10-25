@@ -8,6 +8,8 @@ import MapCatture from './MapCatture'
 import SessioniRegistrate from './SessioniRegistrate'
 import { ventiRosaDeiVenti, moonPhaseKeys, weatherConditionKeys } from './MeteoForm'
 import { useTranslation } from '../locales/LanguageContext'
+import { useDatiCondivisi } from '../utils/condivisione/storage'
+import { datiCondivisiMarcati } from '../utils/condivisione/condivisione'
 
 const AnalisiDati = ({
     activeSection,
@@ -31,8 +33,22 @@ const AnalisiDati = ({
         pressione: 'tutte',
         condizioni: 'tutte',
         localita: 'tutte',
-        faseLunare: 'tutte'
+        faseLunare: 'tutte',
+        origine: 'tutti'
     })
+
+    // Dati ricevuti da altri utenti: solo mappa e sessioni registrate, mai statistiche
+    const condivisi = useDatiCondivisi()
+    const haCondivisi = condivisi.utenti.length > 0
+    const { origine, ...filtriCatture } = filtri
+    const datiMappa = useMemo(() => {
+        const mostraMiei = origine === 'tutti' || origine === 'miei'
+        const altri = origine === 'miei' ? { sessioni: [], catture: [] } : datiCondivisiMarcati(condivisi, origine)
+        return {
+            sessioni: [...(mostraMiei ? sessioniCompletate : []), ...altri.sessioni],
+            catture: [...(mostraMiei ? catture : []), ...altri.catture]
+        }
+    }, [origine, condivisi, sessioniCompletate, catture])
 
     // Calcola anni e mesi disponibili
     const anniDisponibili = useMemo(() => {
@@ -79,7 +95,8 @@ const AnalisiDati = ({
             pressione: 'tutte',
             condizioni: 'tutte',
             localita: 'tutte',
-            faseLunare: 'tutte'
+            faseLunare: 'tutte',
+            origine: 'tutti'
         })
     }
 
@@ -93,15 +110,19 @@ const AnalisiDati = ({
             isActive={activeSection === 'analisi'}
             onToggle={() => setActiveSection(activeSection === 'analisi' ? null : 'analisi')}
         >
-            {catture.length === 0 ? (
+            {catture.length === 0 && !haCondivisi ? (
                 <p className="text-gray-400 text-center py-8">{t('analysis.noCatches')}</p>
             ) : (
                 <>
-                    {/* Statistiche */}
-                    <StatisticheBox stats={stats} />
+                    {catture.length > 0 && (
+                        <>
+                            {/* Statistiche */}
+                            <StatisticheBox stats={stats} />
 
-                    {/* Grafici */}
-                    <GraficiStatistiche catture={catture} filtri={filtri} />
+                            {/* Grafici */}
+                            <GraficiStatistiche catture={catture} filtri={filtriCatture} />
+                        </>
+                    )}
 
                     {/* Filtri */}
                     <div className="bg-gray-800 rounded-lg border border-gray-700 p-3 sm:p-4 mb-3 sm:mb-4">
@@ -117,6 +138,23 @@ const AnalisiDati = ({
                             )}
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                            {/* Origine dati: propri o ricevuti da altri utenti */}
+                            {haCondivisi && (
+                                <select
+                                    value={filtri.origine}
+                                    onChange={(e) => setFiltri(p => ({ ...p, origine: e.target.value }))}
+                                    className="bg-gray-900 border border-amber-700 rounded-lg px-3 py-2.5 sm:py-2 text-white text-sm sm:col-span-2"
+                                    aria-label={t('sharing.originFilter')}
+                                >
+                                    <option value="tutti">{t('sharing.originAll')}</option>
+                                    <option value="miei">{t('sharing.originMine')}</option>
+                                    <option value="condivisi">{t('sharing.originShared')}</option>
+                                    {condivisi.utenti.map(u => (
+                                        <option key={u.id} value={u.id}>{t('sharing.originPerson', { name: u.nome })}</option>
+                                    ))}
+                                </select>
+                            )}
+
                             {/* Anno */}
                             <select
                                 value={filtri.anno}
@@ -232,25 +270,27 @@ const AnalisiDati = ({
 
                     {/* Mappa Sessioni */}
                     <MapCatture
-                        sessioni={sessioniCompletate}
-                        catture={catture}
-                        filtri={filtri}
+                        sessioni={datiMappa.sessioni}
+                        catture={datiMappa.catture}
+                        filtri={filtriCatture}
                     />
 
                     {/* Sessioni Registrate */}
                     <SessioniRegistrate
-                        sessioni={sessioniCompletate}
-                        catture={catture}
+                        sessioni={datiMappa.sessioni}
+                        catture={datiMappa.catture}
                         onDeleteSessione={onDeleteSessione}
-                        filtri={filtri}
+                        filtri={filtriCatture}
                     />
 
-                    {/* Registro Catture */}
-                    <RegistroCatture
-                        catture={catture}
-                        setCatture={setCatture}
-                        filtri={filtri}
-                    />
+                    {/* Registro Catture (solo dati propri) */}
+                    {catture.length > 0 && (
+                        <RegistroCatture
+                            catture={catture}
+                            setCatture={setCatture}
+                            filtri={filtriCatture}
+                        />
+                    )}
                 </>
             )}
         </Section>
