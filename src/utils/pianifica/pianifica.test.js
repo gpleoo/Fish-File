@@ -276,3 +276,27 @@ test('storico: una richiesta per spot e meteo assegnato a ogni uscita', async ()
         assert.equal(meteo.b.condizioni, 'clear', 'fascia a cavallo della mezzanotte')
     })
 })
+
+test('prede con esca: da sessioni simili, altrimenti dallo storico dello spot', () => {
+    const meteo = { pressione: '1012', vento: '10', direzioneVento: 'SE', condizioni: 'cloudy', temperatura: '15' }
+    const sessioni = [1, 2, 3].map(id => ({ id, localita: 'Molo', latitudine: 41, longitudine: 12, dataInizio: '2026-02-0' + id, oraInizio: '06:00', dataFine: '2026-02-0' + id, oraFine: '10:00', meteo }))
+    const catture = [
+        { id: 10, sessioneId: 1, specie: 'Spigola', esca: 'Arenicola', ora: '07:00' },
+        { id: 11, sessioneId: 2, specie: 'Spigola', esca: 'Arenicola', ora: '07:00' },
+        { id: 12, sessioneId: 2, specie: 'Spigola', esca: 'Gambero', ora: '07:30' },
+        { id: 13, sessioneId: 3, specie: 'Orata', esca: 'Bibi', ora: '08:00' }
+    ]
+    const uscite = costruisciUscite(sessioni, catture)
+    const base = { pressione: 1012, ventoKn: 10, ventoDir: 135, onde: null, tAcqua: null, tAria: 15, condizioni: 'cloudy', luna: null, maree: { alte: [], basse: [] } }
+    const finestra = { inizioMin: 360, fineMin: 600 }
+    const [simile] = valutaSpot({ uscite, spot: [{ nome: 'Molo', tipo: 'mare' }], previsto: base, finestra })
+    assert.equal(simile.prede.fonte, 'simili')
+    assert.deepEqual(simile.prede.elenco[0], { specie: 'Spigola', numero: 3, esca: 'Arenicola' })
+    assert.deepEqual(simile.prede.elenco[1], { specie: 'Orata', numero: 1, esca: 'Bibi' })
+
+    const opposto = { ...base, pressione: 990, ventoKn: 30, ventoDir: 315, condizioni: 'storm', tAria: 35 }
+    const [diverso] = valutaSpot({ uscite, spot: [{ nome: 'Molo', tipo: 'mare' }], previsto: opposto, finestra })
+    assert.equal(diverso.nSimili, 0)
+    assert.equal(diverso.prede.fonte, 'spot')
+    assert.equal(diverso.prede.elenco[0].specie, 'Spigola')
+})
