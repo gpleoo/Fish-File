@@ -419,6 +419,112 @@ const it = {
         website: 'Sito',
         call: 'Chiama',
         email: 'Email'
+    },
+
+    // Pianifica uscita
+    planner: {
+        title: 'pianifica uscita',
+        subtitle: 'Trova lo spot migliore per il meteo del giorno',
+        settingsTitle: 'Pianifica uscita',
+        settingsDescription: 'Mostra la sezione per scegliere lo spot in base al meteo',
+        unavailable: 'Pianifica uscita non disponibile al momento. Il resto dell\'app funziona normalmente.',
+        retry: 'Riprova',
+        noSessions: 'Registra almeno una sessione di pesca per usare questa funzione.',
+        setupZones: 'Crea una zona di pesca e assegnale i tuoi spot per iniziare.',
+        manageZones: 'Gestisci zone',
+        whenWhere: 'Quando e dove',
+        zone: 'Zona',
+        date: 'Data',
+        from: 'Dalle',
+        to: 'Alle',
+        spotsInZone: '{count} spot in questa zona',
+        forecastTitle: 'Meteo previsto',
+        resetForecast: 'Ripristina previsione',
+        forecastHelp: 'Valori dalla previsione: correggi quelli che ritieni sbagliati.',
+        forecastError: 'Previsioni non disponibili: inserisci i valori a mano.',
+        tidesTitle: 'Maree',
+        tidesHelp: 'Inserisci gli orari di alta e bassa marea del giorno.',
+        find: 'Trova lo spot migliore',
+        loadingHistory: 'Recupero meteo storico... {done}/{total}',
+        origin: {
+            prev: 'PREV',
+            mod: 'MOD',
+            calc: 'CALC'
+        },
+        factors: {
+            tAria: 'Temp. aria',
+            tAcqua: 'Temp. acqua',
+            pressione: 'Pressione',
+            ventoKn: 'Vento',
+            ventoDir: 'Direzione vento',
+            condizioni: 'Cielo',
+            onde: 'Onde',
+            luna: 'Fase lunare',
+            marea: 'Marea'
+        },
+        tide: {
+            montante: 'Montante',
+            stanca: 'Stanca (acqua ferma)',
+            calante: 'Calante',
+            alta1: '1a alta',
+            alta2: '2a alta',
+            bassa1: '1a bassa',
+            bassa2: '2a bassa'
+        },
+        reliability: {
+            alta: 'Affidabilità alta',
+            media: 'Affidabilità media',
+            bassa: 'Dati insufficienti - solo indicativo'
+        },
+        spotTypes: {
+            mare: 'Mare',
+            lago: 'Lago',
+            fiume: 'Fiume'
+        },
+        results: {
+            back: 'Modifica meteo',
+            basedOn: 'Calcolato su {count} sessioni registrate nella zona.',
+            modified: 'Valori corretti a mano: {fields}.',
+            noSimilar: 'Nessuna sessione con meteo simile su {count} uscite: punteggio basato sulla media dello spot.',
+            similarSummary: '{count} sessioni con meteo simile: media {avg} catture, {empty}% uscite a vuoto.',
+            farForecast: 'Previsione a più di 3 giorni: vento e onde possono cambiare. Ricontrolla il giorno prima.',
+            disclaimer: 'Il punteggio confronta il meteo con il tuo storico: è un\'indicazione, non una certezza.'
+        },
+        detail: {
+            back: 'Classifica',
+            comparison: 'Confronto con le tue {count} giornate migliori qui',
+            noBest: 'Nessuna uscita con catture e meteo registrato in questo spot.',
+            factor: 'Fattore',
+            forecast: 'Previsto',
+            best: 'Giornate migliori',
+            spotWeather: 'Meteo per questo spot',
+            resetSpot: 'Ripristina',
+            spotWeatherHelp: 'Correggi solo se qui il meteo è diverso dal resto della zona.',
+            whatWorked: 'Cosa ha funzionato con meteo simile',
+            species: 'Specie',
+            baits: 'Esche',
+            bestHours: 'Ore migliori',
+            sessionsUsed: 'Sessioni simili usate per il calcolo',
+            noSessions: 'Nessuna sessione con meteo simile.',
+            catches: '{count} catture',
+            withoutWeather: '{count} uscite escluse perché senza dati meteo.'
+        },
+        zones: {
+            title: 'Zone di pesca',
+            help: 'Raggruppa gli spot vicini (entro 20-30 km) in una zona: avranno lo stesso meteo. Il tipo di spot serve per onde e maree.',
+            placeholder: 'es: Litorale pontino',
+            add: 'Aggiungi zona',
+            empty: 'Nessuna zona creata.',
+            spotCount: '{count} spot',
+            confirmDelete: 'Eliminare la zona "{name}"? Gli spot resteranno senza zona.',
+            spots: 'Spot registrati',
+            noSpots: 'Nessuno spot nelle sessioni registrate.',
+            outings: '{count} uscite',
+            zone: 'Zona',
+            type: 'Tipo',
+            noZone: 'Nessuna zona',
+            done: 'Fatto'
+        }
     }
 }
 

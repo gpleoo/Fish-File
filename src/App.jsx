@@ -4,7 +4,7 @@
  * Tutti i diritti riservati.
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react'
 import 'leaflet/dist/leaflet.css'
 
 // Components
@@ -16,6 +16,7 @@ import ListaGestione from './components/ListaGestione'
 import AnalisiDati from './components/AnalisiDati'
 import SponsorSection from './components/SponsorSection'
 import SettingsPanel from './components/SettingsPanel'
+import PianificaErrorBoundary from './components/pianifica/PianificaErrorBoundary'
 import { useToast } from './components/Toast'
 import { Wrench } from './components/Icons'
 import { useTranslation } from './locales/LanguageContext'
@@ -25,6 +26,10 @@ import { initNativeFeatures, isNative } from './utils/native'
 
 // Weather service
 import { fetchWeatherData } from './utils/weatherService'
+
+// Pianifica uscita (modulo isolato, caricato solo se attivo)
+import { usePianificaAttiva } from './utils/pianifica/storage'
+const PianificaUscita = lazy(() => import('./components/pianifica/PianificaUscita'))
 
 // Ads
 import { useAds } from './contexts/AdContext'
@@ -97,6 +102,9 @@ function App() {
 
     // Ads
     const { showBanner, trackCatch, showSessionEndAd } = useAds()
+
+    // Pianifica uscita (attivabile dalle Impostazioni)
+    const [pianificaAttiva] = usePianificaAttiva()
 
     // State - Sezioni attive
     const [activeSection, setActiveSection] = useState(null)
@@ -502,6 +510,20 @@ function App() {
                         <p className="text-gray-400 text-sm sm:text-base">{t('app.subtitle')}</p>
                         {catture.length > 0 && <p className="text-cyan-400 text-xs sm:text-sm mt-1.5 sm:mt-2">{t('app.catchesSaved', { count: catture.length })}</p>}
                     </div>
+
+                    {/* Pianifica Uscita */}
+                    {pianificaAttiva && (
+                        <PianificaErrorBoundary messaggio={t('planner.unavailable')} etichettaRiprova={t('planner.retry')}>
+                            <Suspense fallback={null}>
+                                <PianificaUscita
+                                    catture={catture}
+                                    sessioniCompletate={sessioniCompletate}
+                                    activeSection={activeSection}
+                                    setActiveSection={setActiveSection}
+                                />
+                            </Suspense>
+                        </PianificaErrorBoundary>
+                    )}
 
                     {/* Sessione di Pesca */}
                     <SessionePesca

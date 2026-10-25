@@ -400,6 +400,112 @@ const es = {
         website: 'Web',
         call: 'Llamar',
         email: 'Email'
+    },
+
+    // Pianifica uscita
+    planner: {
+        title: 'planificar salida',
+        subtitle: 'Encuentra el mejor lugar según el tiempo del día',
+        settingsTitle: 'Planificar salida',
+        settingsDescription: 'Muestra la sección que elige el lugar según el tiempo',
+        unavailable: 'Planificar salida no está disponible ahora. El resto de la app funciona con normalidad.',
+        retry: 'Reintentar',
+        noSessions: 'Registra al menos una sesión de pesca para usar esta función.',
+        setupZones: 'Crea una zona de pesca y asígnale tus lugares para empezar.',
+        manageZones: 'Gestionar zonas',
+        whenWhere: 'Cuándo y dónde',
+        zone: 'Zona',
+        date: 'Fecha',
+        from: 'Desde',
+        to: 'Hasta',
+        spotsInZone: '{count} lugares en esta zona',
+        forecastTitle: 'Previsión',
+        resetForecast: 'Restaurar previsión',
+        forecastHelp: 'Valores de la previsión: corrige los que creas incorrectos.',
+        forecastError: 'Previsión no disponible: introduce los valores a mano.',
+        tidesTitle: 'Mareas',
+        tidesHelp: 'Introduce las horas de pleamar y bajamar del día.',
+        find: 'Encontrar el mejor lugar',
+        loadingHistory: 'Recuperando tiempo histórico... {done}/{total}',
+        origin: {
+            prev: 'PREV',
+            mod: 'MOD',
+            calc: 'CALC'
+        },
+        factors: {
+            tAria: 'Temp. aire',
+            tAcqua: 'Temp. agua',
+            pressione: 'Presión',
+            ventoKn: 'Viento',
+            ventoDir: 'Dirección viento',
+            condizioni: 'Cielo',
+            onde: 'Olas',
+            luna: 'Fase lunar',
+            marea: 'Marea'
+        },
+        tide: {
+            montante: 'Creciente',
+            stanca: 'Repunte (agua quieta)',
+            calante: 'Vaciante',
+            alta1: '1a pleamar',
+            alta2: '2a pleamar',
+            bassa1: '1a bajamar',
+            bassa2: '2a bajamar'
+        },
+        reliability: {
+            alta: 'Fiabilidad alta',
+            media: 'Fiabilidad media',
+            bassa: 'Datos insuficientes - solo orientativo'
+        },
+        spotTypes: {
+            mare: 'Mar',
+            lago: 'Lago',
+            fiume: 'Río'
+        },
+        results: {
+            back: 'Modificar tiempo',
+            basedOn: 'Calculado sobre {count} sesiones registradas en la zona.',
+            modified: 'Valores corregidos a mano: {fields}.',
+            noSimilar: 'Ninguna sesión con tiempo similar en {count} salidas: puntuación basada en la media del lugar.',
+            similarSummary: '{count} sesiones con tiempo similar: media {avg} capturas, {empty}% salidas sin capturas.',
+            farForecast: 'Previsión a más de 3 días: viento y olas pueden cambiar. Vuelve a comprobar el día antes.',
+            disclaimer: 'La puntuación compara el tiempo con tu historial: es una indicación, no una certeza.'
+        },
+        detail: {
+            back: 'Clasificación',
+            comparison: 'Comparación con tus {count} mejores días aquí',
+            noBest: 'Ninguna salida con capturas y tiempo registrado en este lugar.',
+            factor: 'Factor',
+            forecast: 'Previsto',
+            best: 'Mejores días',
+            spotWeather: 'Tiempo para este lugar',
+            resetSpot: 'Restaurar',
+            spotWeatherHelp: 'Corrige solo si aquí el tiempo es distinto del resto de la zona.',
+            whatWorked: 'Qué funcionó con tiempo similar',
+            species: 'Especies',
+            baits: 'Cebos',
+            bestHours: 'Mejores horas',
+            sessionsUsed: 'Sesiones similares usadas',
+            noSessions: 'Ninguna sesión con tiempo similar.',
+            catches: '{count} capturas',
+            withoutWeather: '{count} salidas excluidas por falta de datos meteo.'
+        },
+        zones: {
+            title: 'Zonas de pesca',
+            help: 'Agrupa los lugares cercanos (20-30 km) en una zona: tendrán el mismo tiempo. El tipo de lugar sirve para olas y mareas.',
+            placeholder: 'ej: Costa pontina',
+            add: 'Añadir zona',
+            empty: 'Ninguna zona creada.',
+            spotCount: '{count} lugares',
+            confirmDelete: '¿Eliminar la zona "{name}"? Sus lugares quedarán sin zona.',
+            spots: 'Lugares registrados',
+            noSpots: 'Ningún lugar en las sesiones registradas.',
+            outings: '{count} salidas',
+            zone: 'Zona',
+            type: 'Tipo',
+            noZone: 'Sin zona',
+            done: 'Hecho'
+        }
     }
 }
 

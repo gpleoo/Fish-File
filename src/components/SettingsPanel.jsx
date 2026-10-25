@@ -13,6 +13,7 @@ import {
     saveToGoogleDrive,
     saveToDropbox
 } from '../utils/backupService'
+import { usePianificaAttiva } from '../utils/pianifica/storage'
 
 // Privacy Policy URL - Replace with your actual URL when available
 const PRIVACY_POLICY_URL = 'https://gpleoo.github.io/Fish-File/privacy-policy.html'
@@ -48,6 +49,7 @@ const SettingsPanel = ({ onDataRestored }) => {
         return localStorage.getItem('consent_microphone') === 'true'
     })
     const [microphoneBlocked, setMicrophoneBlocked] = useState(false)
+    const [pianificaAttiva, setPianificaAttiva] = usePianificaAttiva()
     const [locationBlocked, setLocationBlocked] = useState(false)
 
     // Check actual browser permission state when panel opens
@@ -778,6 +780,29 @@ const SettingsPanel = ({ onDataRestored }) => {
                                     <p className="text-gray-500 text-xs mt-2 text-center">{t('settings.installHint')}</p>
                                 </div>
                             )}
+
+                            {/* Pianifica Uscita */}
+                            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex-1 mr-4">
+                                        <p className="text-cyan-400 font-semibold text-sm">{t('planner.settingsTitle')}</p>
+                                        <p className="text-gray-500 text-xs mt-0.5">{t('planner.settingsDescription')}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setPianificaAttiva(!pianificaAttiva)}
+                                        role="switch"
+                                        aria-checked={pianificaAttiva}
+                                        aria-label={t('planner.settingsTitle')}
+                                        className={`relative w-14 h-8 rounded-full transition-all duration-300 flex-shrink-0 ${
+                                            pianificaAttiva ? 'bg-green-500 shadow-lg shadow-green-500/30' : 'bg-gray-600'
+                                        }`}
+                                    >
+                                        <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300 ${
+                                            pianificaAttiva ? 'left-7' : 'left-1'
+                                        }`} />
+                                    </button>
+                                </div>
+                            </div>
 
                             {/* Privacy Section */}
                             <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
