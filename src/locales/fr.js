@@ -400,6 +400,113 @@ const fr = {
         website: 'Site',
         call: 'Appeler',
         email: 'Email'
+    },
+
+    // Pianifica uscita
+    planner: {
+        title: 'planifier une sortie',
+        subtitle: 'Trouvez le meilleur spot selon la météo du jour',
+        settingsTitle: 'Planifier une sortie',
+        settingsDescription: 'Affiche la section qui choisit le spot selon la météo',
+        unavailable: 'Planifier une sortie n\'est pas disponible pour le moment. Le reste de l\'app fonctionne normalement.',
+        retry: 'Réessayer',
+        noSessions: 'Enregistrez au moins une session de pêche pour utiliser cette fonction.',
+        setupZones: 'Créez une zone de pêche et assignez-lui vos spots pour commencer.',
+        manageZones: 'Gérer les zones',
+        whenWhere: 'Quand et où',
+        zone: 'Zone',
+        date: 'Date',
+        from: 'De',
+        to: 'À',
+        spotsInZone: '{count} spots dans cette zone',
+        forecastTitle: 'Prévisions',
+        resetForecast: 'Rétablir les prévisions',
+        forecastHelp: 'Valeurs issues des prévisions : corrigez celles qui vous semblent fausses.',
+        forecastError: 'Prévisions indisponibles : saisissez les valeurs à la main.',
+        tidesTitle: 'Marées',
+        tidesHelp: 'Saisissez les heures de pleine et basse mer du jour.',
+        find: 'Trouver le meilleur spot',
+        loadingHistory: 'Récupération de la météo passée... {done}/{total}',
+        origin: {
+            prev: 'PRÉV',
+            mod: 'MOD',
+            calc: 'CALC'
+        },
+        factors: {
+            tAria: 'Temp. air',
+            tAcqua: 'Temp. eau',
+            pressione: 'Pression',
+            ventoKn: 'Vent',
+            ventoDir: 'Direction du vent',
+            condizioni: 'Ciel',
+            onde: 'Vagues',
+            luna: 'Phase lunaire',
+            marea: 'Marée'
+        },
+        tide: {
+            montante: 'Montante',
+            stanca: 'Étale (eau calme)',
+            calante: 'Descendante',
+            alta1: '1re pleine mer',
+            alta2: '2e pleine mer',
+            bassa1: '1re basse mer',
+            bassa2: '2e basse mer'
+        },
+        reliability: {
+            alta: 'Fiabilité élevée',
+            media: 'Fiabilité moyenne',
+            bassa: 'Données insuffisantes - indicatif'
+        },
+        spotTypes: {
+            mare: 'Mer',
+            lago: 'Lac',
+            fiume: 'Rivière'
+        },
+        results: {
+            fewDataGroup: 'Spots avec peu de données similaires (indicatif, score peu fiable) :',
+            back: 'Modifier la météo',
+            basedOn: 'Calculé sur {count} sessions enregistrées dans la zone.',
+            modified: 'Valeurs corrigées à la main : {fields}.',
+            noSimilar: 'Aucune session avec une météo similaire sur {count} sorties : score basé sur la moyenne du spot.',
+            similarSummary: '{count} sessions avec une météo similaire : moyenne {avg} prises, {empty}% sorties bredouilles.',
+            farForecast: 'Prévision à plus de 3 jours : vent et vagues peuvent changer. Revérifiez la veille.',
+            disclaimer: 'Le score compare la météo avec votre historique : c\'est une indication, pas une certitude.'
+        },
+        detail: {
+            back: 'Classement',
+            comparison: 'Comparaison avec vos {count} meilleures journées ici',
+            noBest: 'Aucune sortie avec prises et météo enregistrée sur ce spot.',
+            factor: 'Facteur',
+            forecast: 'Prévu',
+            best: 'Meilleures journées',
+            spotWeather: 'Météo pour ce spot',
+            resetSpot: 'Rétablir',
+            spotWeatherHelp: 'Corrigez seulement si la météo ici diffère du reste de la zone.',
+            whatWorked: 'Ce qui a marché avec une météo similaire',
+            species: 'Espèces',
+            baits: 'Appâts',
+            bestHours: 'Meilleures heures',
+            sessionsUsed: 'Sessions similaires utilisées',
+            noSessions: 'Aucune session avec une météo similaire.',
+            catches: '{count} prises',
+            withoutWeather: '{count} sorties exclues faute de données météo.'
+        },
+        zones: {
+            title: 'Zones de pêche',
+            help: 'Regroupez les spots proches (20-30 km) dans une zone : ils partageront la même météo. Le type de spot sert pour les vagues et les marées.',
+            placeholder: 'ex : Côte pontine',
+            add: 'Ajouter une zone',
+            empty: 'Aucune zone créée.',
+            spotCount: '{count} spots',
+            confirmDelete: 'Supprimer la zone "{name}" ? Ses spots n\'auront plus de zone.',
+            spots: 'Spots enregistrés',
+            noSpots: 'Aucun spot dans les sessions enregistrées.',
+            outings: '{count} sorties',
+            zone: 'Zone',
+            type: 'Type',
+            noZone: 'Aucune zone',
+            done: 'Terminé'
+        }
     }
 }
 

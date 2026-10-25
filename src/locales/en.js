@@ -420,6 +420,113 @@ const en = {
         website: 'Website',
         call: 'Call',
         email: 'Email'
+    },
+
+    // Pianifica uscita
+    planner: {
+        title: 'plan a trip',
+        subtitle: 'Find the best spot for the day\'s weather',
+        settingsTitle: 'Plan a trip',
+        settingsDescription: 'Show the section that picks a spot based on the weather',
+        unavailable: 'Plan a trip is not available right now. The rest of the app works normally.',
+        retry: 'Retry',
+        noSessions: 'Record at least one fishing session to use this feature.',
+        setupZones: 'Create a fishing zone and assign your spots to it to get started.',
+        manageZones: 'Manage zones',
+        whenWhere: 'When and where',
+        zone: 'Zone',
+        date: 'Date',
+        from: 'From',
+        to: 'To',
+        spotsInZone: '{count} spots in this zone',
+        forecastTitle: 'Forecast',
+        resetForecast: 'Reset forecast',
+        forecastHelp: 'Values from the forecast: correct the ones you think are wrong.',
+        forecastError: 'Forecast not available: enter the values manually.',
+        tidesTitle: 'Tides',
+        tidesHelp: 'Enter the high and low tide times for the day.',
+        find: 'Find the best spot',
+        loadingHistory: 'Fetching past weather... {done}/{total}',
+        origin: {
+            prev: 'FCST',
+            mod: 'EDIT',
+            calc: 'CALC'
+        },
+        factors: {
+            tAria: 'Air temp.',
+            tAcqua: 'Water temp.',
+            pressione: 'Pressure',
+            ventoKn: 'Wind',
+            ventoDir: 'Wind direction',
+            condizioni: 'Sky',
+            onde: 'Waves',
+            luna: 'Moon phase',
+            marea: 'Tide'
+        },
+        tide: {
+            montante: 'Rising',
+            stanca: 'Slack water',
+            calante: 'Falling',
+            alta1: '1st high',
+            alta2: '2nd high',
+            bassa1: '1st low',
+            bassa2: '2nd low'
+        },
+        reliability: {
+            alta: 'High reliability',
+            media: 'Medium reliability',
+            bassa: 'Not enough data - indicative only'
+        },
+        spotTypes: {
+            mare: 'Sea',
+            lago: 'Lake',
+            fiume: 'River'
+        },
+        results: {
+            fewDataGroup: 'Spots with little similar data (indicative only, score not reliable):',
+            back: 'Edit weather',
+            basedOn: 'Based on {count} sessions recorded in the zone.',
+            modified: 'Manually corrected: {fields}.',
+            noSimilar: 'No session with similar weather out of {count} trips: score based on the spot average.',
+            similarSummary: '{count} sessions with similar weather: average {avg} catches, {empty}% blank trips.',
+            farForecast: 'Forecast more than 3 days ahead: wind and waves may change. Check again the day before.',
+            disclaimer: 'The score compares the weather with your history: it is a hint, not a certainty.'
+        },
+        detail: {
+            back: 'Ranking',
+            comparison: 'Compared with your {count} best days here',
+            noBest: 'No trip with catches and recorded weather at this spot.',
+            factor: 'Factor',
+            forecast: 'Forecast',
+            best: 'Best days',
+            spotWeather: 'Weather for this spot',
+            resetSpot: 'Reset',
+            spotWeatherHelp: 'Correct only if the weather here differs from the rest of the zone.',
+            whatWorked: 'What worked with similar weather',
+            species: 'Species',
+            baits: 'Baits',
+            bestHours: 'Best hours',
+            sessionsUsed: 'Similar sessions used',
+            noSessions: 'No session with similar weather.',
+            catches: '{count} catches',
+            withoutWeather: '{count} trips excluded for missing weather data.'
+        },
+        zones: {
+            title: 'Fishing zones',
+            help: 'Group nearby spots (within 20-30 km) into a zone: they will share the same weather. The spot type is used for waves and tides.',
+            placeholder: 'e.g. Pontine coast',
+            add: 'Add zone',
+            empty: 'No zones created.',
+            spotCount: '{count} spots',
+            confirmDelete: 'Delete zone "{name}"? Its spots will have no zone.',
+            spots: 'Recorded spots',
+            noSpots: 'No spots in recorded sessions.',
+            outings: '{count} trips',
+            zone: 'Zone',
+            type: 'Type',
+            noZone: 'No zone',
+            done: 'Done'
+        }
     }
 }
 
