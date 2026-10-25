@@ -457,6 +457,11 @@ const es = {
             media: 'Fiabilidad media',
             bassa: 'Datos insuficientes - solo orientativo'
         },
+        prey: {
+            fromSimilar: 'Capturas y cebos con tiempo similar:',
+            fromSpot: 'Capturas y cebos en general en este lugar:',
+            withBait: 'con'
+        },
         spotTypes: {
             mare: 'Mar',
             lago: 'Lago',
@@ -482,7 +487,7 @@ const es = {
             spotWeather: 'Tiempo para este lugar',
             resetSpot: 'Restaurar',
             spotWeatherHelp: 'Corrige solo si aquí el tiempo es distinto del resto de la zona.',
-            whatWorked: 'Qué funcionó con tiempo similar',
+            whatWorked: 'Capturas y cebos',
             species: 'Especies',
             baits: 'Cebos',
             bestHours: 'Mejores horas',

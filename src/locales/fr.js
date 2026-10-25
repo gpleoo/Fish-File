@@ -457,6 +457,11 @@ const fr = {
             media: 'Fiabilité moyenne',
             bassa: 'Données insuffisantes - indicatif'
         },
+        prey: {
+            fromSimilar: 'Prises et appâts avec une météo similaire :',
+            fromSpot: 'Prises et appâts en général sur ce spot :',
+            withBait: 'avec'
+        },
         spotTypes: {
             mare: 'Mer',
             lago: 'Lac',
@@ -482,7 +487,7 @@ const fr = {
             spotWeather: 'Météo pour ce spot',
             resetSpot: 'Rétablir',
             spotWeatherHelp: 'Corrigez seulement si la météo ici diffère du reste de la zone.',
-            whatWorked: 'Ce qui a marché avec une météo similaire',
+            whatWorked: 'Prises et appâts',
             species: 'Espèces',
             baits: 'Appâts',
             bestHours: 'Meilleures heures',

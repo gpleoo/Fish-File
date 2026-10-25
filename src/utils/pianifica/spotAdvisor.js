@@ -418,6 +418,12 @@ const topConteggi = (valori, n = 3) => {
         .map(([nome, numero]) => ({ nome, numero }))
 }
 
+/** Specie piu' catturate, ognuna con l'esca che ha reso di piu' per quella specie */
+const predeConEsca = (catture, n = 3) => topConteggi(catture.map(c => c.specie), n).map(({ nome, numero }) => {
+    const esca = topConteggi(catture.filter(c => c.specie === nome).map(c => c.esca), 1)[0]
+    return { specie: nome, numero, esca: esca ? esca.nome : null }
+})
+
 /** Fascia di due ore con piu' catture (servono almeno 3 catture con orario) */
 const fasciaMigliore = (catture) => {
     const ore = catture.map(c => parseOra(c.ora)).filter(m => m !== null).map(m => Math.floor(m / 60))
@@ -543,6 +549,8 @@ export const valutaSpot = ({ uscite, spot, previsto, correzioniSpot = {}, finest
         const simili = valutate.filter(v => v.sim >= SIM_SIMILE).sort((a, b) => b.sim - a.sim)
         const cattureSimili = simili.flatMap(v => v.uscita.catture)
         const nSimili = simili.length
+        // Prede ed esche: dalle sessioni con meteo simile, altrimenti da tutto lo storico dello spot
+        const catturePrede = cattureSimili.length ? cattureSimili : usciteSpot.flatMap(u => u.catture)
         const affidabilita = nSimili >= SIMILI_AFFIDABILITA_ALTA ? 'alta'
             : nSimili >= SIMILI_AFFIDABILITA_MEDIA ? 'media' : 'bassa'
 
@@ -560,6 +568,11 @@ export const valutaSpot = ({ uscite, spot, previsto, correzioniSpot = {}, finest
             percVuote: nSimili ? simili.filter(v => v.uscita.numeroCatture === 0).length / nSimili : null,
             specie: topConteggi(cattureSimili.map(c => c.specie)),
             esche: topConteggi(cattureSimili.map(c => c.esca)),
+            prede: {
+                fonte: cattureSimili.length ? 'simili' : 'spot',
+                elenco: predeConEsca(catturePrede),
+                esche: topConteggi(catturePrede.map(c => c.esca))
+            },
             fasciaMigliore: fasciaMigliore(cattureSimili),
             confronto: confrontoMigliori(previstoSpot, usciteSpot, mare),
             sessioniSimili: simili.slice(0, 10).map(v => ({

@@ -476,6 +476,11 @@ const it = {
             media: 'Affidabilità media',
             bassa: 'Dati insufficienti - solo indicativo'
         },
+        prey: {
+            fromSimilar: 'Prede ed esche con meteo simile:',
+            fromSpot: 'Prede ed esche in generale su questo spot:',
+            withBait: 'con'
+        },
         spotTypes: {
             mare: 'Mare',
             lago: 'Lago',
@@ -501,7 +506,7 @@ const it = {
             spotWeather: 'Meteo per questo spot',
             resetSpot: 'Ripristina',
             spotWeatherHelp: 'Correggi solo se qui il meteo è diverso dal resto della zona.',
-            whatWorked: 'Cosa ha funzionato con meteo simile',
+            whatWorked: 'Prede ed esche',
             species: 'Specie',
             baits: 'Esche',
             bestHours: 'Ore migliori',

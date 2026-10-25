@@ -477,6 +477,11 @@ const en = {
             media: 'Medium reliability',
             bassa: 'Not enough data - indicative only'
         },
+        prey: {
+            fromSimilar: 'Catches and baits with similar weather:',
+            fromSpot: 'Catches and baits overall at this spot:',
+            withBait: 'with'
+        },
         spotTypes: {
             mare: 'Sea',
             lago: 'Lake',
@@ -502,7 +507,7 @@ const en = {
             spotWeather: 'Weather for this spot',
             resetSpot: 'Reset',
             spotWeatherHelp: 'Correct only if the weather here differs from the rest of the zone.',
-            whatWorked: 'What worked with similar weather',
+            whatWorked: 'Catches and baits',
             species: 'Species',
             baits: 'Baits',
             bestHours: 'Best hours',

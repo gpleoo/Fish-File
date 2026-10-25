@@ -34,6 +34,32 @@ const Card = ({ children, onClick }) => (
     </div>
 )
 
+/** Prede con l'esca che ha reso di piu', o null se lo spot non ha catture */
+const Prede = ({ prede, compatto = false }) => {
+    const { t } = useTranslation()
+    if (!prede || prede.elenco.length === 0) return null
+    return (
+        <div className={compatto ? 'mt-1.5' : ''}>
+            <p className="text-gray-400 text-xs">
+                {t(prede.fonte === 'simili' ? 'planner.prey.fromSimilar' : 'planner.prey.fromSpot')}
+            </p>
+            <ul className="text-gray-200 text-xs">
+                {prede.elenco.map(p => (
+                    <li key={p.specie}>
+                        {p.specie} ({p.numero}){p.esca && <span className="text-gray-400"> {t('planner.prey.withBait')} </span>}{p.esca}
+                    </li>
+                ))}
+            </ul>
+            {!compatto && prede.esche.length > 0 && (
+                <p className="text-gray-200 text-xs mt-1">
+                    <span className="text-gray-400">{t('planner.detail.baits')}: </span>
+                    {prede.esche.map(e => `${e.nome} (${e.numero})`).join(', ')}
+                </p>
+            )}
+        </div>
+    )
+}
+
 const Motivazione = ({ r }) => {
     const { t } = useTranslation()
     if (r.nSimili === 0) {
@@ -78,6 +104,7 @@ export const ClassificaSpot = ({ classifica, onApri, onIndietro, nSessioni, modi
                                     <div className={`h-full rounded ${insufficiente ? 'bg-gray-500' : 'bg-cyan-500'}`} style={{ width: `${r.punteggio}%` }} />
                                 </div>
                                 <Motivazione r={r} />
+                                <Prede prede={r.prede} compatto />
                                 <p className={`text-xs mt-1 ${COLORI_AFFIDABILITA[r.affidabilita]}`}>
                                     {t(`planner.reliability.${r.affidabilita}`)}
                                 </p>
@@ -169,23 +196,12 @@ export const DettaglioSpot = ({ risultato: r, correzioni, onCorreggi, onRipristi
                 ))}
             </Card>
 
-            {r.nSimili > 0 && (
+            {r.prede.elenco.length > 0 && (
                 <Card>
                     <h4 className="text-cyan-400 font-semibold text-sm mb-2">{t('planner.detail.whatWorked')}</h4>
-                    {r.specie.length > 0 && (
-                        <p className="text-gray-200 text-xs mb-1">
-                            <span className="text-gray-400">{t('planner.detail.species')}: </span>
-                            {r.specie.map(s => `${s.nome} (${s.numero})`).join(', ')}
-                        </p>
-                    )}
-                    {r.esche.length > 0 && (
-                        <p className="text-gray-200 text-xs mb-1">
-                            <span className="text-gray-400">{t('planner.detail.baits')}: </span>
-                            {r.esche.map(s => `${s.nome} (${s.numero})`).join(', ')}
-                        </p>
-                    )}
+                    <Prede prede={r.prede} />
                     {r.fasciaMigliore && (
-                        <p className="text-gray-200 text-xs">
+                        <p className="text-gray-200 text-xs mt-1">
                             <span className="text-gray-400">{t('planner.detail.bestHours')}: </span>
                             {r.fasciaMigliore.da} - {r.fasciaMigliore.a}
                         </p>
